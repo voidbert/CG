@@ -14,19 +14,19 @@
 
 # CONFIGURATION VARIABLES
 
-CPP             := g++
-CFLAGS          := -Iinclude -std=c++17 -Wall -Wextra -pedantic -Wshadow \
+CPP    := g++
+CFLAGS := -Iinclude -std=c++17 -Wall -Wextra -pedantic -Wshadow \
 			$(shell pkg-config --cflags glfw3) \
 			$(shell pkg-config --cflags glm) \
 			$(shell pkg-config --cflags gl)
-LIBS            := -lm \
+LIBS := -lm \
 		   $(shell pkg-config --libs glfw3) \
 		   $(shell pkg-config --libs glm) \
 		   $(shell pkg-config --libs gl)
 
-DEBUG_CFLAGS    := -O0 -ggdb3
-RELEASE_CFLAGS  := -O2
-PROFILE_CFLAGS  := -O2 -ggdb3
+DEBUG_CFLAGS   := -O0 -ggdb3
+RELEASE_CFLAGS := -O2
+PROFILE_CFLAGS := -O2 -ggdb3
 
 # Note: none of these directories can be the root of the project
 # Also, these may need to be synced with the ones in .gitignore
