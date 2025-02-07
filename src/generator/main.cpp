@@ -12,25 +12,13 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <filesystem>
 #include <iostream>
 
-#include "engine/main.hpp"
-#include "generator/main.hpp"
+namespace generator {
 
 int main(int argc, char **argv) {
-    if (argc < 1) {
-        std::cerr << "Not enough arguments (program name not provided)" << std::endl;
-        return 1;
-    }
+    std::cout << "I am the generator!" << std::endl;
+    return 1;
+}
 
-    std::string programName = std::filesystem::path(argv[0]).filename();
-    if (programName == "engine") {
-        return engine::main(argc, argv);
-    } else if (programName == "generator") {
-        return generator::main(argc, argv);
-    } else {
-        std::cerr << "Unknown program name: " << programName << std::endl;
-        return 1;
-    }
 }

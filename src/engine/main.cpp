@@ -12,25 +12,31 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <filesystem>
-#include <iostream>
+#include <GLFW/glfw3.h>
 
-#include "engine/main.hpp"
-#include "generator/main.hpp"
+namespace engine {
 
 int main(int argc, char **argv) {
-    if (argc < 1) {
-        std::cerr << "Not enough arguments (program name not provided)" << std::endl;
-        return 1;
+    if (!glfwInit())
+        return -1;
+
+    /* Create a windowed mode window and its OpenGL context */
+    GLFWwindow *window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+        return -1;
     }
 
-    std::string programName = std::filesystem::path(argv[0]).filename();
-    if (programName == "engine") {
-        return engine::main(argc, argv);
-    } else if (programName == "generator") {
-        return generator::main(argc, argv);
-    } else {
-        std::cerr << "Unknown program name: " << programName << std::endl;
-        return 1;
+    glfwMakeContextCurrent(window);
+    while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
+
+    glfwTerminate();
+    return 0;
+}
+
 }
