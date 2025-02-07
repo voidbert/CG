@@ -14,7 +14,7 @@ jobs:
 
             # Don't fail on empty include (not tracked by git)
             - run: if ! [ -d include ]; then mkdir include; fi
-            - run: apt update && apt install -y libglfw3-dev libglm-dev libgl-dev
+            - run: sudo apt update && sudo apt install -y libglfw3-dev libglm-dev libgl-dev
             - run: make
     format:
         runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
 
             # clang-format doesn't come with act's local images. This is just for testing, as
             # scripts contain
-            - run:  apt update && apt -y install cppcheck
+            - run: sudo apt update && sudo apt -y install cppcheck
 
             # Don't fail on empty include (not tracked by git)
             - run: if ! [ -d include ]; then mkdir include; fi
