@@ -1,11 +1,10 @@
 # CONFIGURATION VARIABLES
 
-CC              := g++
-CFLAGS          := -Wall -Wextra -pedantic -Wshadow \
+CPP             := g++
+CFLAGS          := -Iinclude -std=c++17 -Wall -Wextra -pedantic -Wshadow \
 			$(shell pkg-config --cflags glfw3) \
 			$(shell pkg-config --cflags glm) \
-			$(shell pkg-config --cflags gl) \
-STANDARDS       := -std=c++17
+			$(shell pkg-config --cflags gl)
 LIBS            := -lm \
 		   $(shell pkg-config --libs glfw3) \
 		   $(shell pkg-config --libs glm) \
@@ -30,7 +29,7 @@ PREFIX ?= $(HOME)/.local
 
 SOURCES = $(shell find "src" -name '*.cpp' -type f)
 OBJECTS = $(patsubst src/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
-HEADERS = $(shell find "include" -name '*.h' -type f)
+HEADERS = $(shell find "include" -name '*.hpp' -type f)
 DEPENDS = $(patsubst src/%.cpp, $(DEPDIR)/%.d, $(SOURCES))
 REPORTS = $(patsubst reports/%.tex, %.pdf, $(shell find reports -name '*.tex' -type f))
 
@@ -44,7 +43,6 @@ else
 	CFLAGS += $(RELEASE_CFLAGS)
 	BUILD_TYPE = RELEASE
 endif
-CFLAGS += $(STANDARDS)
 
 # Only generate dependencies for tasks that require them
 # THIS WILL NOT WORK IF YOU TRY TO MAKE AN INDIVIDUAL FILE
@@ -60,7 +58,6 @@ else
 	INCLUDE_DEPENDS = N
 endif
 
-# Automatic testing system requires the default rule to also build the test :-(
 default: $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME)
 report: $(REPORTS)
 all: $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME) $(DOCSDIR) $(REPORTS)
@@ -69,32 +66,18 @@ ifeq (Y, $(INCLUDE_DEPENDS))
 include $(DEPENDS)
 endif
 
-# Welcome to our unorthodox meta-programming Makefile! To get auto-dependency generation working,
-# this code is unusual for a Makefile, but hey, it works!
-#
-# To compile a source file, a makefile rule is generated with $(CC) -MM, to account for header
-# dependencies. The commands that actually compile the source are added to that rule file before
-# its included. A script is also run in the end of the generated rule's execution, to regenerate
-# that same rule with any dependency change that may have occurred.
 $(DEPDIR)/%.d: src/%.cpp Makefile
-	$(eval OBJ := $(patsubst src/%.cpp, $(OBJDIR)/%.o, $<))
+	@mkdir -p $$(dirname $@)
+	$(CPP) -MM $< -MF $@ $(CFLAGS)
 
-	$(eval RULE_CMD_MKDIR = @mkdir -p $(shell dirname $(OBJ)))
-	$(eval RULE_CMD_CC = $(CC) -MMD -MT "$(OBJ)" -MF $@2 -c -o $(OBJ) $< $(CFLAGS))
-	$(eval RULE_CMD_SCRIPT = @./scripts/makefilehelper.sh $@)
-
-	@# Create the dependency file for the first time, adding all the commands.
-	@mkdir -p $(shell dirname $@)
-	$(CC) -MM $< -MT $(OBJ) -MF $@ $(CFLAGS)
-
-	@printf "\t%s\n" "$(RULE_CMD_MKDIR)" >> $@
-	@printf "\t%s\n" "$(RULE_CMD_CC)" >> $@
-	@printf "\t%s\n" "$(RULE_CMD_SCRIPT)" >> $@
+$(OBJDIR)/%.o: src/%.cpp
+	@mkdir -p $$(dirname $@)
+	$(CPP) -MMD -MF $(patsubst src/%.cpp, $(DEPDIR)/%.d, $<) -c $< -o $@ $(CFLAGS)
 
 $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME) $(BUILDDIR)/build_type: $(OBJECTS)
 	@mkdir -p $(BUILDDIR)
 	@echo $(BUILD_TYPE) > $(BUILDDIR)/build_type
-	$(CC) -o $(BUILDDIR)/cgmain $^ $(LIBS)
+	$(CPP) -o $(BUILDDIR)/cgmain $^ $(LIBS)
 	@ln -s cgmain $(BUILDDIR)/$(ENGINE_EXENAME) 2> /dev/null ; true
 	@ln -s cgmain $(BUILDDIR)/$(GENERATOR_EXENAME) 2> /dev/null ; true
 
