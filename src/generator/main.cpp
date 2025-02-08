@@ -12,9 +12,10 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <cmath>
 #include <iostream>
 #include <sstream>
-#include <cmath>
+
 #include "utils/utils.hpp"
 
 namespace generator {
@@ -74,16 +75,14 @@ int main(int argc, char **argv) {
                 std::cerr << "<file3d> should end with the '.3d' extension\n";
                 return 1;
             }
-            //generatePlane(length,divisions,file3d)
-        }
-        else {
+            // generatePlane(length,divisions,file3d)
+        } else {
             std::cerr << "Wrong number of arguments\n\n";
             std::cerr << "Try this:\n";
             std::cerr << "  generator plane <length> <divisions> <file3d>\n";
             return 1;
         }
-    }
-    else if (graphical_primitive == "box") {
+    } else if (graphical_primitive == "box") {
         if (argc == 5) {
             std::stringstream ss1(argv[2]);
             float length;
@@ -137,16 +136,14 @@ int main(int argc, char **argv) {
                 std::cerr << "<file3d> should end with the '.3d' extension\n";
                 return 1;
             }
-            //generateBox(length,grid,file3d)
-        }
-        else {
+            // generateBox(length,grid,file3d)
+        } else {
             std::cerr << "Wrong number of arguments\n\n";
             std::cerr << "Try this:\n";
             std::cerr << "  generator box <length> <grid> <file3d>\n";
             return 1;
         }
-    }
-    else if (graphical_primitive == "sphere") {
+    } else if (graphical_primitive == "sphere") {
         if (argc == 6) {
             std::stringstream ss1(argv[2]);
             float radius;
@@ -198,16 +195,14 @@ int main(int argc, char **argv) {
                 std::cerr << "<file3d> should end with the '.3d' extension\n";
                 return 1;
             }
-            //generateSphere(radius,slices,stacks,file3d)
-        }
-        else {
+            // generateSphere(radius,slices,stacks,file3d)
+        } else {
             std::cerr << "Wrong number of arguments\n\n";
             std::cerr << "Try this:\n";
             std::cerr << "  generator sphere <radius> <slices> <stacks> <file3d>\n";
             return 1;
         }
-    }
-    else if (graphical_primitive == "cone") {
+    } else if (graphical_primitive == "cone") {
         if (argc == 7) {
             std::stringstream ss1(argv[2]);
             float radius;
@@ -281,17 +276,16 @@ int main(int argc, char **argv) {
                 std::cerr << "<file3d> should end with the '.3d' extension\n";
                 return 1;
             }
-            //generateCone(radius,height,slices,stacks,file3d)
-        }
-        else {
+            // generateCone(radius,height,slices,stacks,file3d)
+        } else {
             std::cerr << "Wrong number of arguments\n\n";
             std::cerr << "Try this:\n";
             std::cerr << "  generator cone <radius> <height> <slices> <stacks> <file3d>\n";
             return 1;
         }
-    }
-    else {
-        std::cerr << "Graphical primitive '" << graphical_primitive << "' has not been implemented\n\n";
+    } else {
+        std::cerr << "Graphical primitive '" << graphical_primitive
+                  << "' has not been implemented\n\n";
         std::cerr << "The program generator supports the following commands:\n";
         std::cerr << "  generator plane <length> <divisions> <file3d>\n";
         std::cerr << "  generator box <length> <grid> <file3d>\n";

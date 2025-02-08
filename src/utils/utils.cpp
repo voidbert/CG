@@ -12,14 +12,16 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <fstream>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <sstream>
-#include <fstream>
 #include <string>
 #include <vector>
-#include <glm/glm.hpp>
 
-void readObjFile (const std::string& filename, std::vector<glm::vec4>& vertices, std::vector<std::vector<int>>& faces) {
+void readObjFile(const std::string &filename,
+                 std::vector<glm::vec4> &vertices,
+                 std::vector<std::vector<int>> &faces) {
     std::ifstream file(filename);
     if (!file) {
         std::cerr << "Erro ao abrir o arquivo para leitura: " << filename << "\n";
@@ -36,8 +38,7 @@ void readObjFile (const std::string& filename, std::vector<glm::vec4>& vertices,
             float x, y, z, w;
             ss >> x >> y >> z >> w;
             vertices.push_back(glm::vec4(x, y, z, w));
-        }
-        else if (type == "f") {
+        } else if (type == "f") {
             std::vector<int> face;
             int index;
             while (ss >> index) {
@@ -49,17 +50,19 @@ void readObjFile (const std::string& filename, std::vector<glm::vec4>& vertices,
     file.close();
 }
 
-void writeObjFile (const std::string& filename, const std::vector<glm::vec4>& vertices, const std::vector<std::vector<int>>& faces) {
+void writeObjFile(const std::string &filename,
+                  const std::vector<glm::vec4> &vertices,
+                  const std::vector<std::vector<int>> &faces) {
     std::ofstream file(filename, std::ios::out | std::ios::trunc);
     if (!file.is_open()) {
         std::cerr << "Erro ao abrir o arquivo para escrita: " << filename << "\n";
         return;
     }
-    for (const auto& v : vertices) {
+    for (const auto &v : vertices) {
         file << "v " << v.x << " " << v.y << " " << v.z << " " << v.w << "\n";
     }
 
-    for (const auto& f : faces) {
+    for (const auto &f : faces) {
         file << "f";
         for (int idx : f) {
             file << " " << (idx + 1); // 0-based index to 1-based index

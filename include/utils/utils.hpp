@@ -15,10 +15,14 @@
 #ifndef ENGINE_MAIN_HPP
 #define ENGINE_MAIN_HPP
 
-#include <vector>
 #include <glm/glm.hpp>
+#include <vector>
 
-void readObjFile (const std::string& filename, std::vector<glm::vec4>& vertices, std::vector<std::vector<int>>& faces);
-void writeObjFile (const std::string& filename, const std::vector<glm::vec4>& vertices, const std::vector<std::vector<int>>& faces);
+void readObjFile(const std::string &filename,
+                 std::vector<glm::vec4> &vertices,
+                 std::vector<std::vector<int>> &faces);
+void writeObjFile(const std::string &filename,
+                  const std::vector<glm::vec4> &vertices,
+                  const std::vector<std::vector<int>> &faces);
 
 #endif
