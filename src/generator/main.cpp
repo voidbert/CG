@@ -15,6 +15,7 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include "utils/utils.hpp"
 
 namespace generator {
 
@@ -66,6 +67,13 @@ int main(int argc, char **argv) {
                 return 1;
             }
             std::string file3d = argv[4];
+            if (!(file3d.size() >= 3 && file3d.compare(file3d.size() - 3, 3, ".3d") == 0)) {
+                std::cerr << "Invalid command\n\n";
+                std::cerr << "In the command:\n";
+                std::cerr << "  generator plane <length> <divisions> <file3d>\n";
+                std::cerr << "<file3d> should end with the '.3d' extension\n";
+                return 1;
+            }
             //generatePlane(length,divisions,file3d)
         }
         else {
@@ -122,6 +130,13 @@ int main(int argc, char **argv) {
                 return 1;
             }
             std::string file3d = argv[4];
+            if (!(file3d.size() >= 3 && file3d.compare(file3d.size() - 3, 3, ".3d") == 0)) {
+                std::cerr << "Invalid command\n\n";
+                std::cerr << "In the command:\n";
+                std::cerr << "  generator box <length> <grid> <file3d>\n";
+                std::cerr << "<file3d> should end with the '.3d' extension\n";
+                return 1;
+            }
             //generateBox(length,grid,file3d)
         }
         else {
@@ -176,6 +191,13 @@ int main(int argc, char **argv) {
                 return 1;
             }
             std::string file3d = argv[5];
+            if (!(file3d.size() >= 3 && file3d.compare(file3d.size() - 3, 3, ".3d") == 0)) {
+                std::cerr << "Invalid command\n\n";
+                std::cerr << "In the command:\n";
+                std::cerr << "  generator sphere <radius> <slices> <stacks> <file3d>\n";
+                std::cerr << "<file3d> should end with the '.3d' extension\n";
+                return 1;
+            }
             //generateSphere(radius,slices,stacks,file3d)
         }
         else {
@@ -252,6 +274,13 @@ int main(int argc, char **argv) {
                 return 1;
             }
             std::string file3d = argv[6];
+            if (!(file3d.size() >= 3 && file3d.compare(file3d.size() - 3, 3, ".3d") == 0)) {
+                std::cerr << "Invalid command\n\n";
+                std::cerr << "In the command:\n";
+                std::cerr << "  generator cone <radius> <height> <slices> <stacks> <file3d>\n";
+                std::cerr << "<file3d> should end with the '.3d' extension\n";
+                return 1;
+            }
             //generateCone(radius,height,slices,stacks,file3d)
         }
         else {
