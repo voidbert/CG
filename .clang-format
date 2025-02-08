@@ -1,0 +1,191 @@
+---
+
+# Copyright 2025 Ana Oliveira, Humberto Gomes, Mariana Rocha, Sara Lopes
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# GENERAL SETTINGS
+
+BasedOnStyle: LLVM
+Language:     Cpp
+Standard:     c++17
+
+# ALIGNMENT
+
+AlignAfterOpenBracket:  Align
+AlignArrayOfStructures: Left
+AlignEscapedNewlines:   Right
+AlignOperands:          DontAlign
+AlignTrailingComments:
+  Kind: Never
+QualifierAlignment:     Leave
+
+AlignConsecutiveAssignments:
+  Enabled: false
+AlignConsecutiveBitFields:
+  Enabled: false
+AlignConsecutiveDeclarations:
+  Enabled: false
+AlignConsecutiveMacros:
+  Enabled: false
+
+# ARGUMENTS & PARAMETERS
+
+AllowAllArgumentsOnNextLine:               false
+AllowAllParametersOfDeclarationOnNextLine: false
+BinPackArguments:                          false
+BinPackParameters:                         false
+
+# COMMENTS
+
+ReflowComments:               true
+SpacesBeforeTrailingComments: 1
+SpacesInLineCommentPrefix:
+  Minimum:  1
+  Maximum: -1
+
+# CURLY BRACES
+
+BreakBeforeBraces: Attach
+InsertBraces:      false
+RemoveBracesLLVM:  false
+
+# HEADER FILES
+
+SortIncludes:          CaseInsensitive
+SortUsingDeclarations: Lexicographic
+IncludeBlocks:         Regroup
+IncludeCategories:
+  - Regex:           '^<'
+    Priority:        0
+    SortPriority:    0
+    CaseSensitive:   false
+  - Regex:           '^"'
+    Priority:        1
+    SortPriority:    1
+    CaseSensitive:   false
+
+IncludeIsMainRegex:       ''
+IncludeIsMainSourceRegex: ''
+
+# INDENTATION
+
+AccessModifierOffset:              -4
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth:           4
+IndentWidth:                       4
+PPIndentWidth:                     4
+TabWidth:                          4
+UseTab:                            Never
+
+IndentAccessModifiers:         false
+IndentCaseBlocks:              false
+IndentCaseLabels:              true
+IndentExternBlock:             Indent
+IndentGotoLabels:              true
+IndentPPDirectives:            BeforeHash
+IndentRequiresClause:          true
+IndentWrappedFunctionNames:    true
+LambdaBodyIndentation:         Signature
+NamespaceIndentation:          None
+RequiresExpressionIndentation: OuterScope
+
+# LINE BREAKING
+
+AllowBreakBeforeNoexceptSpecifier: OnlyWithParen
+AlwaysBreakBeforeMultilineStrings: false
+BreakAdjacentStringLiterals:       false
+BreakAfterAttributes:              Always
+BreakAfterReturnType:              Automatic
+BreakBeforeBinaryOperators:        None
+BreakBeforeConceptDeclarations:    Always
+BreakBeforeInlineASMColon:         OnlyMultiline
+BreakBeforeTernaryOperators:       false
+BreakConstructorInitializers:      AfterColon
+BreakFunctionDefinitionParameters: false
+BreakInheritanceList:              AfterColon
+BreakStringLiterals:               false
+BreakTemplateDeclarations:         Yes
+EmptyLineAfterAccessModifier:      Never
+EmptyLineBeforeAccessModifier:     Always
+PackConstructorInitializers:       NextLine
+RequiresClausePosition:            OwnLine
+SeparateDefinitionBlocks:          Leave
+
+# LINE PROPERTIES
+
+ColumnLimit: 100
+LineEnding:  LF
+
+KeepEmptyLines:
+    AtEndOfFile:     false
+    AtStartOfBlock:  true
+    AtStartOfFile:   false
+MaxEmptyLinesToKeep: 1
+InsertNewlineAtEOF:  true
+
+# MISCELANEOUS
+
+CompactNamespaces:    false
+DisableFormat:        false
+FixNamespaceComments: false
+InsertTrailingCommas: None
+IntegerLiteralSeparator:
+  Binary: 4
+  BinaryMinDigits: 9
+  Decimal: 3
+  DecimalMinDigits: 7
+  Hex: -1
+
+RemoveParentheses: Leave
+RemoveSemicolon:   true
+
+# SINGLE-LINE BLOCKS AND STATEMENTS
+
+AllowShortBlocksOnASingleLine:              Empty
+AllowShortCaseExpressionOnASingleLine:      false
+AllowShortCaseLabelsOnASingleLine:          false
+AllowShortCompoundRequirementOnASingleLine: false
+AllowShortEnumsOnASingleLine:               false
+AllowShortFunctionsOnASingleLine:           Empty
+AllowShortIfStatementsOnASingleLine:        Never
+AllowShortLambdasOnASingleLine:             All
+AllowShortLoopsOnASingleLine:               false
+
+# SPACING
+
+DerivePointerAlignment:       false
+PointerAlignment:             Right
+ReferenceAlignment:           Pointer
+SpaceAroundPointerQualifiers: Default
+
+BitFieldColonSpacing:              Both
+Cpp11BracedListStyle:              false
+SpaceAfterCStyleCast:              true
+SpaceAfterLogicalNot:              false
+SpaceAfterTemplateKeyword:         false
+SpaceBeforeAssignmentOperators:    true
+SpaceBeforeCaseColon:              false
+SpaceBeforeCpp11BracedList:        true
+SpaceBeforeCtorInitializerColon:   true
+SpaceBeforeInheritanceColon:       true
+SpaceBeforeParens:                 ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets:         false
+SpaceInEmptyBlock:                 false
+
+SpacesInAngles:            Never
+SpacesInContainerLiterals: true
+SpacesInSquareBrackets:    false
+SpacesInParens:            Never
+...
