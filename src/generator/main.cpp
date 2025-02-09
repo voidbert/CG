@@ -56,23 +56,17 @@ int main(int argc, char **argv) {
             double length = stringToDouble(args.at(2));
             int divisions = stringToInt(args.at(3));
             std::string file = args.at(4);
-            if (!(file.size() >= 3 && file.compare(file.size() - 3, 3, ".3d") == 0))
-                throw std::invalid_argument("file doesn't end with the .3d extension");
             // generatePlane(length,divisions,file)
         } else if (args.at(1) == "box") {
             double length = stringToDouble(args.at(2));
             double grid = stringToDouble(args.at(3));
             std::string file = args.at(4);
-            if (!(file.size() >= 3 && file.compare(file.size() - 3, 3, ".3d") == 0))
-                throw std::invalid_argument("file doesn't end with the .3d extension");
             // generateBox(length,grid,file)
         } else if (args.at(1) == "sphere") {
             double radius = stringToDouble(args.at(2));
             int slices = stringToInt(args.at(3));
             int stacks = stringToInt(args.at(4));
             std::string file = args.at(5);
-            if (!(file.size() >= 3 && file.compare(file.size() - 3, 3, ".3d") == 0))
-                throw std::invalid_argument("file doesn't end with the .3d extension");
             // generateSphere(radius,slices,stacks,file)
         } else if (args.at(1) == "cone") {
             double radius = stringToDouble(args.at(2));
@@ -80,8 +74,6 @@ int main(int argc, char **argv) {
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
             std::string file = args.at(6);
-            if (!(file.size() >= 3 && file.compare(file.size() - 3, 3, ".3d") == 0))
-                throw std::invalid_argument("file doesn't end with the .3d extension");
             // generateCone(radius,height,slices,stacks,file)
         } else {
             printUsage(args[0]);
