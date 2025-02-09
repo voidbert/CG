@@ -19,15 +19,16 @@
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
-    void printUsage(const std::string& programName) {
+void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
     std::cerr << "  " << programName << " plane  <length> <divisions> <file>" << std::endl;
     std::cerr << "  " << programName << " box    <length> <grid>      <file>" << std::endl;
     std::cerr << "  " << programName << " sphere <radius> <slices>    <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName << " cone   <radius> <height>    <slices> <stacks> <file>" << std::endl;
+    std::cerr << "  " << programName << " cone   <radius> <height>    <slices> <stacks> <file>"
+              << std::endl;
 }
 
-double stringToDouble(const std::string& str) {
+double stringToDouble(const std::string &str) {
     size_t charactersParsed;
     double ret = std::stod(str, &charactersParsed);
     if (charactersParsed != str.length())
@@ -37,7 +38,7 @@ double stringToDouble(const std::string& str) {
     return ret;
 }
 
-int stringToInt(const std::string& str) {
+int stringToInt(const std::string &str) {
     size_t charactersParsed;
     int ret = std::stoi(str, &charactersParsed);
     if (charactersParsed != str.length())
@@ -57,14 +58,14 @@ int main(int argc, char **argv) {
             std::string file = args.at(4);
             if (!(file.size() >= 3 && file.compare(file.size() - 3, 3, ".3d") == 0))
                 throw std::invalid_argument("file doesn't end with the .3d extension");
-            //generatePlane(length,divisions,file)
+            // generatePlane(length,divisions,file)
         } else if (args.at(1) == "box") {
             double length = stringToDouble(args.at(2));
             double grid = stringToDouble(args.at(3));
             std::string file = args.at(4);
             if (!(file.size() >= 3 && file.compare(file.size() - 3, 3, ".3d") == 0))
                 throw std::invalid_argument("file doesn't end with the .3d extension");
-            //generateBox(length,grid,file)
+            // generateBox(length,grid,file)
         } else if (args.at(1) == "sphere") {
             double radius = stringToDouble(args.at(2));
             int slices = stringToInt(args.at(3));
@@ -72,7 +73,7 @@ int main(int argc, char **argv) {
             std::string file = args.at(5);
             if (!(file.size() >= 3 && file.compare(file.size() - 3, 3, ".3d") == 0))
                 throw std::invalid_argument("file doesn't end with the .3d extension");
-            //generateSphere(radius,slices,stacks,file)
+            // generateSphere(radius,slices,stacks,file)
         } else if (args.at(1) == "cone") {
             double radius = stringToDouble(args.at(2));
             double height = stringToDouble(args.at(3));
@@ -81,14 +82,14 @@ int main(int argc, char **argv) {
             std::string file = args.at(6);
             if (!(file.size() >= 3 && file.compare(file.size() - 3, 3, ".3d") == 0))
                 throw std::invalid_argument("file doesn't end with the .3d extension");
-            //generateCone(radius,height,slices,stacks,file)
+            // generateCone(radius,height,slices,stacks,file)
         } else {
             printUsage(args[0]);
         }
-    } catch (std::out_of_range& e) {
+    } catch (std::out_of_range &e) {
         printUsage(args[0]);
         return 1;
-    } catch (std::invalid_argument& e) {
+    } catch (std::invalid_argument &e) {
         printUsage(args[0]);
         return 1;
     }
