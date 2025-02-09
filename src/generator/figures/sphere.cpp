@@ -19,9 +19,7 @@
 
 #include "generator/figures/sphere.hpp"
 
-void generateSphere(float radius, int slices, int stacks, const std::string &file3d) {
-    std::vector<glm::vec4> vertexes;
-    std::vector<std::vector<int>> faces;
+Sphere::Sphere(float radius, int slices, int stacks) {
     float stackAngle = M_PI / stacks;
     float sliceAngle = 2 * M_PI / slices;
 
@@ -45,6 +43,8 @@ void generateSphere(float radius, int slices, int stacks, const std::string &fil
             faces.push_back(triangle2);
         }
     }
+}
 
+void Sphere::toObj(const std::string &file3d) {
     // writeObjFile(file3d, std::make_pair(vertexes, faces));
 }

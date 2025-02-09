@@ -12,11 +12,18 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#ifndef GENERATOR_FIGURES_SPHERE_HPP
-#define GENERATOR_FIGURES_SPHERE_HPP
+#pragma once
 
+#include <glm/glm.hpp>
 #include <string>
+#include <vector>
 
-void generateSphere(float radius, int slices, int stacks, const std::string &file3d);
+class Sphere {
+private:
+    std::vector<glm::vec4> vertexes;
+    std::vector<std::vector<int>> faces;
 
-#endif
+public:
+    Sphere(float radius, int slices, int stacks);
+    void toObj(const std::string &file3d);
+};
