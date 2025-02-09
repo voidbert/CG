@@ -16,7 +16,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "utils/utils.hpp"
+#include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
 

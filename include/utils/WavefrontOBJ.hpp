@@ -18,9 +18,8 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-void readObjFile(const std::string &filename,
-                 std::vector<glm::vec4> &vertices,
-                 std::vector<std::vector<int>> &faces);
+std::pair<std::vector<glm::vec4>, std::vector<std::vector<int>>>
+    readObjFile(const std::string &filename);
 void writeObjFile(const std::string &filename,
                   const std::vector<glm::vec4> &vertices,
                   const std::vector<std::vector<int>> &faces);

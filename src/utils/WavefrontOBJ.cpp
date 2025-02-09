@@ -19,14 +19,14 @@
 #include <string>
 #include <vector>
 
-void readObjFile(const std::string &filename,
-                 std::vector<glm::vec4> &vertices,
-                 std::vector<std::vector<int>> &faces) {
-    std::ifstream file(filename);
-    if (!file) {
-        std::cerr << "Erro ao abrir o arquivo para leitura: " << filename << "\n";
-        return;
-    }
+std::pair<std::vector<glm::vec4>, std::vector<std::vector<int>>>
+    readObjFile(const std::string &filename) {
+    std::ifstream file;
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    file.open(filename);
+
+    std::vector<glm::vec4> vertices;
+    std::vector<std::vector<int>> faces;
 
     std::string line;
     while (getline(file, line)) {
@@ -48,18 +48,17 @@ void readObjFile(const std::string &filename,
         }
     }
     file.close();
+    return std::make_pair(vertices, faces);
 }
 
 void writeObjFile(const std::string &filename,
                   const std::vector<glm::vec4> &vertices,
                   const std::vector<std::vector<int>> &faces) {
-    std::ofstream file(filename, std::ios::out | std::ios::trunc);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo para escrita: " << filename << "\n";
-        return;
-    }
+    std::ofstream file;
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    file.open(filename, std::ios::out | std::ios::trunc);
     for (const auto &v : vertices) {
-        file << "v " << v.x << " " << v.y << " " << v.z << " " << v.w << "\n";
+        file << "v " << v.x << " " << v.y << " " << v.z << " " << v.w << std::endl;
     }
 
     for (const auto &f : faces) {
@@ -67,7 +66,7 @@ void writeObjFile(const std::string &filename,
         for (int idx : f) {
             file << " " << (idx + 1); // 0-based index to 1-based index
         }
-        file << "\n";
+        file << std::endl;
     }
 
     file.close();
