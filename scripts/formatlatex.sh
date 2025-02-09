@@ -18,27 +18,22 @@
 
 . "$(dirname "$0")/utils.sh"
 
-retval=0
+# shellcheck disable=SC2266
 find reports -type f -name "*.tex" | while IFS="" read -r file; do
 	i=1
 	while IFS="" read -r line; do
 		if printf "%s" "$line" | grep -Pq '\t'; then
-            printf "%s:%s: Use of tabs: \"%s\"\n" "$file" "$i" "$line" >&2
-			retval=1
+            printf "%s:%s: Use of tabs: \"%s\"\n" "$file" "$i" "$line"
 		fi
 
 		if printf "%s" "$line" | grep -Pq '[\t ]$'; then
-            printf "%s:%s: Trailing whitespace: \"%s\"\n" "$file" "$i" "$line" >&2
-			retval=1
+            printf "%s:%s: Trailing whitespace: \"%s\"\n" "$file" "$i" "$line"
 		fi
 
 		if [ "$(printf "%s" "$line" | wc -m)" -gt 100 ]; then
-			printf "%s:%s: Column limit of 100 surpassed: \"%s\"\n" "$file" "$i" "$line" >&2
-			retval=1
+			printf "%s:%s: Column limit of 100 surpassed: \"%s\"\n" "$file" "$i" "$line"
 		fi
 
 		i=$((i + 1))
 	done < "$file"
-done
-
-exit $retval
+done | tee /dev/stderr | [ "$(wc -l)" = 0 ]
