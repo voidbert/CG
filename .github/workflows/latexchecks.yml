@@ -10,7 +10,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-            - run: sudo apt update && apt install -y texlive-latex-base texlive-latex-recommended texlive-font-utils texlive-lang-portuguese
+            - run: >-
+                sudo apt update &&
+                sudo apt install -y texlive-{latex-{base,recommended},font-utils,lang-portuguese}
             - run: make reports
 
     format-reports:
