@@ -32,7 +32,7 @@ Sphere::Sphere(float radius, int slices, int stacks) {
             float theta = jSlice * sliceAngle;
             float x = xz * cos(theta);
             float z = xz * sin(theta);
-            vertexes.push_back(glm::vec4(x, y, z, 1.0));
+            vertices.push_back(glm::vec4(x, y, z, 1.0));
 
             int firstVertex = iStack * (slices + 1) + jSlice;
             int secondVertex = firstVertex + slices + 1;
@@ -46,5 +46,5 @@ Sphere::Sphere(float radius, int slices, int stacks) {
 }
 
 void Sphere::toObj(const std::string &file3d) {
-    // writeObjFile(file3d, std::make_pair(vertexes, faces));
+    // writeObjFile(file3d, std::make_pair(vertices, faces));
 }

@@ -20,7 +20,7 @@
 
 class Sphere {
 private:
-    std::vector<glm::vec4> vertexes;
+    std::vector<glm::vec4> vertices;
     std::vector<std::vector<int>> faces;
 
 public:
