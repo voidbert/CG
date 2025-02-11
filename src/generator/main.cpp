@@ -14,11 +14,24 @@
 
 #include <iostream>
 
+#include "generator/figures/sphere.hpp"
+
 namespace generator {
 
 int main(int argc, char **argv) {
     std::cout << "I am the generator!" << std::endl;
+
+    // remover depois do merge da Ana
+    float radius = std::stof(argv[1]);
+    int slices = std::stoi(argv[2]);
+    int stacks = std::stoi(argv[3]);
+    const char *filepath = argv[4];
+
+    Sphere sphere(radius, slices, stacks);
+    sphere.toObj(filepath);
+
+    std::cout << "Esfera gerada com sucesso e salva em " << filepath << "\n";
+
     return 1;
 }
-
 }

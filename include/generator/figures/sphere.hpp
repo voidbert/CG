@@ -18,9 +18,15 @@
 #include <string>
 #include <vector>
 
+// colocar no utils depois da Ana dar merge
+struct Point {
+    float x, y, z;
+    Point(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
+};
+
 class Sphere {
 private:
-    std::vector<glm::vec4> vertices;
+    std::vector<Point> vertices;
     std::vector<std::vector<int>> faces;
 
 public:
