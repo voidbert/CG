@@ -2,6 +2,7 @@
 
 \usepackage{array}
 \usepackage[portuguese]{babel}
+\usepackage{chngpage}
 \usepackage{float}
 \usepackage[a4paper, margin=2cm]{geometry}
 \usepackage{graphicx}
@@ -9,7 +10,7 @@
 \usepackage{setspace}
 \usepackage{xcolor}
 
-\title{\textbf{Computação Gráfica \\ \large Trabalho Prático -- Fase I}}
+\title{\Huge \textbf{Computação Gráfica \\ \Large Trabalho Prático -- Fase I}}
 \date{2 de março 2025}
 \author{Grupo \textbf{\color{red} TODO}}
 
@@ -19,37 +20,36 @@
     \includegraphics[width=0.25\textwidth]{res/cover/EE-C.eps}
 \end{center}
 
-{\let\newpage\relax\maketitle}
-\maketitle
-\thispagestyle{empty}
-
 \chardef\_=`_
 \onehalfspacing
 \setlength{\parskip}{\baselineskip}
 \setlength{\parindent}{0pt}
 \def\arraystretch{1.5}
 
-\vspace{2cm}
+{\let\newpage\relax\maketitle}
+\maketitle
+\thispagestyle{empty}
 
-\begin{center}
-    \begin{tabular}{>{\centering}p{0.25\textwidth}
-                    >{\centering\arraybackslash}p{0.25\textwidth}}
-        \includegraphics[width=3.5cm]{res/cover/A104437.png} &
-        \includegraphics[width=3.5cm]{res/cover/A104348.png} \\
+\vspace*{\fill}
 
-        Ana Oliveira & Humberto Gomes \\
-        A104437      & A104348
-    \end{tabular}
+\begin{adjustwidth}{-2cm}{-2cm} % These values only need to be large enough to center the table
+    \begin{center}
+        \begin{tabular}{>{\centering}p{0.25\textwidth}
+                        >{\centering}p{0.25\textwidth}
+                        >{\centering}p{0.25\textwidth}
+                        >{\centering\arraybackslash}p{0.25\textwidth}}
+            \includegraphics[width=3.5cm]{res/cover/A104437.png} &
+            \includegraphics[width=3.5cm]{res/cover/A104348.png} &
+            \includegraphics[width=3.5cm]{res/cover/A90817.png} &
+            \includegraphics[width=3.5cm]{res/cover/A104179.png} \\
 
-    \begin{tabular}{>{\centering}p{0.25\textwidth}
-                    >{\centering\arraybackslash}p{0.25\textwidth}}
-        \includegraphics[width=3.5cm]{res/cover/A90817.png} &
-        \includegraphics[width=3.5cm]{res/cover/A104179.png} \\
+            Ana Oliveira & Humberto Gomes & Mariana Cristino & Sara Lopes \\
+            A104437      & A104348        & A90817           & A104179
+        \end{tabular}
+    \end{center}
+\end{adjustwidth}
 
-        Mariana Cristino & Sara Lopes \\
-        A90817           & A104179
-    \end{tabular}
-\end{center}
+\pagebreak
 
 \begin{abstract}
     \textbf{\color{red} TODO - resumo}
@@ -71,14 +71,14 @@
 
 \textbf{\color{red} TODO - conclusão}
 
-% Isto é uma grande gambiarra, mas funciona para pôr a bibliografia como uma secção.
+\begingroup
 \section{Bibliografia}
+\renewcommand{\section}[2]{}
 
-\def\refname{}
-\vspace{-1.5cm}
 \begin{thebibliography}{9}
     \bibitem{exemplo}
         \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
 \end{thebibliography}
+\endgroup
 
 \end{document}
