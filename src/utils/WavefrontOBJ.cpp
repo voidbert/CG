@@ -35,9 +35,9 @@ std::pair<std::vector<glm::vec4>, std::vector<std::vector<int>>>
         ss >> type;
 
         if (type == "v") {
-            float x, y, z, w;
-            ss >> x >> y >> z >> w;
-            vertices.push_back(glm::vec4(x, y, z, w));
+            float x, y, z;
+            ss >> x >> y >> z;
+            vertices.push_back(glm::vec4(x, y, z, 1));
         } else if (type == "f") {
             std::vector<int> face;
             int index;
@@ -58,7 +58,7 @@ void writeObjFile(const std::string &filename,
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(filename, std::ios::out | std::ios::trunc);
     for (const auto &v : vertices) {
-        file << "v " << v.x << " " << v.y << " " << v.z << " " << v.w << std::endl;
+        file << "v " << v.x << " " << v.y << " " << v.z << std::endl;
     }
 
     for (const auto &f : faces) {
