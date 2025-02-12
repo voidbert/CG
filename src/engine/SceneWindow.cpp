@@ -12,14 +12,26 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <cmath>
+#include <GLFW/glfw3.h>
+#include <iostream>
+
 #include "engine/SceneWindow.hpp"
 
 namespace engine {
+SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), brightness(0.f) {}
 
-int main(int argc, char **argv) {
-    SceneWindow window = SceneWindow();
-    window.runLoop();
-    return 0;
+void SceneWindow::onUpdate(float time, float timeElapsed) {
+    brightness = ::sin(time) * 0.5 + 0.5;
+}
+
+void SceneWindow::onRender() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.788f * brightness, 0.086f * brightness, 0.694f * brightness, 1.f);
+}
+
+void SceneWindow::onResize(int _width, int _height) {
+    std::cout << "Window size: " << _width << "x" << _height << std::endl;
 }
 
 }

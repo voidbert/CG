@@ -12,14 +12,31 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/SceneWindow.hpp"
+#pragma once
+
+#include <GLFW/glfw3.h>
+#include <string>
 
 namespace engine {
+class Window {
+private:
+    GLFWwindow *handle;
+    int width, height;
 
-int main(int argc, char **argv) {
-    SceneWindow window = SceneWindow();
-    window.runLoop();
-    return 0;
-}
+public:
+    Window(const std::string &title, int _width, int _height);
+    Window(const Window &window) = delete;
+    Window(Window &&window) = delete;
+    ~Window();
 
+    void runLoop();
+
+    int getWidth();
+    int getHeight();
+
+protected:
+    virtual void onUpdate(float time, float timeElapsed) = 0;
+    virtual void onRender() = 0;
+    virtual void onResize(int _width, int _height) = 0;
+};
 }

@@ -12,14 +12,21 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/SceneWindow.hpp"
+#pragma once
+
+#include "engine/Window.hpp"
 
 namespace engine {
+class SceneWindow : public Window {
+private:
+    float brightness; // Temporary value to test all window methods
 
-int main(int argc, char **argv) {
-    SceneWindow window = SceneWindow();
-    window.runLoop();
-    return 0;
-}
+public:
+    SceneWindow();
 
+protected:
+    void onUpdate(float time, float timeElapsed);
+    void onRender();
+    void onResize(int _width, int _height);
+};
 }
