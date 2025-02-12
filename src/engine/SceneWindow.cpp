@@ -13,7 +13,7 @@
 /// limitations under the License.
 
 #include <cmath>
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #include <iostream>
 
 #include "engine/SceneWindow.hpp"
@@ -31,6 +31,7 @@ void SceneWindow::onRender() {
 }
 
 void SceneWindow::onResize(int _width, int _height) {
+    glViewport(0, 0, _width, _height);
     std::cout << "Window size: " << _width << "x" << _height << std::endl;
 }
 

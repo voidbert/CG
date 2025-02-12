@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <glad/glad.h>
 #include <stdexcept>
 
 #include "engine/Window.hpp"
@@ -23,10 +24,21 @@ Window::Window(const std::string &title, int argWidth, int argHeight) :
         throw std::runtime_error("Failed to initialize GLFW");
     }
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     this->handle = glfwCreateWindow(argWidth, argHeight, title.c_str(), NULL, NULL);
     if (!this->handle) {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW's window");
+    }
+
+    glfwMakeContextCurrent(this->handle);
+
+    int version = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+    if (version == 0) {
+        glfwTerminate();
+        throw std::runtime_error("Failed to load OpenGL");
     }
 
     glfwSetWindowUserPointer(this->handle, this);
@@ -38,8 +50,6 @@ Window::~Window() {
 }
 
 void Window::runLoop() {
-    glfwMakeContextCurrent(this->handle);
-
     double time = glfwGetTime();
     this->onResize(this->width, this->height);
     while (!glfwWindowShouldClose(this->handle)) {
