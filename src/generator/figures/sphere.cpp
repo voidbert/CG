@@ -21,6 +21,19 @@
 
 #include "generator/figures/sphere.hpp"
 
+// vai para o utils também
+Vertex::Vertex(float x, float y, float z) : vertex({ glm::vec4(x, y, z, 1.0f) }) {}
+
+float Vertex::getX() const {
+    return vertex[0].x;
+}
+float Vertex::getY() const {
+    return vertex[0].y;
+}
+float Vertex::getZ() const {
+    return vertex[0].z;
+}
+
 Sphere::Sphere(float radius, int slices, int stacks) {
 
     float stackStep = M_PI / stacks;
@@ -36,7 +49,7 @@ Sphere::Sphere(float radius, int slices, int stacks) {
             float x = xz * sin(phi);
             float z = xz * cos(phi);
 
-            vertices.push_back(Point(x, y, z));
+            vertices.push_back(Vertex(x, y, z));
         }
     }
 
@@ -65,7 +78,7 @@ void Sphere::toObj(const std::string &file3d) {
     file << numVertices << " " << numTriangles << "\n";
 
     for (const auto &p : vertices) {
-        file << "v " << p.x << " " << p.y << " " << p.z << "\n";
+        file << "v " << p.getX() << " " << p.getY() << " " << p.getZ() << "\n";
     }
 
     for (const auto &f : faces) {
