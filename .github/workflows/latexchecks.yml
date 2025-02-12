@@ -12,7 +12,7 @@ jobs:
             - uses: actions/checkout@v4
             - run: >-
                 sudo apt update &&
-                sudo apt install -y texlive-{latex-{base,recommended},font-utils,lang-portuguese}
+                sudo apt install -y texlive-{latex-extra,font-utils,lang-portuguese}
             - run: make reports
 
     format-reports:
