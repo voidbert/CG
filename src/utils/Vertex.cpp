@@ -12,26 +12,10 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <iostream>
+#include <glm/glm.hpp>
+#include <string>
+#include <vector>
 
-#include "generator/figures/Sphere.hpp"
+#include "utils/Vertex.hpp"
 
-namespace generator {
-
-int main(int argc, char **argv) {
-    std::cout << "I am the generator!" << std::endl;
-
-    // remover depois do merge da Ana
-    float radius = std::stof(argv[1]);
-    int slices = std::stoi(argv[2]);
-    int stacks = std::stoi(argv[3]);
-    const char *filepath = argv[4];
-
-    Sphere sphere(radius, slices, stacks);
-    sphere.toObj(filepath);
-
-    std::cout << "Esfera gerada com sucesso e salva em " << filepath << "\n";
-
-    return 1;
-}
-}
+Vertex::Vertex(float x, float y, float z) : position(x, y, z, 1.0f) {}

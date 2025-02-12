@@ -19,20 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "generator/figures/sphere.hpp"
-
-// vai para o utils também
-Vertex::Vertex(float x, float y, float z) : vertex({ glm::vec4(x, y, z, 1.0f) }) {}
-
-float Vertex::getX() const {
-    return vertex[0].x;
-}
-float Vertex::getY() const {
-    return vertex[0].y;
-}
-float Vertex::getZ() const {
-    return vertex[0].z;
-}
+#include "generator/figures/Sphere.hpp"
 
 Sphere::Sphere(float radius, int slices, int stacks) {
 
@@ -65,7 +52,6 @@ Sphere::Sphere(float radius, int slices, int stacks) {
 }
 
 void Sphere::toObj(const std::string &file3d) {
-    // writeObjFile(file3d, std::make_pair(vertices, faces));
     std::ofstream file(file3d);
     if (!file.is_open()) {
         std::cerr << "Erro ao abrir o arquivo para escrita: " << file3d << "\n";
@@ -78,7 +64,7 @@ void Sphere::toObj(const std::string &file3d) {
     file << numVertices << " " << numTriangles << "\n";
 
     for (const auto &p : vertices) {
-        file << "v " << p.getX() << " " << p.getY() << " " << p.getZ() << "\n";
+        file << "v " << p.position.x << " " << p.position.y << " " << p.position.z << "\n";
     }
 
     for (const auto &f : faces) {

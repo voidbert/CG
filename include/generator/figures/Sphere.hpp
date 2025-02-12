@@ -18,17 +18,7 @@
 #include <string>
 #include <vector>
 
-// colocar no utils: Vertex depois da Ana dar merge
-class Vertex {
-private:
-    std::vector<glm::vec4> vertex;
-
-public:
-    Vertex(float x, float y, float z);
-    float getX() const;
-    float getY() const;
-    float getZ() const;
-};
+#include "utils/Vertex.hpp"
 
 class Sphere {
 private:
