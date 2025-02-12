@@ -14,19 +14,22 @@
 
 # CONFIGURATION VARIABLES
 
-CPP    := g++
-CFLAGS := -Iinclude -std=c++17 -Wall -Wextra -pedantic -Wshadow \
-			$(shell pkg-config --cflags glfw3) \
-			$(shell pkg-config --cflags glm) \
-			$(shell pkg-config --cflags gl)
+CC       := gcc
+CPP      := g++
+CFLAGS   := -O2 -w -Ilib/include
+CPPFLAGS := -Iinclude -std=c++17 -Wall -Wextra -pedantic -Wshadow \
+				$(shell pkg-config --cflags glfw3) -DGLFW_INCLUDE_NONE \
+				$(shell pkg-config --cflags glm) \
+				$(shell pkg-config --cflags gl) \
+				-Ilib/include
 LIBS := -lm \
 		   $(shell pkg-config --libs glfw3) \
 		   $(shell pkg-config --libs glm) \
 		   $(shell pkg-config --libs gl)
 
-DEBUG_CFLAGS   := -O0 -ggdb3
-RELEASE_CFLAGS := -O2
-PROFILE_CFLAGS := -O2 -ggdb3
+DEBUG_CPPFLAGS   := -O0 -ggdb3
+RELEASE_CPPFLAGS := -O2
+PROFILE_CPPFLAGS := -O2 -ggdb3
 
 # Note: none of these directories can be the root of the project
 # Also, these may need to be synced with the ones in .gitignore
@@ -41,20 +44,22 @@ PREFIX ?= $(HOME)/.local
 
 # END OF CONFIGURATION
 
-SOURCES = $(shell find "src" -name '*.cpp' -type f)
-OBJECTS = $(patsubst src/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
-HEADERS = $(shell find "include" -name '*.hpp' -type f)
-DEPENDS = $(patsubst src/%.cpp, $(DEPDIR)/%.d, $(SOURCES))
-REPORTS = $(patsubst reports/%.tex, %.pdf, $(shell find reports -name '*.tex' -type f))
+SOURCES     = $(shell find "src" -name '*.cpp' -type f)
+OBJECTS     = $(patsubst src/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
+LIB_SOURCES = $(shell find "lib" -name '*.c' -type f)
+LIB_OBJECTS = $(patsubst lib/%.c, $(OBJDIR)/%.o, $(LIB_SOURCES))
+HEADERS     = $(shell find "include" -name '*.hpp' -type f)
+DEPENDS     = $(patsubst src/%.cpp, $(DEPDIR)/%.d, $(SOURCES))
+REPORTS     = $(patsubst reports/%.tex, %.pdf, $(shell find reports -name '*.tex' -type f))
 
 ifeq ($(DEBUG), 1)
-	CFLAGS += $(DEBUG_CFLAGS)
+	CPPFLAGS += $(DEBUG_CPPFLAGS)
 	BUILD_TYPE = DEBUG
 else ifeq ($(PROFILE), 1)
-	CFLAGS += $(PROFILE_CFLAGS)
+	CPPFLAGS += $(PROFILE_CPPFLAGS)
 	BUILD_TYPE = PROFILE
 else
-	CFLAGS += $(RELEASE_CFLAGS)
+	CPPFLAGS += $(RELEASE_CPPFLAGS)
 	BUILD_TYPE = RELEASE
 endif
 
@@ -82,13 +87,18 @@ endif
 
 $(DEPDIR)/%.d: src/%.cpp Makefile
 	@mkdir -p $$(dirname $@)
-	$(CPP) -MM $< -MF $@ $(CFLAGS)
+	$(CPP) -MM $< -MF $@ $(CPPFLAGS)
 
-$(OBJDIR)/%.o: src/%.cpp
+$(OBJDIR)/%.o: src/%.cpp Makefile
 	@mkdir -p $$(dirname $@)
-	$(CPP) -MMD -MF $(patsubst src/%.cpp, $(DEPDIR)/%.d, $<) -c $< -o $@ $(CFLAGS)
+	$(CPP) -MMD -MF $(patsubst src/%.cpp, $(DEPDIR)/%.d, $<) -c $< -o $@ $(CPPFLAGS)
 
-$(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME) $(BUILDDIR)/build_type: $(OBJECTS)
+$(OBJDIR)/%.o: lib/%.c Makefile
+	@mkdir -p $$(dirname $@)
+	$(CC) -c $< -o $@ $(CFLAGS)
+
+$(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME) $(BUILDDIR)/build_type: \
+	$(OBJECTS) $(LIB_OBJECTS)
 	@mkdir -p $(BUILDDIR)
 	@echo $(BUILD_TYPE) > $(BUILDDIR)/build_type
 	$(CPP) -o $(BUILDDIR)/cgmain $^ $(LIBS)
