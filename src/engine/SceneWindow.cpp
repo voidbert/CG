@@ -13,21 +13,24 @@
 /// limitations under the License.
 
 #include <cmath>
-#include <glad/glad.h>
 #include <iostream>
 
 #include "engine/SceneWindow.hpp"
 
 namespace engine {
-SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), brightness(0.f) {}
+SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), model() {
+    // Only do this once, as we have a single shader program
+    this->pipeline.use();
 
-void SceneWindow::onUpdate(float time, float timeElapsed) {
-    brightness = ::sin(time) * 0.5 + 0.5;
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
+
+void SceneWindow::onUpdate(float time, float timeElapsed) {}
 
 void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(0.788f * brightness, 0.086f * brightness, 0.694f * brightness, 1.f);
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+    this->model.draw();
 }
 
 void SceneWindow::onResize(int _width, int _height) {

@@ -14,22 +14,20 @@
 
 #pragma once
 
-#include "engine/Model.hpp"
-#include "engine/RenderPipeline.hpp"
-#include "engine/Window.hpp"
+#include <glad/glad.h>
 
 namespace engine {
-class SceneWindow : public Window {
+class Model {
 private:
-    RenderPipeline pipeline;
-    Model model; // TODO - remove temporary value to test all window methods
+    GLuint vao, vbo, ibo;
+    unsigned int vertexCount;
 
 public:
-    SceneWindow();
+    Model();
+    Model(const Model &model) = delete;
+    Model(Model &&) = delete;
+    ~Model();
 
-protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
+    void draw() const;
 };
 }
