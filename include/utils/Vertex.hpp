@@ -12,18 +12,14 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#ifndef ENGINE_MAIN_HPP
-#define ENGINE_MAIN_HPP
+#pragma once
 
 #include <glm/glm.hpp>
+#include <string>
 #include <vector>
 
-#include "utils/Vertex.hpp"
+struct Vertex {
+    glm::vec4 position;
 
-std::pair<std::vector<Vertex>, std::vector<std::vector<int>>>
-    readObjFile(const std::string &filename);
-void writeObjFile(const std::string &filename,
-                  const std::vector<Vertex> &vertices,
-                  const std::vector<std::vector<int>> &faces);
-
-#endif
+    Vertex(float x, float y, float z);
+};

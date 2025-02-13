@@ -16,6 +16,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "generator/figures/Sphere.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
@@ -67,7 +68,8 @@ int main(int argc, char **argv) {
             int slices = stringToInt(args.at(3));
             int stacks = stringToInt(args.at(4));
             std::string file = args.at(5);
-            // generateSphere(radius,slices,stacks,file)
+            Sphere sphere(radius, slices, stacks);
+            sphere.toObj(file);
         } else if (args.at(1) == "cone") {
             double radius = stringToDouble(args.at(2));
             double height = stringToDouble(args.at(3));

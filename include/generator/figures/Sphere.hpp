@@ -12,18 +12,20 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#ifndef ENGINE_MAIN_HPP
-#define ENGINE_MAIN_HPP
+#pragma once
 
 #include <glm/glm.hpp>
+#include <string>
 #include <vector>
 
 #include "utils/Vertex.hpp"
 
-std::pair<std::vector<Vertex>, std::vector<std::vector<int>>>
-    readObjFile(const std::string &filename);
-void writeObjFile(const std::string &filename,
-                  const std::vector<Vertex> &vertices,
-                  const std::vector<std::vector<int>> &faces);
+class Sphere {
+private:
+    std::vector<Vertex> vertices;
+    std::vector<std::vector<int>> faces;
 
-#endif
+public:
+    Sphere(float radius, int slices, int stacks);
+    void toObj(const std::string &file3d);
+};
