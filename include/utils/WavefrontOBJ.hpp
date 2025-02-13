@@ -18,10 +18,12 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-std::pair<std::vector<glm::vec4>, std::vector<std::vector<int>>>
+#include "utils/Vertex.hpp"
+
+std::pair<std::vector<Vertex>, std::vector<std::vector<int>>>
     readObjFile(const std::string &filename);
 void writeObjFile(const std::string &filename,
-                  const std::vector<glm::vec4> &vertices,
+                  const std::vector<Vertex> &vertices,
                   const std::vector<std::vector<int>> &faces);
 
 #endif

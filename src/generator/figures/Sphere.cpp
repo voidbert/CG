@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "generator/figures/Sphere.hpp"
+#include "utils/WavefrontOBJ.hpp"
 
 Sphere::Sphere(float radius, int slices, int stacks) {
 
@@ -52,24 +53,5 @@ Sphere::Sphere(float radius, int slices, int stacks) {
 }
 
 void Sphere::toObj(const std::string &file3d) {
-    std::ofstream file(file3d);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo para escrita: " << file3d << "\n";
-        return;
-    }
-
-    int numTriangles = faces.size();
-    int numVertices = vertices.size();
-
-    file << numVertices << " " << numTriangles << "\n";
-
-    for (const auto &p : vertices) {
-        file << "v " << p.position.x << " " << p.position.y << " " << p.position.z << "\n";
-    }
-
-    for (const auto &f : faces) {
-        file << "f " << (f[0] + 1) << " " << (f[1] + 1) << " " << (f[2] + 1) << "\n";
-    }
-
-    file.close();
+    writeObjFile(file3d, vertices, faces);
 }

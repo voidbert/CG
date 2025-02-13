@@ -19,13 +19,16 @@
 #include <string>
 #include <vector>
 
-std::pair<std::vector<glm::vec4>, std::vector<std::vector<int>>>
+#include "utils/Vertex.hpp"
+#include "utils/WavefrontOBJ.hpp"
+
+std::pair<std::vector<Vertex>, std::vector<std::vector<int>>>
     readObjFile(const std::string &filename) {
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(filename);
 
-    std::vector<glm::vec4> vertices;
+    std::vector<Vertex> vertices;
     std::vector<std::vector<int>> faces;
 
     std::string line;
@@ -37,7 +40,8 @@ std::pair<std::vector<glm::vec4>, std::vector<std::vector<int>>>
         if (type == "v") {
             float x, y, z;
             ss >> x >> y >> z;
-            vertices.push_back(glm::vec4(x, y, z, 1));
+            Vertex v = Vertex(x, y, z);
+            vertices.push_back(v);
         } else if (type == "f") {
             std::vector<int> face;
             int index;
@@ -52,13 +56,13 @@ std::pair<std::vector<glm::vec4>, std::vector<std::vector<int>>>
 }
 
 void writeObjFile(const std::string &filename,
-                  const std::vector<glm::vec4> &vertices,
+                  const std::vector<Vertex> &vertices,
                   const std::vector<std::vector<int>> &faces) {
     std::ofstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(filename, std::ios::out | std::ios::trunc);
     for (const auto &v : vertices) {
-        file << "v " << v.x << " " << v.y << " " << v.z << std::endl;
+        file << "v " << v.position.x << " " << v.position.y << " " << v.position.z << std::endl;
     }
 
     for (const auto &f : faces) {
