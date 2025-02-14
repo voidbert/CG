@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "engine/Model.hpp"
 #include "engine/RenderPipeline.hpp"
 #include "engine/Window.hpp"
@@ -22,7 +24,7 @@ namespace engine {
 class SceneWindow : public Window {
 private:
     RenderPipeline pipeline;
-    Model model; // TODO - remove temporary value to test all window methods
+    std::unique_ptr<Model> model;
 
 public:
     SceneWindow();

@@ -15,6 +15,8 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/vec4.hpp>
+#include <vector>
 
 namespace engine {
 class Model {
@@ -23,7 +25,7 @@ private:
     unsigned int vertexCount;
 
 public:
-    Model();
+    Model(const std::vector<glm::vec4> &positions, const std::vector<std::vector<int>> &faces);
     Model(const Model &model) = delete;
     Model(Model &&) = delete;
     ~Model();

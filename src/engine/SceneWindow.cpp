@@ -12,15 +12,20 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <cmath>
-#include <iostream>
-
 #include "engine/SceneWindow.hpp"
 
 namespace engine {
-SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), model() {
+SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline() {
     // Only do this once, as we have a single shader program
     this->pipeline.use();
+
+    std::vector<glm::vec4> vertices { glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f),
+                                      glm::vec4(0.5f, -0.5f, 0.0f, 1.0f),
+                                      glm::vec4(0.0f, 0.5f, 0.0f, 1.0f) };
+    std::vector<std::vector<int>> faces {
+        { 0, 1, 2 }
+    };
+    this->model = std::make_unique<Model>(vertices, faces);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
@@ -30,12 +35,11 @@ void SceneWindow::onUpdate(float time, float timeElapsed) {}
 void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
-    this->model.draw();
+    this->model->draw();
 }
 
 void SceneWindow::onResize(int _width, int _height) {
     glViewport(0, 0, _width, _height);
-    std::cout << "Window size: " << _width << "x" << _height << std::endl;
 }
 
 }
