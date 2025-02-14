@@ -35,8 +35,10 @@ const char *fragmentShaderSource = R"(
 #version 460 core
 layout (location = 0) out vec4 outColor;
 
+layout (location = 2) uniform vec4 uniColor;
+
 void main() {
-    outColor = vec4(1.0f, 0.0, 0.0f, 1.0f);
+    outColor = uniColor;
 }
 )";
 
@@ -70,10 +72,16 @@ RenderPipeline::~RenderPipeline() {
 
 void RenderPipeline::use() const {
     glUseProgram(this->program);
+    this->setCameraMatrix(glm::mat4(1.0f));
+    this->setColor(glm::vec4(1.0f));
 }
 
 void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
     glUniformMatrix4fv(1, 1, false, reinterpret_cast<const float *>(&matrix));
+}
+
+void RenderPipeline::setColor(const glm::vec4 &color) const {
+    glUniform4f(2, color[0], color[1], color[2], color[3]);
 }
 
 void RenderPipeline::assertShaderCompilation(GLuint shader) const {
