@@ -54,7 +54,7 @@ void Window::runLoop() {
     this->onResize(this->width, this->height);
     while (!glfwWindowShouldClose(this->handle)) {
         glfwSetWindowSizeCallback(this->handle, [](GLFWwindow *_handle, int _width, int _height) {
-            Window *window = (Window *) glfwGetWindowUserPointer(_handle);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(_handle));
             window->width = _width;
             window->height = _height;
             window->onResize(_width, _height);
