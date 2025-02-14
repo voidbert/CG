@@ -6,6 +6,7 @@ on:
             - 'src/**'
             - 'include/**'
             - 'Makefile'
+            - 'scripts/format.sh'
 jobs:
     build:
         runs-on: ubuntu-latest

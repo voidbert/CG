@@ -1,0 +1,22 @@
+name: Script checks
+on:
+    pull_request:
+        paths:
+            - '.github/workflows/**'
+            - 'scripts/formatlatex.sh'
+            - 'reports/**'
+jobs:
+    build-reports:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: >-
+                sudo apt update &&
+                sudo apt install -y texlive-{latex-extra,font-utils,lang-portuguese}
+            - run: make reports
+
+    format-reports:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: ./scripts/formatlatex.sh

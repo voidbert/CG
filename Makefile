@@ -78,7 +78,7 @@ else
 endif
 
 default: $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME)
-report: $(REPORTS)
+reports: $(REPORTS)
 all: $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME) $(DOCSDIR) $(REPORTS)
 
 ifeq (Y, $(INCLUDE_DEPENDS))
@@ -105,10 +105,13 @@ $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME) $(BUILDDIR)/build
 	@ln -s cgmain $(BUILDDIR)/$(ENGINE_EXENAME) 2> /dev/null ; true
 	@ln -s cgmain $(BUILDDIR)/$(GENERATOR_EXENAME) 2> /dev/null ; true
 
-%.pdf: reports/%.tex
+$(BUILDDIR)/%.pdf: reports/%.tex Makefile
 	$(eval TMP_LATEX = $(shell mktemp -d))
-	cd reports && pdflatex -halt-on-error -output-directory $(TMP_LATEX) $(shell basename $<)
-	@cp $(TMP_LATEX)/$@ $@
+	$(eval PDF_NAME := $(patsubst reports/%.tex, %.pdf, $<))
+
+	@mkdir -p $(BUILDDIR)
+	cd reports && pdflatex -halt-on-error -output-directory $(TMP_LATEX) $(shell basename $<) < /dev/null
+	@cp $(TMP_LATEX)/$(PDF_NAME) $@
 	@rm -r $(TMP_LATEX)
 
 .PHONY: clean
