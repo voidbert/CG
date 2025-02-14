@@ -30,11 +30,12 @@ public:
     ~Window();
 
     void runLoop();
-
     int getWidth();
     int getHeight();
 
 protected:
+    GLFWwindow *getHandle();
+
     virtual void onUpdate(float time, float timeElapsed) = 0;
     virtual void onRender() = 0;
     virtual void onResize(int _width, int _height) = 0;

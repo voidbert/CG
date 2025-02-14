@@ -42,6 +42,7 @@ Window::Window(const std::string &title, int argWidth, int argHeight) :
     }
 
     glfwSetWindowUserPointer(this->handle, this);
+    glfwSetInputMode(this->handle, GLFW_STICKY_KEYS, GLFW_TRUE);
 }
 
 Window::~Window() {
@@ -76,6 +77,10 @@ int Window::getWidth() {
 
 int Window::getHeight() {
     return this->height;
+}
+
+GLFWwindow *Window::getHandle() {
+    return this->handle;
 }
 
 }

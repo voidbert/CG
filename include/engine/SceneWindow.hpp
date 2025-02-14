@@ -24,7 +24,10 @@ namespace engine {
 class SceneWindow : public Window {
 private:
     RenderPipeline pipeline;
-    std::unique_ptr<Model> model;
+
+    // TODO - remove, these are for testing purposes only
+    std::unique_ptr<Model> model1, model2;
+    glm::vec3 translate;
 
 public:
     SceneWindow();
