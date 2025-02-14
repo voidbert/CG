@@ -8,3 +8,6 @@
 /build
 /deps
 /obj
+
+# LaTeX compilation
+*-eps-converted-to.pdf

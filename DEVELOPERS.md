@@ -31,8 +31,10 @@ Don't forget to run `make clean` between different build types.
 Developer-written reports can be compiled with:
 
 ```console
-$ make report
+$ make reports
 ```
+
+The output PDFs will be placed in the `build` directory.
 
 ## Profiling
 
@@ -47,7 +49,7 @@ A `PROFILE` build is recommended.
 
 ## Code style
 
-### Formatting
+### C++ formatting
 
 The `format.sh` script will attempt to format the whole project to a temporary directory (using
 `clang-format`), and then compare the results with your original source files. You can choose
@@ -67,6 +69,12 @@ handle the rest.
 
 Methods and variables should be named in `camelCase`. Type names (classes and enums) should be named
 in `PascalCase`.
+
+### LaTeX formatting
+
+Report formatting can be checked with the `formatlatex.sh` script. It isn't as capable as
+`clang-format`, so it only checks for the use of tabs, trailing whitespace, and columns with over
+100 characters. There are no checks for alignment and all errors have to be fixed manually.
 
 ## Other scripts
 
