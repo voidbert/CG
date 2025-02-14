@@ -24,14 +24,16 @@ const char *vertexShaderSource = R"(
 #version 460 core
 layout (location = 0) in vec4 inPosition;
 
+layout (location = 1) uniform mat4 uniCameraMatrix;
+
 void main() {
-    gl_Position = inPosition;
+    gl_Position = uniCameraMatrix * inPosition;
 }
 )";
 
 const char *fragmentShaderSource = R"(
 #version 460 core
-out vec4 outColor;
+layout (location = 0) out vec4 outColor;
 
 void main() {
     outColor = vec4(1.0f, 0.0, 0.0f, 1.0f);
@@ -70,6 +72,10 @@ void RenderPipeline::use() const {
     glUseProgram(this->program);
 }
 
+void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
+    glUniformMatrix4fv(1, 1, false, reinterpret_cast<const float *>(&matrix));
+}
+
 void RenderPipeline::assertShaderCompilation(GLuint shader) const {
     int success;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
@@ -99,5 +105,4 @@ void RenderPipeline::assertProgramLinking() const {
         throw std::runtime_error("Program linking error: " + logMessage);
     }
 }
-
 }

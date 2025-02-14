@@ -15,6 +15,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/mat4x4.hpp>
 
 namespace engine {
 class RenderPipeline {
@@ -28,6 +29,7 @@ public:
     ~RenderPipeline();
 
     void use() const;
+    void setCameraMatrix(const glm::mat4 &matrix) const;
 
 private:
     void assertShaderCompilation(GLuint shader) const;
