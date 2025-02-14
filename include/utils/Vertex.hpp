@@ -14,8 +14,7 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
-#include <string>
+#include <glm/vec4.hpp>
 #include <vector>
 
 struct Vertex {

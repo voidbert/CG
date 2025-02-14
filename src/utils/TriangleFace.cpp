@@ -12,23 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
-
-#include <glm/vec3.hpp>
-#include <string>
-#include <vector>
-
 #include "utils/TriangleFace.hpp"
-#include "utils/Vertex.hpp"
 
-class WavefrontOBJ {
-protected:
-    std::vector<glm::vec4> positions;
-    std::vector<TriangleFace> faces;
-
-public:
-    WavefrontOBJ();
-    WavefrontOBJ(const std::string &filename);
-
-    void writeToFile(const std::string &filename) const;
-};
+TriangleFace::TriangleFace(unsigned int _p1, unsigned int _p2, unsigned int _p3) :
+    p1(_p1), p2(_p2), p3(_p3) {}

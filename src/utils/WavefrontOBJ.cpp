@@ -13,26 +13,19 @@
 /// limitations under the License.
 
 #include <fstream>
-#include <glm/glm.hpp>
-#include <iostream>
 #include <sstream>
-#include <string>
-#include <vector>
 
-#include "utils/Vertex.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
-std::pair<std::vector<Vertex>, std::vector<std::vector<int>>>
-    readObjFile(const std::string &filename) {
+WavefrontOBJ::WavefrontOBJ() : positions(), faces() {}
+
+WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(filename);
 
-    std::vector<Vertex> vertices;
-    std::vector<std::vector<int>> faces;
-
     std::string line;
-    while (getline(file, line)) {
+    while (std::getline(file, line)) {
         std::stringstream ss(line);
         std::string type;
         ss >> type;
@@ -40,38 +33,38 @@ std::pair<std::vector<Vertex>, std::vector<std::vector<int>>>
         if (type == "v") {
             float x, y, z;
             ss >> x >> y >> z;
-            Vertex v = Vertex(x, y, z);
-            vertices.push_back(v);
+            this->positions.push_back(glm::vec4(x, y, z, 1.0f));
+
+            // TODO - support for w coordinate
         } else if (type == "f") {
-            std::vector<int> face;
-            int index;
-            while (ss >> index) {
-                face.push_back(index - 1); // 1-based index to 0-based index
-            }
-            faces.push_back(face);
+            unsigned int p1, p2, p3;
+            ss >> p1 >> p2 >> p3;
+
+            // 1-based index to 0-based index
+            this->faces.push_back(TriangleFace(p1 - 1, p2 - 1, p3 - 1));
         }
+
+        // TODO - comment support
     }
-    file.close();
-    return std::make_pair(vertices, faces);
+
+    // TODO - error checking
 }
 
-void writeObjFile(const std::string &filename,
-                  const std::vector<Vertex> &vertices,
-                  const std::vector<std::vector<int>> &faces) {
+void WavefrontOBJ::writeToFile(const std::string &filename) const {
     std::ofstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(filename, std::ios::out | std::ios::trunc);
-    for (const auto &v : vertices) {
-        file << "v " << v.position.x << " " << v.position.y << " " << v.position.z << std::endl;
-    }
 
-    for (const auto &f : faces) {
-        file << "f";
-        for (int idx : f) {
-            file << " " << (idx + 1); // 0-based index to 1-based index
-        }
+    for (const glm::vec4 &v : this->positions) {
+        file << "v " << v.x << " " << v.y << " " << v.z;
+        if (v.w != 0.0f)
+            file << " " << v.w;
+
         file << std::endl;
     }
 
-    file.close();
+    for (const TriangleFace &f : this->faces) {
+        // 0-based index to 1-based index
+        file << "f " << f.p1 + 1 << " " << f.p2 + 1 << " " << f.p3 + 1 << std::endl;
+    }
 }

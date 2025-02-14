@@ -14,21 +14,7 @@
 
 #pragma once
 
-#include <glm/vec3.hpp>
-#include <string>
-#include <vector>
-
-#include "utils/TriangleFace.hpp"
-#include "utils/Vertex.hpp"
-
-class WavefrontOBJ {
-protected:
-    std::vector<glm::vec4> positions;
-    std::vector<TriangleFace> faces;
-
-public:
-    WavefrontOBJ();
-    WavefrontOBJ(const std::string &filename);
-
-    void writeToFile(const std::string &filename) const;
+struct TriangleFace {
+    unsigned int p1, p2, p3;
+    TriangleFace(unsigned int _p1, unsigned int _p2, unsigned int _p3);
 };

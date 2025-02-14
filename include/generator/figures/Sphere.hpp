@@ -14,18 +14,9 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
-#include <string>
-#include <vector>
+#include "utils/WavefrontOBJ.hpp"
 
-#include "utils/Vertex.hpp"
-
-class Sphere {
-private:
-    std::vector<Vertex> vertices;
-    std::vector<std::vector<int>> faces;
-
+class Sphere : public WavefrontOBJ {
 public:
     Sphere(float radius, int slices, int stacks);
-    void toObj(const std::string &file3d);
 };

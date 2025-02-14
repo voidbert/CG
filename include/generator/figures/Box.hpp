@@ -14,17 +14,9 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include "utils/WavefrontOBJ.hpp"
 
-#include "utils/Vertex.hpp"
-
-class Box {
-private:
-    std::vector<Vertex> vertices;
-    std::vector<std::vector<int>> faces;
-
+class Box : public WavefrontOBJ {
 public:
     Box(float size, int divisions);
-    void toObj(const std::string &file3d);
 };

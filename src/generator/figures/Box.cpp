@@ -12,10 +12,6 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <fstream>
-#include <iostream>
-#include <vector>
-
 #include "generator/figures/Box.hpp"
 
 Box::Box(float size, int divisions) {
@@ -72,7 +68,7 @@ Box::Box(float size, int divisions) {
                 pos[axis2] = -half + i * step;
                 pos[fixed] = half * normal[fixed];
 
-                vertices.push_back(Vertex(pos.x, pos.y, pos.z));
+                this->positions.push_back(glm::vec4(pos.x, pos.y, pos.z, 1.0f));
             }
         }
 
@@ -81,27 +77,10 @@ Box::Box(float size, int divisions) {
             for (int j = 0; j < divisions; j++) {
                 int idx = offset + i * (divisions + 1) + j;
 
-                faces.push_back({ idx, idx + 1, idx + divisions + 1 });
-                faces.push_back({ idx + 1, idx + divisions + 2, idx + divisions + 1 });
+                this->faces.push_back(TriangleFace(idx, idx + 1, idx + divisions + 1));
+                this->faces.push_back(
+                    TriangleFace(idx + 1, idx + divisions + 2, idx + divisions + 1));
             }
         }
     }
-}
-
-void Box::toObj(const std::string &file3d) {
-    std::ofstream file(file3d);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o ficheiro: " << file3d << "\n";
-        return;
-    }
-
-    for (const auto &p : vertices) {
-        file << "v " << p.position.x << " " << p.position.y << " " << p.position.z << "\n";
-    }
-
-    for (const auto &f : faces) {
-        file << "f " << (f[0] + 1) << " " << (f[1] + 1) << " " << (f[2] + 1) << "\n";
-    }
-
-    file.close();
 }
