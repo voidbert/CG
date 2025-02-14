@@ -16,6 +16,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "generator/figures/Box.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
@@ -62,7 +63,8 @@ int main(int argc, char **argv) {
             double length = stringToDouble(args.at(2));
             double grid = stringToDouble(args.at(3));
             std::string file = args.at(4);
-            // generateBox(length,grid,file)
+            Box box(length, grid);
+            box.toObj(file);
         } else if (args.at(1) == "sphere") {
             double radius = stringToDouble(args.at(2));
             int slices = stringToInt(args.at(3));
