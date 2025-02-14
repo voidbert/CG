@@ -12,6 +12,9 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <stdexcept>
+#include <string>
+
 #include "engine/RenderPipeline.hpp"
 
 namespace engine {
@@ -19,39 +22,42 @@ namespace engine {
 
 const char *vertexShaderSource = R"(
 #version 460 core
-layout (location = 0) in vec4 position;
+layout (location = 0) in vec4 inPosition;
 
-void main()
-{
-    gl_Position = position;
+void main() {
+    gl_Position = inPosition;
 }
 )";
 
 const char *fragmentShaderSource = R"(
 #version 460 core
-out vec4 fragColor;
+out vec4 outColor;
 
-void main()
-{
-    fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+void main() {
+    outColor = vec4(1.0f, 0.0, 0.0f, 1.0f);
 }
 )";
 
-RenderPipeline::RenderPipeline() {
-    // TODO - add error handling
+RenderPipeline::RenderPipeline() : vertexShader(0), fragmentShader(0), program(0) {
 
+    // Compile vertex shader
     this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(this->vertexShader, 1, &vertexShaderSource, nullptr);
-    glCompileShader(vertexShader);
+    glCompileShader(this->vertexShader);
+    this->assertShaderCompilation(this->vertexShader);
 
+    // Compile fragment shader
     this->fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(this->fragmentShader, 1, &fragmentShaderSource, nullptr);
-    glCompileShader(fragmentShader);
+    glCompileShader(this->fragmentShader);
+    this->assertShaderCompilation(this->fragmentShader);
 
+    // Create shader program
     this->program = glCreateProgram();
     glAttachShader(this->program, this->vertexShader);
-    glAttachShader(this->program, this->vertexShader);
+    glAttachShader(this->program, this->fragmentShader);
     glLinkProgram(this->program);
+    this->assertProgramLinking();
 }
 
 RenderPipeline::~RenderPipeline() {
@@ -63,4 +69,35 @@ RenderPipeline::~RenderPipeline() {
 void RenderPipeline::use() const {
     glUseProgram(this->program);
 }
+
+void RenderPipeline::assertShaderCompilation(GLuint shader) const {
+    int success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        int logLength;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &logLength);
+
+        std::string logMessage;
+        logMessage.reserve(logLength + 1);
+        glGetShaderInfoLog(shader, logLength, nullptr, logMessage.data());
+
+        throw std::runtime_error("Shader compilation error: " + logMessage);
+    }
+}
+
+void RenderPipeline::assertProgramLinking() const {
+    int success;
+    glGetProgramiv(this->program, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        int logLength;
+        glGetProgramiv(this->program, GL_COMPILE_STATUS, &logLength);
+
+        std::string logMessage;
+        logMessage.reserve(logLength + 1);
+        glGetProgramInfoLog(this->program, logLength, nullptr, logMessage.data());
+
+        throw std::runtime_error("Program linking error: " + logMessage);
+    }
+}
+
 }

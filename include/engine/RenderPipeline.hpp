@@ -20,7 +20,6 @@ namespace engine {
 class RenderPipeline {
 private:
     GLuint vertexShader, fragmentShader, program;
-    unsigned int vertexCount;
 
 public:
     RenderPipeline();
@@ -29,5 +28,9 @@ public:
     ~RenderPipeline();
 
     void use() const;
+
+private:
+    void assertShaderCompilation(GLuint shader) const;
+    void assertProgramLinking() const;
 };
 }
