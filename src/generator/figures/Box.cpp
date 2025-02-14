@@ -12,9 +12,9 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <vector>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 #include "generator/figures/Box.hpp"
 
@@ -27,12 +27,42 @@ Box::Box(float size, int divisions) {
         int axis1, axis2, fixed;
 
         switch (face) {
-            case 0: normal = {0, 0, 1}; axis1 = 0; axis2 = 1; fixed = 2; break; 
-            case 1: normal = {0, 0, -1}; axis1 = 0; axis2 = 1; fixed = 2; break; 
-            case 2: normal = {0, 1, 0}; axis1 = 0; axis2 = 2; fixed = 1; break;
-            case 3: normal = {0, -1, 0}; axis1 = 0; axis2 = 2; fixed = 1; break;
-            case 4: normal = {1, 0, 0}; axis1 = 1; axis2 = 2; fixed = 0; break; 
-            case 5: normal = {-1, 0, 0}; axis1 = 1; axis2 = 2; fixed = 0; break;
+            case 0:
+                normal = { 0, 0, 1 };
+                axis1 = 0;
+                axis2 = 1;
+                fixed = 2;
+                break;
+            case 1:
+                normal = { 0, 0, -1 };
+                axis1 = 0;
+                axis2 = 1;
+                fixed = 2;
+                break;
+            case 2:
+                normal = { 0, 1, 0 };
+                axis1 = 0;
+                axis2 = 2;
+                fixed = 1;
+                break;
+            case 3:
+                normal = { 0, -1, 0 };
+                axis1 = 0;
+                axis2 = 2;
+                fixed = 1;
+                break;
+            case 4:
+                normal = { 1, 0, 0 };
+                axis1 = 1;
+                axis2 = 2;
+                fixed = 0;
+                break;
+            case 5:
+                normal = { -1, 0, 0 };
+                axis1 = 1;
+                axis2 = 2;
+                fixed = 0;
+                break;
         }
 
         for (int i = 0; i <= divisions; i++) {
@@ -51,8 +81,8 @@ Box::Box(float size, int divisions) {
             for (int j = 0; j < divisions; j++) {
                 int idx = offset + i * (divisions + 1) + j;
 
-                faces.push_back({idx, idx + 1, idx + divisions + 1});
-                faces.push_back({idx + 1, idx + divisions + 2, idx + divisions + 1});
+                faces.push_back({ idx, idx + 1, idx + divisions + 1 });
+                faces.push_back({ idx + 1, idx + divisions + 2, idx + divisions + 1 });
             }
         }
     }
