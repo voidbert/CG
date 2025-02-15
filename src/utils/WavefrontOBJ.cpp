@@ -24,8 +24,10 @@ WavefrontOBJ::WavefrontOBJ() : positions(), faces() {}
 
 WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
     std::ifstream file;
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(filename);
+    if (!file.is_open()) {
+        throw std::ios_base::failure("Failed to open OBJ file");
+    }
 
     std::string line;
     while (std::getline(file, line)) {
@@ -48,6 +50,10 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
         }
 
         // TODO - comment support
+    }
+
+    if (file.bad()) {
+        throw std::ios_base::failure("Error while reading from OBJ file");
     }
 
     // TODO - error checking
@@ -102,6 +108,6 @@ std::pair<std::vector<Vertex>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVe
     return std::make_pair(vertices, indices);
 }
 
-// TODO - model optimization
+// TODO - model optimization before writing? Maybe a possible feature?
 
 }
