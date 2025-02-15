@@ -48,4 +48,4 @@ public:
     static std::vector<std::unique_ptr<Entity>> loadModels(const std::string &directory);
 };
 
-} 
+}
