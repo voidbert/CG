@@ -14,6 +14,9 @@
 
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtx/hash.hpp>
 #include <glm/vec4.hpp>
 
 namespace utils {
@@ -21,7 +24,19 @@ namespace utils {
 struct Vertex {
     glm::vec4 position;
 
+    Vertex(const glm::vec4 &_position);
     Vertex(float x, float y, float z);
+
+    bool operator==(const Vertex &) const = default;
+};
+
+}
+
+namespace std {
+
+template<>
+struct hash<utils::Vertex> {
+    size_t operator()(const utils::Vertex &p) const;
 };
 
 }

@@ -16,6 +16,17 @@
 
 namespace utils {
 
+Vertex::Vertex(const glm::vec4 &_position) : position(_position) {}
 Vertex::Vertex(float x, float y, float z) : position(x, y, z, 1.0f) {}
+
+}
+
+namespace std {
+
+size_t hash<utils::Vertex>::operator()(const utils::Vertex &p) const {
+    return hash<glm::vec4> {}(p.position);
+}
+
+template struct std::hash<utils::Vertex>;
 
 }
