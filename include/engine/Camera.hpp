@@ -15,28 +15,28 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/mat4x4.hpp>
+#include <glm/glm.hpp>
+#include <GLFW/glfw3.h>
 
 namespace engine {
-class RenderPipeline {
+
+class Camera {
 private:
-    GLuint vertexShader, fragmentShader, program;
+    glm::vec3 position;
+    float pitch, yaw;
+    float fov; 
 
 public:
-    RenderPipeline();
-    RenderPipeline(const RenderPipeline &model) = delete;
-    RenderPipeline(RenderPipeline &&) = delete;
-    ~RenderPipeline();
+    Camera();
 
-    void use() const;
-    void setCameraMatrix(const glm::mat4 &matrix) const;
-    void setColor(const glm::vec4 &color) const;
-    void setProjectionMatrix(const glm::mat4 &matrix) const;
+    void processInput(GLFWwindow* window, float deltaTime);
+    void apply(GLuint shaderProgram) const;
+    void zoom(float offset);
 
-    GLuint getShaderProgram() const { return program; }
-
-private:
-    void assertShaderCompilation(GLuint shader) const;
-    void assertProgramLinking() const;
+    glm::vec3 getPosition() const;
+    float getPitch() const;
+    float getYaw() const;
+    float getFOV() const;
 };
-}
+
+} 

@@ -21,6 +21,7 @@ namespace engine {
 SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), translate() {
     // Only do this once, as we have a single shader program
     this->pipeline.use();
+    this->entities = Entity::loadModels("build/");
 
     std::vector<glm::vec4> vertices1 { glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f),
                                        glm::vec4(0.5f, -0.5f, 0.0f, 1.0f),
@@ -42,6 +43,8 @@ SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), transla
 void SceneWindow::onUpdate(float time, float timeElapsed) {
     GLFWwindow *const windowHandle = this->getHandle();
 
+    this->camera.processInput(windowHandle, timeElapsed);
+
     const int up = glfwGetKey(windowHandle, GLFW_KEY_W);
     const int down = glfwGetKey(windowHandle, GLFW_KEY_S);
     const int left = glfwGetKey(windowHandle, GLFW_KEY_A);
@@ -55,13 +58,28 @@ void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    this->pipeline.setCameraMatrix(glm::mat4(1.0f));
-    this->pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    this->model1->draw();
+    // Creates a perspective projection matrix for realistic depth perception
+    glm::mat4 projectionMatrix = glm::perspective(
+        glm::radians(camera.getFOV()),
+        800.0f / 600.0f, 
+        0.1f, 100.0f
+    );
 
-    this->pipeline.setCameraMatrix(glm::translate(glm::mat4(1.0f), this->translate));
-    this->pipeline.setColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-    this->model2->draw();
+    this->pipeline.setProjectionMatrix(projectionMatrix);
+
+    this->camera.apply(this->pipeline.getShaderProgram());
+
+    for (const auto& entity : entities) {
+        entity->draw(this->pipeline.getShaderProgram());
+    }
+
+    // this->pipeline.setCameraMatrix(glm::mat4(1.0f));
+    this->pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    // this->model1->draw();
+
+    // this->pipeline.setCameraMatrix(glm::translate(glm::mat4(1.0f), this->translate));
+    // this->pipeline.setColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+    // this->model2->draw();
 }
 
 void SceneWindow::onResize(int _width, int _height) {

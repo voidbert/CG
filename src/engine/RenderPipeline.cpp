@@ -14,6 +14,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 #include "engine/RenderPipeline.hpp"
 
@@ -25,9 +26,10 @@ const char *vertexShaderSource = R"(
 layout (location = 0) in vec4 inPosition;
 
 layout (location = 1) uniform mat4 uniCameraMatrix;
+layout (location = 3) uniform mat4 projectionMatrix;
 
 void main() {
-    gl_Position = uniCameraMatrix * inPosition;
+    gl_Position = projectionMatrix * uniCameraMatrix * inPosition;
 }
 )";
 
@@ -82,6 +84,14 @@ void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
 
 void RenderPipeline::setColor(const glm::vec4 &color) const {
     glUniform4f(2, color[0], color[1], color[2], color[3]);
+}
+
+void RenderPipeline::setProjectionMatrix(const glm::mat4 &matrix) const {
+    GLint projLoc = glGetUniformLocation(this->program, "projectionMatrix");
+    if (projLoc == -1) {
+        std::cerr << "[ERRO] Não foi possível encontrar 'projectionMatrix' no shader!" << std::endl;
+    }
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, &matrix[0][0]);
 }
 
 void RenderPipeline::assertShaderCompilation(GLuint shader) const {

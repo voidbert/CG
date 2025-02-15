@@ -14,29 +14,33 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include <memory>
+#include <glm/glm.hpp>
 #include <glad/glad.h>
-#include <glm/mat4x4.hpp>
 
 namespace engine {
-class RenderPipeline {
+
+class Entity {
 private:
-    GLuint vertexShader, fragmentShader, program;
+    std::vector<glm::vec3> vertices;
+    std::vector<int> indices;
+    
+    GLuint VAO, VBO, EBO;
+    glm::vec3 position;
+    float rotX, rotY, rotZ, scale;
+
+    void setupMesh();
 
 public:
-    RenderPipeline();
-    RenderPipeline(const RenderPipeline &model) = delete;
-    RenderPipeline(RenderPipeline &&) = delete;
-    ~RenderPipeline();
+    Entity(const std::string& modelFile, glm::vec3 position, float rotX, float rotY, float rotZ, float scale);
+    virtual ~Entity();  
 
-    void use() const;
-    void setCameraMatrix(const glm::mat4 &matrix) const;
-    void setColor(const glm::vec4 &color) const;
-    void setProjectionMatrix(const glm::mat4 &matrix) const;
+    void draw(GLuint shaderProgram) const;
+    glm::vec3 getPosition() const;
 
-    GLuint getShaderProgram() const { return program; }
-
-private:
-    void assertShaderCompilation(GLuint shader) const;
-    void assertProgramLinking() const;
+    static std::vector<std::unique_ptr<Entity>> loadModels(const std::string& directory);
 };
-}
+
+} // namespace engine
