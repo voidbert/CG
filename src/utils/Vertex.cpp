@@ -12,6 +12,10 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtx/hash.hpp>
+
 #include "utils/Vertex.hpp"
 
 namespace utils {

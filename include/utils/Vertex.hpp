@@ -14,9 +14,6 @@
 
 #pragma once
 
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include <glm/gtx/hash.hpp>
 #include <glm/vec4.hpp>
 
 namespace utils {
