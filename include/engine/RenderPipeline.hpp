@@ -12,14 +12,28 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/SceneWindow.hpp"
+#pragma once
+
+#include <glad/glad.h>
+#include <glm/mat4x4.hpp>
 
 namespace engine {
+class RenderPipeline {
+private:
+    GLuint vertexShader, fragmentShader, program;
 
-int main(int argc, char **argv) {
-    SceneWindow window = SceneWindow();
-    window.runLoop();
-    return 0;
-}
+public:
+    RenderPipeline();
+    RenderPipeline(const RenderPipeline &model) = delete;
+    RenderPipeline(RenderPipeline &&) = delete;
+    ~RenderPipeline();
 
+    void use() const;
+    void setCameraMatrix(const glm::mat4 &matrix) const;
+    void setColor(const glm::vec4 &color) const;
+
+private:
+    void assertShaderCompilation(GLuint shader) const;
+    void assertProgramLinking() const;
+};
 }

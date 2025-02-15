@@ -12,14 +12,29 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/SceneWindow.hpp"
+#pragma once
+
+#include <memory>
+
+#include "engine/Model.hpp"
+#include "engine/RenderPipeline.hpp"
+#include "engine/Window.hpp"
 
 namespace engine {
+class SceneWindow : public Window {
+private:
+    RenderPipeline pipeline;
 
-int main(int argc, char **argv) {
-    SceneWindow window = SceneWindow();
-    window.runLoop();
-    return 0;
-}
+    // TODO - remove, these are for testing purposes only
+    std::unique_ptr<Model> model1, model2;
+    glm::vec3 translate;
 
+public:
+    SceneWindow();
+
+protected:
+    void onUpdate(float time, float timeElapsed);
+    void onRender();
+    void onResize(int _width, int _height);
+};
 }
