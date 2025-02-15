@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 
 #include "utils/WavefrontOBJ.hpp"
 
@@ -67,8 +68,40 @@ void WavefrontOBJ::writeToFile(const std::string &filename) const {
 
     for (const TriangleFace &f : this->faces) {
         // 0-based index to 1-based index
-        file << "f " << f.p1 + 1 << " " << f.p2 + 1 << " " << f.p3 + 1 << std::endl;
+        file << "f ";
+        file << f.positions[0] + 1 << " ";
+        file << f.positions[1] + 1 << " ";
+        file << f.positions[0] + 1 << std::endl;
     }
 }
+
+std::pair<std::vector<Vertex>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVertices() const {
+    std::unordered_map<Vertex, int32_t> addedVertices;
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+
+    for (const TriangleFace &face : faces) {
+        for (int i = 0; i < 3; ++i) {
+            Vertex vertex(this->positions[face.positions[i]]);
+
+            auto it = addedVertices.find(vertex);
+            uint32_t bufferIndex;
+
+            if (it == addedVertices.end()) {
+                vertices.push_back(vertex);
+                bufferIndex = vertices.size() - 1;
+                addedVertices[vertex] = bufferIndex;
+            } else {
+                bufferIndex = it->second;
+            }
+
+            indices.push_back(bufferIndex);
+        }
+    }
+
+    return std::make_pair(vertices, indices);
+}
+
+// TODO - model optimization
 
 }

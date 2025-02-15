@@ -14,11 +14,14 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace utils {
 
 struct TriangleFace {
-    unsigned int p1, p2, p3;
-    TriangleFace(unsigned int _p1, unsigned int _p2, unsigned int _p3);
+    uint32_t positions[3];
+
+    TriangleFace(uint32_t p1, uint32_t p2, uint32_t p3);
 };
 
 }
