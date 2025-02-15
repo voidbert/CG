@@ -12,14 +12,24 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/SceneWindow.hpp"
+#pragma once
+
+#include <glad/glad.h>
+#include <glm/vec4.hpp>
+#include <vector>
 
 namespace engine {
+class Model {
+private:
+    GLuint vao, vbo, ibo;
+    unsigned int vertexCount;
 
-int main(int argc, char **argv) {
-    SceneWindow window = SceneWindow();
-    window.runLoop();
-    return 0;
-}
+public:
+    Model(const std::vector<glm::vec4> &positions, const std::vector<std::vector<int>> &faces);
+    Model(const Model &model) = delete;
+    Model(Model &&) = delete;
+    ~Model();
 
+    void draw() const;
+};
 }
