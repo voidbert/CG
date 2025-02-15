@@ -15,8 +15,8 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 namespace engine {
 
@@ -24,12 +24,12 @@ class Camera {
 private:
     glm::vec3 position;
     float pitch, yaw;
-    float fov; 
+    float fov;
 
 public:
     Camera();
 
-    void processInput(GLFWwindow* window, float deltaTime);
+    void processInput(GLFWwindow *window, float deltaTime);
     void apply(GLuint shaderProgram) const;
     void zoom(float offset);
 
@@ -39,4 +39,4 @@ public:
     float getFOV() const;
 };
 
-} 
+}

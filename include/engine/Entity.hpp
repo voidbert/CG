@@ -14,11 +14,11 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
-#include <memory>
-#include <glm/glm.hpp>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace engine {
 
@@ -26,7 +26,7 @@ class Entity {
 private:
     std::vector<glm::vec3> vertices;
     std::vector<int> indices;
-    
+
     GLuint VAO, VBO, EBO;
     glm::vec3 position;
     float rotX, rotY, rotZ, scale;
@@ -34,13 +34,18 @@ private:
     void setupMesh();
 
 public:
-    Entity(const std::string& modelFile, glm::vec3 position, float rotX, float rotY, float rotZ, float scale);
-    virtual ~Entity();  
+    Entity(const std::string &modelFile,
+           glm::vec3 position,
+           float rotX,
+           float rotY,
+           float rotZ,
+           float scale);
+    virtual ~Entity();
 
     void draw(GLuint shaderProgram) const;
     glm::vec3 getPosition() const;
 
-    static std::vector<std::unique_ptr<Entity>> loadModels(const std::string& directory);
+    static std::vector<std::unique_ptr<Entity>> loadModels(const std::string &directory);
 };
 
 } // namespace engine

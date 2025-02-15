@@ -16,11 +16,11 @@
 
 #include <memory>
 
+#include "engine/Camera.hpp"
+#include "engine/Entity.hpp"
 #include "engine/Model.hpp"
 #include "engine/RenderPipeline.hpp"
 #include "engine/Window.hpp"
-#include "engine/Camera.hpp"  
-#include "engine/Entity.hpp"
 
 namespace engine {
 class SceneWindow : public Window {

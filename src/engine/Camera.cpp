@@ -13,15 +13,14 @@
 /// limitations under the License.
 
 #include "engine/Camera.hpp"
-
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
-#include <algorithm> 
 
 namespace engine {
 
 Camera::Camera() : position(0.0f, 0.0f, 3.0f), pitch(0.0f), yaw(-90.0f), fov(45.0f) {}
 
-void Camera::processInput(GLFWwindow* window, float deltaTime) {
+void Camera::processInput(GLFWwindow *window, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         position.z -= 2.5f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -33,7 +32,8 @@ void Camera::processInput(GLFWwindow* window, float deltaTime) {
 }
 
 void Camera::apply(GLuint shaderProgram) const {
-    glm::mat4 viewMatrix = glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 viewMatrix =
+        glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     GLint viewLoc = glGetUniformLocation(shaderProgram, "uniCameraMatrix");
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &viewMatrix[0][0]);
@@ -43,8 +43,14 @@ float Camera::getFOV() const {
     return fov;
 }
 
-glm::vec3 Camera::getPosition() const { return position; }
-float Camera::getPitch() const { return pitch; }
-float Camera::getYaw() const { return yaw; }
+glm::vec3 Camera::getPosition() const {
+    return position;
+}
+float Camera::getPitch() const {
+    return pitch;
+}
+float Camera::getYaw() const {
+    return yaw;
+}
 
-} 
+}

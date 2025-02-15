@@ -59,17 +59,14 @@ void SceneWindow::onRender() {
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
     // Creates a perspective projection matrix for realistic depth perception
-    glm::mat4 projectionMatrix = glm::perspective(
-        glm::radians(camera.getFOV()),
-        800.0f / 600.0f, 
-        0.1f, 100.0f
-    );
+    glm::mat4 projectionMatrix =
+        glm::perspective(glm::radians(camera.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
 
     this->pipeline.setProjectionMatrix(projectionMatrix);
 
     this->camera.apply(this->pipeline.getShaderProgram());
 
-    for (const auto& entity : entities) {
+    for (const auto &entity : entities) {
         entity->draw(this->pipeline.getShaderProgram());
     }
 

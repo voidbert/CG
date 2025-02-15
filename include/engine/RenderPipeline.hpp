@@ -33,7 +33,9 @@ public:
     void setColor(const glm::vec4 &color) const;
     void setProjectionMatrix(const glm::mat4 &matrix) const;
 
-    GLuint getShaderProgram() const { return program; }
+    GLuint getShaderProgram() const {
+        return program;
+    }
 
 private:
     void assertShaderCompilation(GLuint shader) const;

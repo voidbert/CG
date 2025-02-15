@@ -13,18 +13,22 @@
 /// limitations under the License.
 
 #include "engine/Entity.hpp"
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 namespace fs = std::filesystem;
 namespace engine {
 
-Entity::Entity(const std::string& modelFile, glm::vec3 initialPosition, float rotationX, float rotationY, float rotationZ, float scaling)
-    : position(initialPosition), rotX(rotationX), rotY(rotationY), rotZ(rotationZ), scale(scaling) {
-    
+Entity::Entity(const std::string &modelFile,
+               glm::vec3 initialPosition,
+               float rotationX,
+               float rotationY,
+               float rotationZ,
+               float scaling) :
+    position(initialPosition), rotX(rotationX), rotY(rotationY), rotZ(rotationZ), scale(scaling) {
+
     std::ifstream file(modelFile);
     if (!file.is_open()) {
         std::cerr << "[ERRO] Falha ao abrir " << modelFile << std::endl;
@@ -69,22 +73,22 @@ void Entity::draw(GLuint shaderProgram) const {
     glBindVertexArray(0);
 }
 
-std::vector<std::unique_ptr<Entity>> Entity::loadModels(const std::string& directory) {
+std::vector<std::unique_ptr<Entity>> Entity::loadModels(const std::string &directory) {
     std::vector<std::unique_ptr<Entity>> models;
 
     try {
-        for (const auto& entry : fs::directory_iterator(directory)) {
+        for (const auto &entry : fs::directory_iterator(directory)) {
             if (entry.path().extension() == ".3d") {
                 std::cout << "[DEBUG] Modelo carregado: " << entry.path().filename() << std::endl;
-                models.push_back(std::make_unique<Entity>(
-                    entry.path().string(),
-                    glm::vec3(0.0f),
-                    0.0f, 0.0f, 0.0f,
-                    1.0f
-                ));
+                models.push_back(std::make_unique<Entity>(entry.path().string(),
+                                                          glm::vec3(0.0f),
+                                                          0.0f,
+                                                          0.0f,
+                                                          0.0f,
+                                                          1.0f));
             }
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cerr << "[ERRO] Falha ao listar modelos: " << e.what() << std::endl;
     }
 
@@ -99,15 +103,21 @@ void Entity::setupMesh() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,
+                 vertices.size() * sizeof(glm::vec3),
+                 vertices.data(),
+                 GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 indices.size() * sizeof(int),
+                 indices.data(),
+                 GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void *) 0);
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
 }
 
-} 
+}
