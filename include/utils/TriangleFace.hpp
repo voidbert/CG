@@ -14,7 +14,11 @@
 
 #pragma once
 
+namespace utils {
+
 struct TriangleFace {
     unsigned int p1, p2, p3;
     TriangleFace(unsigned int _p1, unsigned int _p2, unsigned int _p3);
 };
+
+}

@@ -16,7 +16,11 @@
 
 #include "utils/WavefrontOBJ.hpp"
 
-class Box : public WavefrontOBJ {
+namespace generator::figures {
+
+class Box : public utils::WavefrontOBJ {
 public:
     Box(float size, int divisions);
 };
+
+}

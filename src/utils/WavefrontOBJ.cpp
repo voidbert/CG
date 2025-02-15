@@ -17,6 +17,8 @@
 
 #include "utils/WavefrontOBJ.hpp"
 
+namespace utils {
+
 WavefrontOBJ::WavefrontOBJ() : positions(), faces() {}
 
 WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
@@ -57,7 +59,7 @@ void WavefrontOBJ::writeToFile(const std::string &filename) const {
 
     for (const glm::vec4 &v : this->positions) {
         file << "v " << v.x << " " << v.y << " " << v.z;
-        if (v.w != 0.0f)
+        if (v.w != 1.0f)
             file << " " << v.w;
 
         file << std::endl;
@@ -67,4 +69,6 @@ void WavefrontOBJ::writeToFile(const std::string &filename) const {
         // 0-based index to 1-based index
         file << "f " << f.p1 + 1 << " " << f.p2 + 1 << " " << f.p3 + 1 << std::endl;
     }
+}
+
 }

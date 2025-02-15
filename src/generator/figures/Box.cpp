@@ -12,7 +12,11 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <glm/vec3.hpp>
+
 #include "generator/figures/Box.hpp"
+
+namespace generator::figures {
 
 Box::Box(float size, int divisions) {
     float step = size / divisions;
@@ -77,10 +81,12 @@ Box::Box(float size, int divisions) {
             for (int j = 0; j < divisions; j++) {
                 int idx = offset + i * (divisions + 1) + j;
 
-                this->faces.push_back(TriangleFace(idx, idx + 1, idx + divisions + 1));
+                this->faces.push_back(utils::TriangleFace(idx, idx + 1, idx + divisions + 1));
                 this->faces.push_back(
-                    TriangleFace(idx + 1, idx + divisions + 2, idx + divisions + 1));
+                    utils::TriangleFace(idx + 1, idx + divisions + 2, idx + divisions + 1));
             }
         }
     }
+}
+
 }

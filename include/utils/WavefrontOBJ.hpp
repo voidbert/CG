@@ -14,12 +14,14 @@
 
 #pragma once
 
-#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <string>
 #include <vector>
 
 #include "utils/TriangleFace.hpp"
 #include "utils/Vertex.hpp"
+
+namespace utils {
 
 class WavefrontOBJ {
 protected:
@@ -32,3 +34,5 @@ public:
 
     void writeToFile(const std::string &filename) const;
 };
+
+}

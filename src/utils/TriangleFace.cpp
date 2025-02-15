@@ -14,5 +14,9 @@
 
 #include "utils/TriangleFace.hpp"
 
+namespace utils {
+
 TriangleFace::TriangleFace(unsigned int _p1, unsigned int _p2, unsigned int _p3) :
     p1(_p1), p2(_p2), p3(_p3) {}
+
+}

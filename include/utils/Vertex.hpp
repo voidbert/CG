@@ -15,10 +15,13 @@
 #pragma once
 
 #include <glm/vec4.hpp>
-#include <vector>
+
+namespace utils {
 
 struct Vertex {
     glm::vec4 position;
 
     Vertex(float x, float y, float z);
 };
+
+}

@@ -16,7 +16,11 @@
 
 #include "utils/WavefrontOBJ.hpp"
 
-class Sphere : public WavefrontOBJ {
+namespace generator::figures {
+
+class Sphere : public utils::WavefrontOBJ {
 public:
     Sphere(float radius, int slices, int stacks);
 };
+
+}

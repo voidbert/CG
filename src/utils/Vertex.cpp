@@ -12,10 +12,10 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <glm/glm.hpp>
-#include <string>
-#include <vector>
-
 #include "utils/Vertex.hpp"
 
+namespace utils {
+
 Vertex::Vertex(float x, float y, float z) : position(x, y, z, 1.0f) {}
+
+}

@@ -16,6 +16,8 @@
 
 #include "generator/figures/Sphere.hpp"
 
+namespace generator::figures {
+
 Sphere::Sphere(float radius, int slices, int stacks) {
     float stackStep = M_PI / stacks;
     float sliceStep = 2 * M_PI / slices;
@@ -39,8 +41,10 @@ Sphere::Sphere(float radius, int slices, int stacks) {
             int curr = iStack * (slices + 1) + jSlice;
             int next = (iStack + 1) * (slices + 1) + jSlice;
 
-            this->faces.push_back(TriangleFace(curr, next, next + 1));
-            this->faces.push_back(TriangleFace(curr, curr + 1, next + 1));
+            this->faces.push_back(utils::TriangleFace(curr, next, next + 1));
+            this->faces.push_back(utils::TriangleFace(curr, curr + 1, next + 1));
         }
     }
+}
+
 }

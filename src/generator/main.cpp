@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
             double grid = stringToDouble(args.at(3));
             std::string file = args.at(4);
 
-            Box box(length, grid);
+            figures::Box box(length, grid);
             box.writeToFile(file);
         } else if (args.at(1) == "sphere") {
             double radius = stringToDouble(args.at(2));
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
             int stacks = stringToInt(args.at(4));
             std::string file = args.at(5);
 
-            Sphere sphere(radius, slices, stacks);
+            figures::Sphere sphere(radius, slices, stacks);
             sphere.writeToFile(file);
         } else if (args.at(1) == "cone") {
             double radius = stringToDouble(args.at(2));
