@@ -22,19 +22,17 @@ SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), transla
     // Only do this once, as we have a single shader program
     this->pipeline.use();
 
-    std::vector<glm::vec4> vertices1 { glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f),
-                                       glm::vec4(0.5f, -0.5f, 0.0f, 1.0f),
-                                       glm::vec4(0.0f, 0.5f, 0.0f, 1.0f) };
+    std::vector<utils::Vertex> vertices1 { utils::Vertex(-0.5f, -0.5f, 0.0f),
+                                           utils::Vertex(0.5f, -0.5f, 0.0f),
+                                           utils::Vertex(0.0f, 0.5f, 0.0f) };
 
-    std::vector<glm::vec4> vertices2 { glm::vec4(0.5f, 0.5f, 0.0f, 1.0f),
-                                       glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f),
-                                       glm::vec4(0.0f, -0.5f, 0.0f, 1.0f) };
-    std::vector<std::vector<int>> faces {
-        { 0, 1, 2 }
-    };
+    std::vector<utils::Vertex> vertices2 { utils::Vertex(0.5f, 0.5f, 0.0f),
+                                           utils::Vertex(-0.5f, 0.5f, 0.0f),
+                                           utils::Vertex(0.0f, -0.5f, 0.0f) };
+    std::vector<uint32_t> indices { 0, 1, 2 };
 
-    this->model1 = std::make_unique<Model>(vertices1, faces);
-    this->model2 = std::make_unique<Model>(vertices2, faces);
+    this->model1 = std::make_unique<Model>(vertices1, indices);
+    this->model2 = std::make_unique<Model>(vertices1, indices);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }

@@ -15,8 +15,9 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/vec4.hpp>
 #include <vector>
+
+#include "utils/WavefrontOBJ.hpp"
 
 namespace engine {
 class Model {
@@ -25,11 +26,16 @@ private:
     unsigned int vertexCount;
 
 public:
-    Model(const std::vector<glm::vec4> &positions, const std::vector<std::vector<int>> &faces);
+    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> indices);
+    explicit Model(const utils::WavefrontOBJ &objectFile);
+
     Model(const Model &model) = delete;
     Model(Model &&) = delete;
     ~Model();
 
     void draw() const;
+
+private:
+    explicit Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices);
 };
 }
