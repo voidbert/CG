@@ -26,12 +26,16 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
     std::ifstream file;
     file.open(filename);
     if (!file.is_open()) {
-        throw std::ios_base::failure("Failed to open OBJ file");
+        throw std::ios_base::failure("Failed to open OBJ file: " + filename);
     }
 
     std::string line;
     while (std::getline(file, line)) {
         std::stringstream ss(line);
+        ss.exceptions(std::ios::failbit);
+
+        // TODO - In the future, with a more complex format, change to RegEx approach
+
         std::string type;
         ss >> type;
 
@@ -39,24 +43,26 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
             float x, y, z;
             ss >> x >> y >> z;
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
-
-            // TODO - support for w coordinate
         } else if (type == "f") {
-            unsigned int p1, p2, p3;
+            uint32_t p1, p2, p3;
             ss >> p1 >> p2 >> p3;
 
             // 1-based index to 0-based index
             this->faces.push_back(TriangleFace(p1 - 1, p2 - 1, p3 - 1));
         }
-
-        // TODO - comment support
     }
 
     if (file.bad()) {
-        throw std::ios_base::failure("Error while reading from OBJ file");
+        throw std::ios_base::failure("Error while reading from OBJ file: " + filename);
     }
 
-    // TODO - error checking
+    for (const TriangleFace &face : this->faces) {
+        for (const uint32_t &positionIndex : face.positions) {
+            if (positionIndex >= this->positions.size()) {
+                throw std::runtime_error("Invalid data in OBJ file: " + filename);
+            }
+        }
+    }
 }
 
 void WavefrontOBJ::writeToFile(const std::string &filename) const {

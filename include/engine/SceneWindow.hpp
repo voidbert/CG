@@ -26,7 +26,7 @@ private:
     RenderPipeline pipeline;
 
     // TODO - remove, these are for testing purposes only
-    std::unique_ptr<Model> model1, model2;
+    std::unique_ptr<Model> model;
     glm::vec3 translate;
 
 public:

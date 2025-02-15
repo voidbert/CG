@@ -22,17 +22,9 @@ SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), transla
     // Only do this once, as we have a single shader program
     this->pipeline.use();
 
-    std::vector<utils::Vertex> vertices1 { utils::Vertex(-0.5f, -0.5f, 0.0f),
-                                           utils::Vertex(0.5f, -0.5f, 0.0f),
-                                           utils::Vertex(0.0f, 0.5f, 0.0f) };
-
-    std::vector<utils::Vertex> vertices2 { utils::Vertex(0.5f, 0.5f, 0.0f),
-                                           utils::Vertex(-0.5f, 0.5f, 0.0f),
-                                           utils::Vertex(0.0f, -0.5f, 0.0f) };
-    std::vector<uint32_t> indices { 0, 1, 2 };
-
-    this->model1 = std::make_unique<Model>(vertices1, indices);
-    this->model2 = std::make_unique<Model>(vertices1, indices);
+    // TODO - in the future, remove this, as this is just for testing
+    const utils::WavefrontOBJ object("out.obj");
+    this->model = std::make_unique<Model>(object);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
@@ -53,13 +45,9 @@ void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    this->pipeline.setCameraMatrix(glm::mat4(1.0f));
-    this->pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    this->model1->draw();
-
     this->pipeline.setCameraMatrix(glm::translate(glm::mat4(1.0f), this->translate));
-    this->pipeline.setColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-    this->model2->draw();
+    this->pipeline.setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    this->model->draw();
 }
 
 void SceneWindow::onResize(int _width, int _height) {
