@@ -14,18 +14,13 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
-#include <string>
-#include <vector>
+#include "utils/WavefrontOBJ.hpp"
 
-#include "utils/Vertex.hpp"
+namespace generator::figures {
 
-class Sphere {
-private:
-    std::vector<Vertex> vertices;
-    std::vector<std::vector<int>> faces;
-
+class Sphere : public utils::WavefrontOBJ {
 public:
     Sphere(float radius, int slices, int stacks);
-    void toObj(const std::string &file3d);
 };
+
+}

@@ -12,11 +12,8 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#ifndef ENGINE_MAIN_HPP
-#define ENGINE_MAIN_HPP
+#pragma once
 
 namespace engine {
 int main(int argc, char **argv);
 }
-
-#endif

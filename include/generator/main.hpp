@@ -12,11 +12,8 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#ifndef GENERATOR_MAIN_HPP
-#define GENERATOR_MAIN_HPP
+#pragma once
 
 namespace generator {
 int main(int argc, char **argv);
 }
-
-#endif

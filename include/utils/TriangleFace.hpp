@@ -12,25 +12,16 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#define GLM_ENABLE_EXPERIMENTAL
+#pragma once
 
-#include <glm/gtx/hash.hpp>
-
-#include "utils/Vertex.hpp"
+#include <cstdint>
 
 namespace utils {
 
-Vertex::Vertex(const glm::vec4 &_position) : position(_position) {}
-Vertex::Vertex(float x, float y, float z) : position(x, y, z, 1.0f) {}
+struct TriangleFace {
+    uint32_t positions[3];
 
-}
-
-namespace std {
-
-size_t hash<utils::Vertex>::operator()(const utils::Vertex &p) const {
-    return hash<glm::vec4> {}(p.position);
-}
-
-template struct std::hash<utils::Vertex>;
+    TriangleFace(uint32_t p1, uint32_t p2, uint32_t p3);
+};
 
 }
