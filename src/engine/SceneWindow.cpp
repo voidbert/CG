@@ -20,6 +20,7 @@
 namespace engine {
 SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), translate() {
     // Only do this once, as we have a single shader program
+
     this->pipeline.use();
 
     std::vector<glm::vec4> vertices1 { glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f),
@@ -58,7 +59,7 @@ void SceneWindow::onRender() {
 
     glm::mat4 cameraMatrix = camera.getCameraMatrix(static_cast<float>(getWidth()) / getHeight());
 
-    this->pipeline.setTransformMatrix(cameraMatrix);
+    this->pipeline.setCameraMatrix(cameraMatrix);
 
     this->pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
     this->model1->draw();

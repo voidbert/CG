@@ -12,52 +12,37 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <glm/gtc/constants.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "engine/Camera.hpp"
 
 namespace engine {
 
 Camera::Camera() :
     position(0.0f, 0.0f, 3.0f),
-    front(0.0f, 0.0f, -1.0f),
+    lookAt(0.0f, 0.0f, 0.0f),
     up(0.0f, 1.0f, 0.0f),
-    pitch(0.0f),
-    yaw(-glm::half_pi<float>()) {
-    updateVectors();
-}
+    fov(45.0f),
+    nearPlane(0.1f),
+    farPlane(100.0f) {}
+
+Camera::Camera(const glm::vec3 &pos,
+               const glm::vec3 &target,
+               const glm::vec3 &upDir,
+               float fovAngle,
+               float near,
+               float far) :
+    position(pos), lookAt(target), up(upDir), fov(fovAngle), nearPlane(near), farPlane(far) {}
 
 void Camera::move(const glm::vec3 &direction, float deltaTime) {
     float speed = 2.5f * deltaTime;
-    position += direction * speed;
-}
-
-void Camera::rotate(float deltaYaw, float deltaPitch) {
-    yaw += deltaYaw;
-    pitch += deltaPitch;
-
-    if (pitch > glm::radians(89.0f))
-        pitch = glm::radians(89.0f);
-    if (pitch < glm::radians(-89.0f))
-        pitch = glm::radians(-89.0f);
-
-    updateVectors();
+    this->position += direction * speed;
+    this->lookAt += direction * speed;
 }
 
 glm::mat4 Camera::getCameraMatrix(float aspectRatio) const {
-    glm::mat4 view = glm::lookAt(position, position + front, up);
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+    glm::mat4 view = glm::lookAt(this->position, this->lookAt, this->up);
+    glm::mat4 projection =
+        glm::perspective(glm::radians(this->fov), aspectRatio, this->nearPlane, this->farPlane);
     return projection * view;
-}
-
-void Camera::updateVectors() {
-    glm::vec3 direction;
-    direction.x = cos(yaw) * cos(pitch);
-    direction.y = sin(pitch);
-    direction.z = sin(yaw) * cos(pitch);
-
-    front = glm::normalize(direction);
 }
 
 }

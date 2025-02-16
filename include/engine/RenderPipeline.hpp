@@ -29,8 +29,7 @@ public:
     ~RenderPipeline();
 
     void use() const;
-    // void setCameraMatrix(const glm::mat4 &matrix) const;
-    void setTransformMatrix(const glm::mat4 &matrix) const;
+    void setCameraMatrix(const glm::mat4 &matrix) const;
     void setColor(const glm::vec4 &color) const;
 
 private:

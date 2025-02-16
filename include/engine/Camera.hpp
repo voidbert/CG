@@ -22,18 +22,22 @@ namespace engine {
 class Camera {
 private:
     glm::vec3 position;
-    glm::vec3 front;
+    glm::vec3 lookAt;
     glm::vec3 up;
-    float pitch, yaw;
-
-    void updateVectors();
+    float fov;
+    float nearPlane;
+    float farPlane;
 
 public:
     Camera();
+    Camera(const glm::vec3 &position,
+           const glm::vec3 &lookAt,
+           const glm::vec3 &up,
+           float fov,
+           float nearPlane,
+           float farPlane);
 
     void move(const glm::vec3 &direction, float deltaTime);
-    void rotate(float deltaYaw, float deltaPitch);
-
     glm::mat4 getCameraMatrix(float aspectRatio) const;
 };
 
