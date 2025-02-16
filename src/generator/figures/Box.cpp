@@ -12,67 +12,51 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <fstream>
-#include <iostream>
-#include <vector>
+#include <glm/vec3.hpp>
 
 #include "generator/figures/Box.hpp"
+
+namespace generator::figures {
 
 Box::Box(float size, int divisions) {
     float step = size / divisions;
     float half = size / 2.0f;
 
     for (int face = 0; face < 6; face++) {
-        glm::vec3 normal;
-        int axis1, axis2, fixed;
+        glm::vec3 ivec, jvec;
 
         switch (face) {
+            // Front and back
             case 0:
-                normal = { 0, 0, 1 };
-                axis1 = 0;
-                axis2 = 1;
-                fixed = 2;
-                break;
             case 1:
-                normal = { 0, 0, -1 };
-                axis1 = 0;
-                axis2 = 1;
-                fixed = 2;
+                ivec = glm::vec3(1.0f, 0.0f, 0.0f);
+                jvec = glm::vec3(0.0f, 1.0f, 0.0f);
                 break;
+            // Right and left
             case 2:
-                normal = { 0, 1, 0 };
-                axis1 = 0;
-                axis2 = 2;
-                fixed = 1;
-                break;
             case 3:
-                normal = { 0, -1, 0 };
-                axis1 = 0;
-                axis2 = 2;
-                fixed = 1;
+                ivec = glm::vec3(0.0f, 1.0f, 0.0f);
+                jvec = glm::vec3(0.0f, 0.0f, 1.0f);
                 break;
+            // Top and bottom
             case 4:
-                normal = { 1, 0, 0 };
-                axis1 = 1;
-                axis2 = 2;
-                fixed = 0;
-                break;
             case 5:
-                normal = { -1, 0, 0 };
-                axis1 = 1;
-                axis2 = 2;
-                fixed = 0;
+                ivec = glm::vec3(1.0f, 0.0f, 0.0f);
+                jvec = glm::vec3(0.0f, 0.0f, 1.0f);
                 break;
         }
 
+        const bool positiveCoordinateFace = (face % 2) == 0;
+        const float faceNormalMultiplier = positiveCoordinateFace ? 1.0f : -1.0f;
+
+        const glm::vec3 faceNormal = glm::vec3(1.0f, 1.0f, 1.0f) - ivec - jvec;
+        const glm::vec3 faceStartTranslate =
+            (ivec + jvec + faceNormal * faceNormalMultiplier) * -half;
+
         for (int i = 0; i <= divisions; i++) {
             for (int j = 0; j <= divisions; j++) {
-                glm::vec3 pos(0.0f);
-                pos[axis1] = -half + j * step;
-                pos[axis2] = -half + i * step;
-                pos[fixed] = half * normal[fixed];
-
-                vertices.push_back(Vertex(pos.x, pos.y, pos.z));
+                const glm::vec3 vertexOffset = ivec * (i * step) + jvec * (j * step);
+                this->positions.push_back(glm::vec4(faceStartTranslate + vertexOffset, 1.0f));
             }
         }
 
@@ -81,27 +65,12 @@ Box::Box(float size, int divisions) {
             for (int j = 0; j < divisions; j++) {
                 int idx = offset + i * (divisions + 1) + j;
 
-                faces.push_back({ idx, idx + 1, idx + divisions + 1 });
-                faces.push_back({ idx + 1, idx + divisions + 2, idx + divisions + 1 });
+                this->faces.push_back(utils::TriangleFace(idx, idx + 1, idx + divisions + 1));
+                this->faces.push_back(
+                    utils::TriangleFace(idx + 1, idx + divisions + 2, idx + divisions + 1));
             }
         }
     }
 }
 
-void Box::toObj(const std::string &file3d) {
-    std::ofstream file(file3d);
-    if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o ficheiro: " << file3d << "\n";
-        return;
-    }
-
-    for (const auto &p : vertices) {
-        file << "v " << p.position.x << " " << p.position.y << " " << p.position.z << "\n";
-    }
-
-    for (const auto &f : faces) {
-        file << "f " << (f[0] + 1) << " " << (f[1] + 1) << " " << (f[2] + 1) << "\n";
-    }
-
-    file.close();
 }

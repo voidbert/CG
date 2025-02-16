@@ -12,32 +12,27 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <fstream>
-#include <glm/glm.hpp>
-#include <iostream>
-#include <math.h>
-#include <string>
-#include <vector>
+#include <cmath>
 
 #include "generator/figures/Sphere.hpp"
-#include "utils/WavefrontOBJ.hpp"
+
+namespace generator::figures {
 
 Sphere::Sphere(float radius, int slices, int stacks) {
-
     float stackStep = M_PI / stacks;
     float sliceStep = 2 * M_PI / slices;
 
     for (int iStack = 0; iStack <= stacks; iStack++) {
         float theta = iStack * stackStep;
-        float y = radius * cos(theta);
-        float xz = radius * sin(theta);
+        float y = radius * cosf(theta);
+        float xz = radius * sinf(theta);
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
             float phi = jSlice * sliceStep;
-            float x = xz * sin(phi);
-            float z = xz * cos(phi);
+            float x = xz * sinf(phi);
+            float z = xz * cosf(phi);
 
-            vertices.push_back(Vertex(x, y, z));
+            this->positions.push_back(glm::vec4(x, y, z, 1.0f));
         }
     }
 
@@ -46,12 +41,10 @@ Sphere::Sphere(float radius, int slices, int stacks) {
             int curr = iStack * (slices + 1) + jSlice;
             int next = (iStack + 1) * (slices + 1) + jSlice;
 
-            faces.push_back({ curr, next, next + 1 });
-            faces.push_back({ curr, curr + 1, next + 1 });
+            this->faces.push_back(utils::TriangleFace(curr, next, next + 1));
+            this->faces.push_back(utils::TriangleFace(curr, curr + 1, next + 1));
         }
     }
 }
 
-void Sphere::toObj(const std::string &file3d) {
-    writeObjFile(file3d, vertices, faces);
 }

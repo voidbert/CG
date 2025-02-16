@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <glm/gtc/type_ptr.hpp>
 #include <stdexcept>
 #include <string>
 
@@ -43,7 +44,6 @@ void main() {
 )";
 
 RenderPipeline::RenderPipeline() : vertexShader(0), fragmentShader(0), program(0) {
-
     // Compile vertex shader
     this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(this->vertexShader, 1, &vertexShaderSource, nullptr);
@@ -79,7 +79,7 @@ void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
     glUniformMatrix4fv(1, 1, GL_FALSE, &matrix[0][0]);
 }
 void RenderPipeline::setColor(const glm::vec4 &color) const {
-    glUniform4f(2, color[0], color[1], color[2], color[3]);
+    glUniform4f(2, color.x, color.y, color.z, color.w);
 }
 
 void RenderPipeline::assertShaderCompilation(GLuint shader) const {

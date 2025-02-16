@@ -14,17 +14,13 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include "utils/WavefrontOBJ.hpp"
 
-#include "utils/Vertex.hpp"
+namespace generator::figures {
 
-class Box {
-private:
-    std::vector<Vertex> vertices;
-    std::vector<std::vector<int>> faces;
-
+class Box : public utils::WavefrontOBJ {
 public:
     Box(float size, int divisions);
-    void toObj(const std::string &file3d);
 };
+
+}

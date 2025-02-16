@@ -13,65 +13,107 @@
 /// limitations under the License.
 
 #include <fstream>
-#include <glm/glm.hpp>
-#include <iostream>
 #include <sstream>
-#include <string>
-#include <vector>
+#include <unordered_map>
 
-#include "utils/Vertex.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
-std::pair<std::vector<Vertex>, std::vector<std::vector<int>>>
-    readObjFile(const std::string &filename) {
-    std::ifstream file;
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    file.open(filename);
+namespace utils {
 
-    std::vector<Vertex> vertices;
-    std::vector<std::vector<int>> faces;
+WavefrontOBJ::WavefrontOBJ() : positions(), faces() {}
+
+WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
+    std::ifstream file;
+    file.open(filename);
+    if (!file.is_open()) {
+        throw std::ios_base::failure("Failed to open OBJ file: " + filename);
+    }
 
     std::string line;
-    while (getline(file, line)) {
+    while (std::getline(file, line)) {
         std::stringstream ss(line);
+        ss.exceptions(std::ios::failbit);
+
+        // TODO - In the future, with a more complex format, change to RegEx approach
+
         std::string type;
         ss >> type;
 
         if (type == "v") {
             float x, y, z;
             ss >> x >> y >> z;
-            Vertex v = Vertex(x, y, z);
-            vertices.push_back(v);
+            this->positions.push_back(glm::vec4(x, y, z, 1.0f));
         } else if (type == "f") {
-            std::vector<int> face;
-            int index;
-            while (ss >> index) {
-                face.push_back(index - 1); // 1-based index to 0-based index
-            }
-            faces.push_back(face);
+            uint32_t p1, p2, p3;
+            ss >> p1 >> p2 >> p3;
+
+            // 1-based index to 0-based index
+            this->faces.push_back(TriangleFace(p1 - 1, p2 - 1, p3 - 1));
         }
     }
-    file.close();
-    return std::make_pair(vertices, faces);
+
+    if (file.bad()) {
+        throw std::ios_base::failure("Error while reading from OBJ file: " + filename);
+    }
+
+    for (const TriangleFace &face : this->faces) {
+        for (const uint32_t &positionIndex : face.positions) {
+            if (positionIndex >= this->positions.size()) {
+                throw std::runtime_error("Invalid data in OBJ file: " + filename);
+            }
+        }
+    }
 }
 
-void writeObjFile(const std::string &filename,
-                  const std::vector<Vertex> &vertices,
-                  const std::vector<std::vector<int>> &faces) {
+void WavefrontOBJ::writeToFile(const std::string &filename) const {
     std::ofstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(filename, std::ios::out | std::ios::trunc);
-    for (const auto &v : vertices) {
-        file << "v " << v.position.x << " " << v.position.y << " " << v.position.z << std::endl;
-    }
 
-    for (const auto &f : faces) {
-        file << "f";
-        for (int idx : f) {
-            file << " " << (idx + 1); // 0-based index to 1-based index
-        }
+    for (const glm::vec4 &v : this->positions) {
+        file << "v " << v.x << " " << v.y << " " << v.z;
+        if (v.w != 1.0f)
+            file << " " << v.w;
+
         file << std::endl;
     }
 
-    file.close();
+    for (const TriangleFace &f : this->faces) {
+        // 0-based index to 1-based index
+        file << "f ";
+        file << f.positions[0] + 1 << " ";
+        file << f.positions[1] + 1 << " ";
+        file << f.positions[0] + 1 << std::endl;
+    }
+}
+
+std::pair<std::vector<Vertex>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVertices() const {
+    std::unordered_map<Vertex, int32_t> addedVertices;
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+
+    for (const TriangleFace &face : faces) {
+        for (int i = 0; i < 3; ++i) {
+            Vertex vertex(this->positions[face.positions[i]]);
+
+            auto it = addedVertices.find(vertex);
+            uint32_t bufferIndex;
+
+            if (it == addedVertices.end()) {
+                vertices.push_back(vertex);
+                bufferIndex = vertices.size() - 1;
+                addedVertices[vertex] = bufferIndex;
+            } else {
+                bufferIndex = it->second;
+            }
+
+            indices.push_back(bufferIndex);
+        }
+    }
+
+    return std::make_pair(vertices, indices);
+}
+
+// TODO - model optimization before writing? Maybe a possible feature?
+
 }

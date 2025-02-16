@@ -23,19 +23,9 @@ SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), transla
 
     this->pipeline.use();
 
-    std::vector<glm::vec4> vertices1 { glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f),
-                                       glm::vec4(0.5f, -0.5f, 0.0f, 1.0f),
-                                       glm::vec4(0.0f, 0.5f, 0.0f, 1.0f) };
-
-    std::vector<glm::vec4> vertices2 { glm::vec4(0.5f, 0.5f, 0.0f, 1.0f),
-                                       glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f),
-                                       glm::vec4(0.0f, -0.5f, 0.0f, 1.0f) };
-    std::vector<std::vector<int>> faces {
-        { 0, 1, 2 }
-    };
-
-    this->model1 = std::make_unique<Model>(vertices1, faces);
-    this->model2 = std::make_unique<Model>(vertices2, faces);
+    // TODO - in the future, remove this, as this is just for testing
+    const utils::WavefrontOBJ object("out.obj");
+    this->model = std::make_unique<Model>(object);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }

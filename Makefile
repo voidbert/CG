@@ -17,7 +17,7 @@
 CC       := gcc
 CPP      := g++
 CFLAGS   := -O2 -w -Ilib/include
-CPPFLAGS := -Iinclude -std=c++17 -Wall -Wextra -pedantic -Wshadow \
+CPPFLAGS := -Iinclude -std=c++20 -Wall -Wextra -pedantic -Wshadow \
 				$(shell pkg-config --cflags glfw3) -DGLFW_INCLUDE_NONE \
 				$(shell pkg-config --cflags glm) \
 				$(shell pkg-config --cflags gl) \
