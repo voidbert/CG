@@ -73,11 +73,12 @@ RenderPipeline::~RenderPipeline() {
 
 void RenderPipeline::use() const {
     glUseProgram(this->program);
+    this->setCameraMatrix(glm::mat4(1.0f));
     this->setColor(glm::vec4(1.0f));
 }
 
 void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
-    glUniformMatrix4fv(1, 1, GL_FALSE, &matrix[0][0]);
+    glUniformMatrix4fv(1, 1, false, glm::value_ptr(matrix));
 }
 
 void RenderPipeline::setColor(const glm::vec4 &color) const {
