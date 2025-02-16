@@ -22,10 +22,12 @@ SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), transla
     // Only do this once, as we have a single shader program
 
     // TODO - in the future, remove this, as this is just for testing
-    camera = Camera(glm::vec3(0.0f, 0.0f, 5.0f), 
-                glm::vec3(0.0f, 0.0f, 0.0f),  
-                glm::vec3(0.0f, 1.0f, 0.0f), 
-                60.0f, 0.01f, 1000.0f); 
+    camera = Camera(glm::vec3(0.0f, 0.0f, 5.0f),
+                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    glm::vec3(0.0f, 1.0f, 0.0f),
+                    60.0f,
+                    0.01f,
+                    1000.0f);
 
     this->pipeline.use();
 
@@ -44,7 +46,7 @@ void SceneWindow::onUpdate(float time, float timeElapsed) {
     const int left = glfwGetKey(windowHandle, GLFW_KEY_A);
     const int right = glfwGetKey(windowHandle, GLFW_KEY_D);
 
-    const float cameraSpeed = 2.5f; 
+    const float cameraSpeed = 2.5f;
     const glm::vec3 direction((right - left), 0.0f, (down - up));
     camera.move(direction * cameraSpeed, timeElapsed);
     // this->translate += direction;
