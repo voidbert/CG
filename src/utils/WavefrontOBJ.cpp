@@ -83,7 +83,7 @@ void WavefrontOBJ::writeToFile(const std::string &filename) const {
         file << "f ";
         file << f.positions[0] + 1 << " ";
         file << f.positions[1] + 1 << " ";
-        file << f.positions[0] + 1 << std::endl;
+        file << f.positions[2] + 1 << std::endl;
     }
 }
 
