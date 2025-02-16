@@ -12,7 +12,6 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <iostream>
 #include <stdexcept>
 #include <string>
 
@@ -26,10 +25,9 @@ const char *vertexShaderSource = R"(
 layout (location = 0) in vec4 inPosition;
 
 layout (location = 1) uniform mat4 uniCameraMatrix;
-layout (location = 3) uniform mat4 projectionMatrix;
 
 void main() {
-    gl_Position = projectionMatrix * uniCameraMatrix * inPosition;
+    gl_Position = uniCameraMatrix * inPosition;
 }
 )";
 
@@ -74,24 +72,19 @@ RenderPipeline::~RenderPipeline() {
 
 void RenderPipeline::use() const {
     glUseProgram(this->program);
-    this->setCameraMatrix(glm::mat4(1.0f));
+    // this->setCameraMatrix(glm::mat4(1.0f));
     this->setColor(glm::vec4(1.0f));
 }
 
-void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
-    glUniformMatrix4fv(1, 1, false, reinterpret_cast<const float *>(&matrix));
-}
+// void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
+//     glUniformMatrix4fv(1, 1, false, reinterpret_cast<const float *>(&matrix));
+// }
 
+void RenderPipeline::setTransformMatrix(const glm::mat4 &matrix) const {
+    glUniformMatrix4fv(1, 1, GL_FALSE, &matrix[0][0]);
+}
 void RenderPipeline::setColor(const glm::vec4 &color) const {
     glUniform4f(2, color[0], color[1], color[2], color[3]);
-}
-
-void RenderPipeline::setProjectionMatrix(const glm::mat4 &matrix) const {
-    GLint projLoc = glGetUniformLocation(this->program, "projectionMatrix");
-    if (projLoc == -1) {
-        std::cerr << "[ERRO] Não foi possível encontrar 'projectionMatrix' no shader!" << std::endl;
-    }
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, &matrix[0][0]);
 }
 
 void RenderPipeline::assertShaderCompilation(GLuint shader) const {

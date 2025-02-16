@@ -12,45 +12,52 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/Camera.hpp"
-#include <algorithm>
+#include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "engine/Camera.hpp"
 
 namespace engine {
 
-Camera::Camera() : position(0.0f, 0.0f, 3.0f), pitch(0.0f), yaw(-90.0f), fov(45.0f) {}
-
-void Camera::processInput(GLFWwindow *window, float deltaTime) {
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        position.z -= 2.5f * deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        position.z += 2.5f * deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        position.x -= 2.5f * deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        position.x += 2.5f * deltaTime;
+Camera::Camera() :
+    position(0.0f, 0.0f, 3.0f),
+    front(0.0f, 0.0f, -1.0f),
+    up(0.0f, 1.0f, 0.0f),
+    pitch(0.0f),
+    yaw(-glm::half_pi<float>()) {
+    updateVectors();
 }
 
-void Camera::apply(GLuint shaderProgram) const {
-    glm::mat4 viewMatrix =
-        glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    GLint viewLoc = glGetUniformLocation(shaderProgram, "uniCameraMatrix");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &viewMatrix[0][0]);
+void Camera::move(const glm::vec3 &direction, float deltaTime) {
+    float speed = 2.5f * deltaTime;
+    position += direction * speed;
 }
 
-float Camera::getFOV() const {
-    return fov;
+void Camera::rotate(float deltaYaw, float deltaPitch) {
+    yaw += deltaYaw;
+    pitch += deltaPitch;
+
+    if (pitch > glm::radians(89.0f))
+        pitch = glm::radians(89.0f);
+    if (pitch < glm::radians(-89.0f))
+        pitch = glm::radians(-89.0f);
+
+    updateVectors();
 }
 
-glm::vec3 Camera::getPosition() const {
-    return position;
+glm::mat4 Camera::getCameraMatrix(float aspectRatio) const {
+    glm::mat4 view = glm::lookAt(position, position + front, up);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+    return projection * view;
 }
-float Camera::getPitch() const {
-    return pitch;
-}
-float Camera::getYaw() const {
-    return yaw;
+
+void Camera::updateVectors() {
+    glm::vec3 direction;
+    direction.x = cos(yaw) * cos(pitch);
+    direction.y = sin(pitch);
+    direction.z = sin(yaw) * cos(pitch);
+
+    front = glm::normalize(direction);
 }
 
 }

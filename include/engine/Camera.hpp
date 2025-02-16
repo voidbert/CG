@@ -14,29 +14,27 @@
 
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace engine {
 
 class Camera {
 private:
     glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 up;
     float pitch, yaw;
-    float fov;
+
+    void updateVectors();
 
 public:
     Camera();
 
-    void processInput(GLFWwindow *window, float deltaTime);
-    void apply(GLuint shaderProgram) const;
-    void zoom(float offset);
+    void move(const glm::vec3 &direction, float deltaTime);
+    void rotate(float deltaYaw, float deltaPitch);
 
-    glm::vec3 getPosition() const;
-    float getPitch() const;
-    float getYaw() const;
-    float getFOV() const;
+    glm::mat4 getCameraMatrix(float aspectRatio) const;
 };
 
 }

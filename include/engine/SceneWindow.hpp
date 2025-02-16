@@ -17,7 +17,6 @@
 #include <memory>
 
 #include "engine/Camera.hpp"
-#include "engine/Entity.hpp"
 #include "engine/Model.hpp"
 #include "engine/RenderPipeline.hpp"
 #include "engine/Window.hpp"
@@ -27,7 +26,6 @@ class SceneWindow : public Window {
 private:
     RenderPipeline pipeline;
     Camera camera;
-    std::vector<std::unique_ptr<Entity>> entities;
 
     // TODO - remove, these are for testing purposes only
     std::unique_ptr<Model> model1, model2;
