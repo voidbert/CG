@@ -14,29 +14,31 @@
 
 #pragma once
 
-#include <memory>
-
-#include "engine/Camera.hpp"
-#include "engine/Model.hpp"
-#include "engine/RenderPipeline.hpp"
-#include "engine/Window.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace engine {
-class SceneWindow : public Window {
-private:
-    RenderPipeline pipeline;
-    Camera camera;
 
-    // TODO - remove, these are for testing purposes only
-    std::unique_ptr<Model> model;
-    glm::vec3 translate;
+class Camera {
+private:
+    glm::vec3 position;
+    glm::vec3 lookAt;
+    glm::vec3 up;
+    float fov;
+    float nearPlane;
+    float farPlane;
 
 public:
-    SceneWindow();
+    Camera();
+    Camera(const glm::vec3 &position,
+           const glm::vec3 &lookAt,
+           const glm::vec3 &up,
+           float fov,
+           float nearPlane,
+           float farPlane);
 
-protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
+    void move(const glm::vec3 &direction, float deltaTime);
+    glm::mat4 getCameraMatrix(float aspectRatio) const;
 };
+
 }
