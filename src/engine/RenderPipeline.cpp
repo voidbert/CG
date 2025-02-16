@@ -44,6 +44,7 @@ void main() {
 )";
 
 RenderPipeline::RenderPipeline() : vertexShader(0), fragmentShader(0), program(0) {
+
     // Compile vertex shader
     this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(this->vertexShader, 1, &vertexShaderSource, nullptr);
@@ -78,6 +79,7 @@ void RenderPipeline::use() const {
 void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
     glUniformMatrix4fv(1, 1, GL_FALSE, &matrix[0][0]);
 }
+
 void RenderPipeline::setColor(const glm::vec4 &color) const {
     glUniform4f(2, color.x, color.y, color.z, color.w);
 }

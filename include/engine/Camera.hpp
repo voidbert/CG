@@ -30,14 +30,10 @@ private:
 
 public:
     Camera();
-    Camera(const glm::vec3 &position,
-           const glm::vec3 &lookAt,
-           const glm::vec3 &up,
-           float fov,
-           float nearPlane,
-           float farPlane);
+    Camera(const glm::vec3& position, const glm::vec3& lookAt, const glm::vec3& up, 
+           float fov, float nearPlane, float farPlane); 
 
-    void move(const glm::vec3 &direction, float deltaTime);
+    void move(const glm::vec3& direction, float deltaTime);
     glm::mat4 getCameraMatrix(float aspectRatio) const;
 };
 

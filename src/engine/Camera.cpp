@@ -16,23 +16,19 @@
 
 namespace engine {
 
-Camera::Camera() :
-    position(0.0f, 0.0f, 3.0f),
-    lookAt(0.0f, 0.0f, 0.0f),
-    up(0.0f, 1.0f, 0.0f),
-    fov(45.0f),
-    nearPlane(0.1f),
-    farPlane(100.0f) {}
+Camera::Camera()
+    : position(0.0f, 0.0f, 3.0f),
+      lookAt(0.0f, 0.0f, 0.0f),
+      up(0.0f, 1.0f, 0.0f),
+      fov(45.0f),
+      nearPlane(0.1f),
+      farPlane(100.0f) {}
 
-Camera::Camera(const glm::vec3 &pos,
-               const glm::vec3 &target,
-               const glm::vec3 &upDir,
-               float fovAngle,
-               float near,
-               float far) :
-    position(pos), lookAt(target), up(upDir), fov(fovAngle), nearPlane(near), farPlane(far) {}
+Camera::Camera(const glm::vec3& pos, const glm::vec3& target, const glm::vec3& upDir, 
+               float fovAngle, float near, float far) 
+    : position(pos), lookAt(target), up(upDir), fov(fovAngle), nearPlane(near), farPlane(far) {}
 
-void Camera::move(const glm::vec3 &direction, float deltaTime) {
+void Camera::move(const glm::vec3& direction, float deltaTime) {
     float speed = 2.5f * deltaTime;
     this->position += direction * speed;
     this->lookAt += direction * speed;
@@ -40,8 +36,7 @@ void Camera::move(const glm::vec3 &direction, float deltaTime) {
 
 glm::mat4 Camera::getCameraMatrix(float aspectRatio) const {
     glm::mat4 view = glm::lookAt(this->position, this->lookAt, this->up);
-    glm::mat4 projection =
-        glm::perspective(glm::radians(this->fov), aspectRatio, this->nearPlane, this->farPlane);
+    glm::mat4 projection = glm::perspective(glm::radians(this->fov), aspectRatio, this->nearPlane, this->farPlane);
     return projection * view;
 }
 
