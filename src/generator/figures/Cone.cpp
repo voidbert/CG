@@ -54,7 +54,7 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
         }
     }
 
-    int top = slices * height + 1;
+    int top = slices * stacks + 1;
     for (int jSlice = 0; jSlice < slices; jSlice++) {
         int nextSlice = (curr + 1) % slices + slices * (stacks - 1);
         this->faces.push_back(utils::TriangleFace(top, curr, nextSlice));
