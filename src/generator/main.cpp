@@ -17,6 +17,7 @@
 #include <sstream>
 
 #include "generator/figures/Box.hpp"
+#include "generator/figures/Cone.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
@@ -81,6 +82,8 @@ int main(int argc, char **argv) {
             int stacks = stringToInt(args.at(5));
             std::string file = args.at(6);
             // generateCone(radius,height,slices,stacks,file)
+            figures::Cone cone(radius, height, slices, stacks);
+            cone.writeToFile(file);
         } else {
             printUsage(args[0]);
         }
