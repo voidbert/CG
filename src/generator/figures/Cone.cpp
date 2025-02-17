@@ -49,15 +49,13 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
             int next_top = next + slices;
             this->faces.push_back(utils::TriangleFace(curr, curr_top, next_top));
             this->faces.push_back(utils::TriangleFace(curr, next_top, next));
-
             curr++;
         }
     }
-
     int top = slices * stacks + 1;
     for (int jSlice = 0; jSlice < slices; jSlice++) {
-        int nextSlice = (curr + 1) % slices + slices * (stacks - 1);
-        this->faces.push_back(utils::TriangleFace(top, curr, nextSlice));
+        int nextSlice = (curr + jSlice) % slices + slices * (stacks - 1);
+        this->faces.push_back(utils::TriangleFace(curr + jSlice, top, nextSlice + 1));
     }
 }
 
