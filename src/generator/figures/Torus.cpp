@@ -34,7 +34,7 @@ Torus::Torus(float majorRadius, float minorRadius, int slices, int stacks) {
 
             float x = (majorRadius + minorRadius * cosV) * cosU;
             float y = minorRadius * sinV;
-            float z = (majorRadius + minorRadius * cosV) * sinU;  
+            float z = (majorRadius + minorRadius * cosV) * sinU;
 
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
         }
