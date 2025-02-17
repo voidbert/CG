@@ -18,6 +18,7 @@
 
 #include "generator/figures/Box.hpp"
 #include "generator/figures/Sphere.hpp"
+#include "generator/figures/Torus.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
@@ -26,8 +27,8 @@ void printUsage(const std::string &programName) {
     std::cerr << "  " << programName << " plane  <length> <divisions> <file>" << std::endl;
     std::cerr << "  " << programName << " box    <length> <grid>      <file>" << std::endl;
     std::cerr << "  " << programName << " sphere <radius> <slices>    <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName << " cone   <radius> <height>    <slices> <stacks> <file>"
-              << std::endl;
+    std::cerr << "  " << programName << " cone   <radius> <height>    <slices> <stacks> <file>" << std::endl;
+    std::cerr << "  " << programName << " torus  <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
 }
 
 double stringToDouble(const std::string &str) {
@@ -81,6 +82,15 @@ int main(int argc, char **argv) {
             int stacks = stringToInt(args.at(5));
             std::string file = args.at(6);
             // generateCone(radius,height,slices,stacks,file)
+        } else if (args.at(1) == "torus") {
+            double majorRadius = stringToDouble(args.at(2));
+            double minorRadius = stringToDouble(args.at(3));
+            int slices = stringToInt(args.at(4));
+            int stacks = stringToInt(args.at(5));
+            std::string file = args.at(6);
+
+            figures::Torus torus(majorRadius, minorRadius, slices, stacks);
+            torus.writeToFile(file);
         } else {
             printUsage(args[0]);
         }
