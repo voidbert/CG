@@ -44,6 +44,7 @@ void main() {
 )";
 
 RenderPipeline::RenderPipeline() : vertexShader(0), fragmentShader(0), program(0) {
+
     // Compile vertex shader
     this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(this->vertexShader, 1, &vertexShaderSource, nullptr);

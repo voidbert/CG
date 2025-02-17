@@ -20,10 +20,19 @@
 namespace engine {
 SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), translate() {
     // Only do this once, as we have a single shader program
+
+    // TODO - in the future, remove this, as this is just for testing
+    camera = Camera(glm::vec3(0.0f, 0.0f, 5.0f),
+                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    glm::vec3(0.0f, 1.0f, 0.0f),
+                    60.0f,
+                    0.01f,
+                    1000.0f);
+
     this->pipeline.use();
 
     // TODO - in the future, remove this, as this is just for testing
-    const utils::WavefrontOBJ object("out.obj");
+    const utils::WavefrontOBJ object("box.3d");
     this->model = std::make_unique<Model>(object);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -37,16 +46,20 @@ void SceneWindow::onUpdate(float time, float timeElapsed) {
     const int left = glfwGetKey(windowHandle, GLFW_KEY_A);
     const int right = glfwGetKey(windowHandle, GLFW_KEY_D);
 
-    const glm::vec3 direction((right - left) * 0.01f, (up - down) * 0.01f, 0.0f);
-    this->translate += direction;
+    const float cameraSpeed = 2.5f;
+    const glm::vec3 direction((right - left), 0.0f, (down - up));
+    camera.move(direction * cameraSpeed, timeElapsed);
+    // this->translate += direction;
 }
 
 void SceneWindow::onRender() {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    this->pipeline.setCameraMatrix(glm::translate(glm::mat4(1.0f), this->translate));
-    this->pipeline.setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    glm::mat4 cameraMatrix = camera.getCameraMatrix(static_cast<float>(getWidth()) / getHeight());
+
+    this->pipeline.setCameraMatrix(cameraMatrix);
+    this->pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
     this->model->draw();
 }
 
