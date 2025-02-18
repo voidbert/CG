@@ -22,7 +22,8 @@ Sphere::Sphere(float radius, int slices, int stacks) {
     float stackStep = M_PI / stacks;
     float sliceStep = 2 * M_PI / slices;
 
-    for (int iStack = 0; iStack <= stacks; iStack++) {
+    this->positions.push_back(glm::vec4(0.0f, radius, 0.0f, 1.0f));
+    for (int iStack = 1; iStack <= stacks; iStack++) {
         float theta = iStack * stackStep;
         float y = radius * cosf(theta);
         float xz = radius * sinf(theta);
@@ -36,13 +37,23 @@ Sphere::Sphere(float radius, int slices, int stacks) {
         }
     }
 
-    for (int iStack = 0; iStack < stacks; iStack++) {
-        for (int jSlice = 0; jSlice < slices; jSlice++) {
-            int curr = iStack * (slices + 1) + jSlice;
-            int next = (iStack + 1) * (slices + 1) + jSlice;
+    for (int jSlice = 0; jSlice < slices; jSlice++) {
+        int nextSlice = (jSlice + 1) % slices + 1;
+        this->faces.push_back(utils::TriangleFace(0, jSlice + 1, nextSlice));
+    }
 
-            this->faces.push_back(utils::TriangleFace(curr, next, next + 1));
-            this->faces.push_back(utils::TriangleFace(curr, curr + 1, next + 1));
+    for (int iStack = 0; iStack < stacks - 1; ++iStack) {
+        int topStart = 1 + iStack * (slices + 1);
+        int bottomStart = 1 + (iStack + 1) * (slices + 1);
+
+        for (int jSlice = 0; jSlice < slices; ++jSlice) {
+            int currentTop = topStart + jSlice;
+            int nextTop = topStart + (jSlice + 1) % (slices + 1);
+            int currentBottom = bottomStart + jSlice;
+            int nextBottom = bottomStart + (jSlice + 1) % (slices + 1);
+
+            faces.push_back(utils::TriangleFace(currentTop, currentBottom, nextBottom));
+            faces.push_back(utils::TriangleFace(currentTop, nextBottom, nextTop));
         }
     }
 }
