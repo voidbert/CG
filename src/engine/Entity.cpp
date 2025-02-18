@@ -12,32 +12,21 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
+#include "engine/Entity.hpp"
 
-#include "engine/Camera.hpp"
 #include "engine/Model.hpp"
-#include "engine/RenderPipeline.hpp"
-#include "engine/Scene.hpp"
-#include "engine/Window.hpp"
 
 namespace engine {
-class SceneWindow : public Window {
-private:
-    RenderPipeline pipeline;
-    // Camera camera;
+Entity::Entity(std::unique_ptr<engine::Model> argModel, const glm::vec4 &argColor) {
+    this->model = std::move(argModel);
+    this->color = argColor;
+}
 
-    // TODO - remove, these are for testing purposes only
-    // std::unique_ptr<Model> model;
-    // glm::vec3 translate;
-    Scene scene;
+void Entity::draw(const RenderPipeline &pipeline) const {
+    pipeline.setColor(color);
+    if (model) {
+        model->draw();
+    }
+}
 
-public:
-    SceneWindow();
-    void setScene(Scene &&newScene);
-
-protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
-};
 }

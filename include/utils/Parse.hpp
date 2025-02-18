@@ -14,30 +14,17 @@
 
 #pragma once
 
-#include "engine/Camera.hpp"
-#include "engine/Model.hpp"
-#include "engine/RenderPipeline.hpp"
+#include <string>
+#include <tinyxml2.h>
+
+#include "engine/Entity.hpp"
 #include "engine/Scene.hpp"
-#include "engine/Window.hpp"
 
-namespace engine {
-class SceneWindow : public Window {
-private:
-    RenderPipeline pipeline;
-    // Camera camera;
-
-    // TODO - remove, these are for testing purposes only
-    // std::unique_ptr<Model> model;
-    // glm::vec3 translate;
-    Scene scene;
-
-public:
-    SceneWindow();
-    void setScene(Scene &&newScene);
-
-protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
-};
+namespace utils {
+engine::Scene configScene(const std::string &filename);
+engine::Scene parseSceneXML(const std::string &filename);
+engine::Scene parseSceneOBJ(const std::string &filename);
+void processGroup(tinyxml2::XMLElement *groupElement,
+                  glm::mat4 parentTransform,
+                  std::vector<std::unique_ptr<engine::Entity>> &entities);
 }

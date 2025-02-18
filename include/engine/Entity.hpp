@@ -14,30 +14,23 @@
 
 #pragma once
 
-#include "engine/Camera.hpp"
+#include <glad/glad.h>
+#include <glm/vec4.hpp>
+#include <memory>
+#include <vector>
+
 #include "engine/Model.hpp"
 #include "engine/RenderPipeline.hpp"
-#include "engine/Scene.hpp"
-#include "engine/Window.hpp"
 
 namespace engine {
-class SceneWindow : public Window {
-private:
-    RenderPipeline pipeline;
-    // Camera camera;
-
-    // TODO - remove, these are for testing purposes only
-    // std::unique_ptr<Model> model;
-    // glm::vec3 translate;
-    Scene scene;
+class Entity {
+protected:
+    std::unique_ptr<Model> model;
+    glm::vec4 color;
+    // Phase 2 – Add Geometric Transforms
 
 public:
-    SceneWindow();
-    void setScene(Scene &&newScene);
-
-protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
+    Entity(std::unique_ptr<Model> argModel, const glm::vec4 &argColor);
+    void draw(const RenderPipeline &pipeline) const;
 };
 }

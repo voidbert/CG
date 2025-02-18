@@ -18,24 +18,33 @@
 #include "engine/SceneWindow.hpp"
 
 namespace engine {
-SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), translate() {
+SceneWindow::SceneWindow() : Window("CG 2024/25", 640, 480), pipeline(), scene() {
     // Only do this once, as we have a single shader program
 
     // TODO - in the future, remove this, as this is just for testing
-    camera = Camera(glm::vec3(0.0f, 0.0f, 5.0f),
+    /*camera = Camera(glm::vec3(0.0f, 0.0f, 5.0f),
                     glm::vec3(0.0f, 0.0f, 0.0f),
                     glm::vec3(0.0f, 1.0f, 0.0f),
                     60.0f,
                     0.01f,
-                    1000.0f);
+                    1000.0f);*/
 
     this->pipeline.use();
 
+    // To remove when all of the figures are using the right-hand rule
+    // glFrontFace(GL_CCW);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
+
     // TODO - in the future, remove this, as this is just for testing
-    const utils::WavefrontOBJ object("box.3d");
-    this->model = std::make_unique<Model>(object);
+    /*const utils::WavefrontOBJ object("box.3d");
+    this->model = std::make_unique<Model>(object);*/
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+}
+
+void SceneWindow::setScene(Scene &&newScene) {
+    this->scene = std::move(newScene);
 }
 
 void SceneWindow::onUpdate(float time, float timeElapsed) {
@@ -46,25 +55,29 @@ void SceneWindow::onUpdate(float time, float timeElapsed) {
     const int left = glfwGetKey(windowHandle, GLFW_KEY_A);
     const int right = glfwGetKey(windowHandle, GLFW_KEY_D);
 
-    const float cameraSpeed = 2.5f;
+    // const float cameraSpeed = 2.5f;
     const glm::vec3 direction((right - left), 0.0f, (down - up));
-    camera.move(direction * cameraSpeed, timeElapsed);
-    // this->translate += direction;
+    // camera.move(direction * cameraSpeed, timeElapsed);
+    //  this->translate += direction;
+    scene.updateCamera(timeElapsed, direction);
 }
 
 void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    glm::mat4 cameraMatrix = camera.getCameraMatrix(static_cast<float>(getWidth()) / getHeight());
+    glm::mat4 cameraMatrix = scene.getCameraMatrix();
 
     this->pipeline.setCameraMatrix(cameraMatrix);
-    this->pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    this->model->draw();
+    // this->pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    // this->model->draw();
+    this->scene.draw(this->pipeline);
 }
 
 void SceneWindow::onResize(int _width, int _height) {
     glViewport(0, 0, _width, _height);
+
+    scene.setWindowSize(_width, _height);
 }
 
 }

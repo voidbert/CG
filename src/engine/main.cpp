@@ -12,12 +12,21 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/SceneWindow.hpp"
+#include <iostream>
 
+#include "engine/Scene.hpp"
+#include "engine/SceneWindow.hpp"
+#include "utils/Parse.hpp"
 namespace engine {
 
 int main(int argc, char **argv) {
+    if (argc == 1) {
+        std::cerr << "Usage: " << argv[0] << std::endl;
+        return 1;
+    }
+
     SceneWindow window = SceneWindow();
+    window.setScene(utils::configScene(argv[1]));
     window.runLoop();
     return 0;
 }
