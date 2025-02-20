@@ -40,13 +40,11 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
 
         for (int jSlice = 0; jSlice < slices; jSlice++) {
             int nextSlice = (jSlice + 1) % slices;
+            int topNext = topStart + jSlice;
+            int bottomNext = bottomStart + nextSlice;
 
-            this->faces.push_back(utils::TriangleFace(topStart + jSlice,
-                                                      bottomStart + jSlice,
-                                                      bottomStart + nextSlice));
-            this->faces.push_back(utils::TriangleFace(topStart + jSlice,
-                                                      bottomStart + nextSlice,
-                                                      topStart + nextSlice));
+            this->faces.push_back(utils::TriangleFace(topNext, bottomStart + jSlice, bottomNext));
+            this->faces.push_back(utils::TriangleFace(topNext, bottomNext, topStart + nextSlice));
         }
     }
 
