@@ -17,16 +17,15 @@
 #include "engine/Model.hpp"
 
 namespace engine {
-Entity::Entity(std::unique_ptr<engine::Model> argModel, const glm::vec4 &argColor) {
+
+Entity::Entity(std::unique_ptr<Model> argModel, const glm::vec4 &argColor) {
     this->model = std::move(argModel);
     this->color = argColor;
 }
 
 void Entity::draw(const RenderPipeline &pipeline) const {
     pipeline.setColor(color);
-    if (model) {
-        model->draw();
-    }
+    this->model->draw();
 }
 
 }

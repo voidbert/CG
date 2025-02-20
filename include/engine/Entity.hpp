@@ -14,10 +14,8 @@
 
 #pragma once
 
-#include <glad/glad.h>
 #include <glm/vec4.hpp>
 #include <memory>
-#include <vector>
 
 #include "engine/Model.hpp"
 #include "engine/RenderPipeline.hpp"
@@ -27,7 +25,7 @@ class Entity {
 protected:
     std::unique_ptr<Model> model;
     glm::vec4 color;
-    // Phase 2 – Add Geometric Transforms
+    // TODO - Phase 2 – Add Geometric Transforms
 
 public:
     Entity(std::unique_ptr<Model> argModel, const glm::vec4 &argColor);
