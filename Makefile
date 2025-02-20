@@ -21,11 +21,13 @@ CPPFLAGS := -Iinclude -std=c++20 -Wall -Wextra -pedantic -Wshadow \
 				$(shell pkg-config --cflags glfw3) -DGLFW_INCLUDE_NONE \
 				$(shell pkg-config --cflags glm) \
 				$(shell pkg-config --cflags gl) \
+				$(shell pkg-config --cflags tinyxml2) \
 				-Ilib/include
-LIBS := -lm -Llib -ltinyxml2 \
-		   $(shell pkg-config --libs glfw3) \
-		   $(shell pkg-config --libs glm) \
-		   $(shell pkg-config --libs gl) \
+LIBS := -lm \
+	$(shell pkg-config --libs glfw3) \
+	$(shell pkg-config --libs glm) \
+	$(shell pkg-config --libs gl) \
+	$(shell pkg-config --libs tinyxml2)
 
 DEBUG_CPPFLAGS   := -O0 -ggdb3
 RELEASE_CPPFLAGS := -O2
