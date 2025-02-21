@@ -13,7 +13,6 @@
 /// limitations under the License.
 
 #include <cmath>
-#include <format>
 
 #include "engine/Camera.hpp"
 #include "engine/Entity.hpp"
@@ -42,12 +41,12 @@ const tinyxml2::XMLElement *Scene::getOnlyOneNodeFromXML(const tinyxml2::XMLNode
 
     const tinyxml2::XMLElement *child = parent->FirstChildElement(name.c_str());
     if (!child) {
-        throw std::runtime_error(std::format("<{}> element not found in scene XML", name));
+        throw std::runtime_error("<" + name + "> element not found in scene XML");
     }
 
     const tinyxml2::XMLElement *child2 = child->NextSiblingElement(name.c_str());
     if (child2) {
-        throw std::runtime_error(std::format("More than one <{}> element in scene XML", name));
+        throw std::runtime_error("More than one <" + name + "> element in scene XML");
     }
 
     return child;
@@ -59,8 +58,8 @@ glm::vec3 Scene::getVectorFromXML(const tinyxml2::XMLElement *element) {
     float z = element->FloatAttribute("z", NAN);
 
     if (std::isnan(x) || std::isnan(y) || std::isnan(z)) {
-        throw std::runtime_error(
-            std::format("Invalid vector in <{}> in scene XML file", element->Name()));
+        std::string name = element->Name();
+        throw std::runtime_error("Invalid vector in <" + name + "> in scene XML file");
     }
 
     return glm::vec3(x, y, z);
