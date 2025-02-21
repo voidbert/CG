@@ -21,7 +21,13 @@
 namespace engine {
 
 SceneWindow::SceneWindow(const std::string &sceneFile) :
-    Window(sceneFile, 640, 480), pipeline(), scene(sceneFile) {
+    Window(sceneFile, 640, 480),
+    pipeline(),
+    scene(sceneFile),
+    xAxis(glm::vec3(1.0f, 0.0f, 0.0f)),
+    yAxis(glm::vec3(0.0f, 1.0f, 0.0f)),
+    zAxis(glm::vec3(0.0f, 0.0f, 1.0f)) {
+
     this->resize(scene.getWindowWidth(), scene.getWindowHeight());
 
     // Only do this once, as we have a single shader program
@@ -32,7 +38,7 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void SceneWindow::onUpdate(float time, float timeElapsed) {
@@ -56,6 +62,11 @@ void SceneWindow::onRender() {
 
     glm::mat4 cameraMatrix =
         scene.getCamera().getCameraMatrix(static_cast<float>(this->getWidth()) / this->getHeight());
+
+    this->pipeline.setCameraMatrix(cameraMatrix);
+    this->xAxis.draw(this->pipeline);
+    this->yAxis.draw(this->pipeline);
+    this->zAxis.draw(this->pipeline);
 
     this->pipeline.setCameraMatrix(cameraMatrix * rot);
     this->scene.draw(this->pipeline);

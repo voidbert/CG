@@ -14,26 +14,23 @@
 
 #pragma once
 
-#include <memory>
+#include <glm/vec4.hpp>
 
-#include "engine/Axis.hpp"
 #include "engine/RenderPipeline.hpp"
-#include "engine/Scene.hpp"
-#include "engine/Window.hpp"
 
 namespace engine {
-class SceneWindow : public Window {
+class Axis {
 private:
-    RenderPipeline pipeline;
-    Scene scene;
-    Axis xAxis, yAxis, zAxis;
+    GLuint vao, vbo;
+    glm::vec4 color;
 
 public:
-    SceneWindow(const std::string &sceneFile);
+    Axis(const glm::vec3 &direction);
 
-protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
+    Axis(const Axis &model) = delete;
+    Axis(Axis &&) = delete;
+    ~Axis();
+
+    void draw(const RenderPipeline &pipeline) const;
 };
 }
