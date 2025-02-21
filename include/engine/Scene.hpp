@@ -14,9 +14,10 @@
 
 #pragma once
 
-#include <glad/glad.h>
-#include <glm/vec4.hpp>
+#include <filesystem>
+#include <memory>
 #include <string>
+#include <tinyxml2.h>
 #include <vector>
 
 #include "engine/Camera.hpp"
@@ -24,30 +25,40 @@
 #include "engine/RenderPipeline.hpp"
 
 namespace engine {
+
 class Scene {
 private:
     int windowWidth, windowHeight;
     std::string windowTitle;
     Camera camera;
-    std::vector<std::unique_ptr<engine::Entity>> entities;
+
+    // TODO - Phase 2 - add support for groups (linear scene is going to make it harder for phase 3)
+    std::vector<std::unique_ptr<Entity>> entities;
 
 public:
-    Scene();
-    Scene(const int &argWindowWidth,
-          const int &argWindowHeight,
-          const std::string &argWindowTitle,
-          const Camera &argCamera,
-          std::vector<std::unique_ptr<engine::Entity>> argEntities);
-    void addEntity(std::unique_ptr<engine::Entity> entity);
-    void draw(const RenderPipeline &pipeline);
-    void updateCamera(float timeElapsed, const glm::vec3 &direction);
-    glm::mat4 getCameraMatrix() const;
+    Scene(const std::string &file);
+    Scene(const Scene &scene) = delete;
+    Scene(Scene &&scene) = delete;
+
+    int getWindowWidth() const;
+    int getWindowHeight() const;
+    Camera &getCamera();
+
+    void draw(const RenderPipeline &pipeline) const;
     void setWindowSize(int width, int height);
 
-    Scene(const Scene &) = delete;
-    Scene &operator=(const Scene &) = delete;
+private:
+    const tinyxml2::XMLElement *getOnlyOneNodeFromXML(const tinyxml2::XMLNode *parent,
+                                                      const std::string &name);
+    glm::vec3 getVectorFromXML(const tinyxml2::XMLElement *element);
 
-    Scene(Scene &&other) noexcept;
-    Scene &operator=(Scene &&other) noexcept;
+    void getWindowFromXML(const tinyxml2::XMLElement *worldElement);
+    void getCameraFromXML(const tinyxml2::XMLElement *worldElement);
+
+    void getEntitiesFromWorldXML(const std::filesystem::path &sceneDirectory,
+                                 const tinyxml2::XMLElement *worldElement);
+    void getEntitiesFromGroupXML(const std::filesystem::path &sceneDirectory,
+                                 const tinyxml2::XMLElement *groupdElement);
 };
+
 }
