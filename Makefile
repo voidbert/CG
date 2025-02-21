@@ -21,11 +21,13 @@ CPPFLAGS := -Iinclude -std=c++20 -Wall -Wextra -pedantic -Wshadow \
 				$(shell pkg-config --cflags glfw3) -DGLFW_INCLUDE_NONE \
 				$(shell pkg-config --cflags glm) \
 				$(shell pkg-config --cflags gl) \
+				$(shell pkg-config --cflags tinyxml2) \
 				-Ilib/include
 LIBS := -lm \
-		   $(shell pkg-config --libs glfw3) \
-		   $(shell pkg-config --libs glm) \
-		   $(shell pkg-config --libs gl)
+	$(shell pkg-config --libs glfw3) \
+	$(shell pkg-config --libs glm) \
+	$(shell pkg-config --libs gl) \
+	$(shell pkg-config --libs tinyxml2)
 
 DEBUG_CPPFLAGS   := -O0 -ggdb3
 RELEASE_CPPFLAGS := -O2
@@ -50,7 +52,7 @@ LIB_SOURCES = $(shell find "lib" -name '*.c' -type f)
 LIB_OBJECTS = $(patsubst lib/%.c, $(OBJDIR)/%.o, $(LIB_SOURCES))
 HEADERS     = $(shell find "include" -name '*.hpp' -type f)
 DEPENDS     = $(patsubst src/%.cpp, $(DEPDIR)/%.d, $(SOURCES))
-REPORTS     = $(patsubst reports/%.tex, %.pdf, $(shell find reports -name '*.tex' -type f))
+REPORTS     = $(patsubst reports/%.tex, $(BUILDDIR)/%.pdf, $(shell find reports -name '*.tex' -type f))
 
 ifeq ($(DEBUG), 1)
 	CPPFLAGS += $(DEBUG_CPPFLAGS)

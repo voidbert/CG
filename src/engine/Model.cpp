@@ -57,4 +57,5 @@ void Model::draw() const {
     glBindVertexArray(this->vao);
     glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
 }
+
 }
