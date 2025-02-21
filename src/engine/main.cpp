@@ -16,17 +16,16 @@
 
 #include "engine/Scene.hpp"
 #include "engine/SceneWindow.hpp"
-#include "utils/Parse.hpp"
+
 namespace engine {
 
 int main(int argc, char **argv) {
-    if (argc == 1) {
-        std::cerr << "Usage: " << argv[0] << std::endl;
+    if (argc <= 1) {
+        std::cerr << "Usage: " << argv[0] << " <scene.xml>" << std::endl;
         return 1;
     }
 
-    SceneWindow window = SceneWindow();
-    window.setScene(utils::configScene(argv[1]));
+    SceneWindow window(argv[1]);
     window.runLoop();
     return 0;
 }

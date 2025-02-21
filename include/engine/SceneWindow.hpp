@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include "engine/Camera.hpp"
-#include "engine/Model.hpp"
+#include <memory>
+
 #include "engine/RenderPipeline.hpp"
 #include "engine/Scene.hpp"
 #include "engine/Window.hpp"
@@ -24,16 +24,10 @@ namespace engine {
 class SceneWindow : public Window {
 private:
     RenderPipeline pipeline;
-    // Camera camera;
-
-    // TODO - remove, these are for testing purposes only
-    // std::unique_ptr<Model> model;
-    // glm::vec3 translate;
     Scene scene;
 
 public:
-    SceneWindow();
-    void setScene(Scene &&newScene);
+    SceneWindow(const std::string &sceneFile);
 
 protected:
     void onUpdate(float time, float timeElapsed);
