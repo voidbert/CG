@@ -18,9 +18,9 @@
 
 namespace engine {
 
-Entity::Entity(std::unique_ptr<Model> argModel, const glm::vec4 &argColor) {
-    this->model = std::move(argModel);
-    this->color = argColor;
+Entity::Entity(std::shared_ptr<Model> _model, const glm::vec4 &_color) {
+    this->model = _model;
+    this->color = _color;
 }
 
 void Entity::draw(const RenderPipeline &pipeline) const {

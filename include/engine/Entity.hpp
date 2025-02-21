@@ -23,12 +23,12 @@
 namespace engine {
 class Entity {
 protected:
-    std::unique_ptr<Model> model;
+    std::shared_ptr<Model> model;
     glm::vec4 color;
     // TODO - Phase 2 – Add Geometric Transforms
 
 public:
-    Entity(std::unique_ptr<Model> argModel, const glm::vec4 &argColor);
+    Entity(std::shared_ptr<Model> _model, const glm::vec4 &color);
     void draw(const RenderPipeline &pipeline) const;
 };
 }
