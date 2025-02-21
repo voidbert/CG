@@ -51,7 +51,7 @@ void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    float time = glfwGetTime()*100;
+    float time = glfwGetTime() * 100;
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), glm::radians(time), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 cameraMatrix =
