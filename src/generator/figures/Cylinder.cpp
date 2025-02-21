@@ -17,13 +17,13 @@
 #include "generator/figures/Cylinder.hpp"
 
 namespace generator::figures {
-Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
+Cylinder::Cylinder(float radius, float height, int stacks, int slices) {
     float sliceStep = 2 * M_PI / slices;
-    float stackStep = height / (stacks - 1);
+    float stackStep = height / stacks;
     float halfHeight = height / 2.0f;
 
-    for (int iStack = 0; iStack < stacks; iStack++) {
-        float y = -halfHeight + iStack * stackStep;
+    for (int iStack = 0; iStack <= stacks; iStack++) {
+        float y = iStack * stackStep;
 
         for (int jSlice = 0; jSlice < slices; jSlice++) {
             float phi = jSlice * sliceStep;
@@ -34,7 +34,7 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
         }
     }
 
-    for (int iStack = 0; iStack < stacks - 1; iStack++) {
+    for (int iStack = 0; iStack < stacks; iStack++) {
         int topStart = iStack * slices;
         int bottomStart = (iStack + 1) * slices;
 
@@ -49,11 +49,11 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
     }
 
     int topCenter = this->positions.size();
-    this->positions.push_back(glm::vec4(0, halfHeight, 0, 1.0f));
+    this->positions.push_back(glm::vec4(0, height, 0, 1.0f));
     int bottomCenter = this->positions.size();
-    this->positions.push_back(glm::vec4(0, -halfHeight, 0, 1.0f));
+    this->positions.push_back(glm::vec4(0, 0, 0, 1.0f));
 
-    int topBaseIndex = (stacks - 1) * slices;
+    int topBaseIndex = stacks * slices;
     int baseIndex = 0;
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {

@@ -25,12 +25,13 @@
 namespace generator {
 void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
-    std::cerr << "  " << programName << " plane  <length> <divisions> <file>" << std::endl;
-    std::cerr << "  " << programName << " box    <length> <grid>      <file>" << std::endl;
-    std::cerr << "  " << programName << " sphere <radius> <slices>    <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName << " cone   <radius> <height>    <slices> <stacks> <file>"
+    std::cerr << "  " << programName << " plane    <length> <divisions> <file>" << std::endl;
+    std::cerr << "  " << programName << " box      <length> <grid>      <file>" << std::endl;
+    std::cerr << "  " << programName << " sphere   <radius> <slices>    <stacks> <file>"
               << std::endl;
-    std::cerr << "  " << programName << " cylinder <radius> <height>  <slices> <stacks> <file>"
+    std::cerr << "  " << programName << " cone     <radius> <height>    <slices> <stacks> <file>"
+              << std::endl;
+    std::cerr << "  " << programName << " cylinder <radius> <height>    <slices> <stacks> <file>"
               << std::endl;
 }
 
