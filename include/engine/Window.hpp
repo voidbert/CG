@@ -30,8 +30,10 @@ public:
     ~Window();
 
     void runLoop();
-    int getWidth();
-    int getHeight();
+    void resize(int _width, int _height);
+
+    int getWidth() const;
+    int getHeight() const;
 
 protected:
     GLFWwindow *getHandle();

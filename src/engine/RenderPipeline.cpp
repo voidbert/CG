@@ -114,4 +114,5 @@ void RenderPipeline::assertProgramLinking() const {
         throw std::runtime_error("Program linking error: " + logMessage);
     }
 }
+
 }

@@ -14,24 +14,21 @@
 
 #pragma once
 
+#include <glm/vec4.hpp>
 #include <memory>
 
+#include "engine/Model.hpp"
 #include "engine/RenderPipeline.hpp"
-#include "engine/Scene.hpp"
-#include "engine/Window.hpp"
 
 namespace engine {
-class SceneWindow : public Window {
-private:
-    RenderPipeline pipeline;
-    Scene scene;
+class Entity {
+protected:
+    std::shared_ptr<Model> model;
+    glm::vec4 color;
+    // TODO - Phase 2 – Add Geometric Transforms
 
 public:
-    SceneWindow(const std::string &sceneFile);
-
-protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
+    Entity(std::shared_ptr<Model> _model, const glm::vec4 &color);
+    void draw(const RenderPipeline &pipeline) const;
 };
 }
