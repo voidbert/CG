@@ -24,6 +24,7 @@ namespace engine {
 
 Scene::Scene(const std::string &file) {
     const std::filesystem::path sceneDirectory = std::filesystem::path(file).parent_path();
+    std::unordered_map<std::string, std::shared_ptr<Model>> loadedModels;
 
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS) {
@@ -33,7 +34,7 @@ Scene::Scene(const std::string &file) {
     const tinyxml2::XMLElement *worldElement = this->getOnlyOneNodeFromXML(&doc, "world");
     this->getWindowFromXML(worldElement);
     this->getCameraFromXML(worldElement);
-    this->getEntitiesFromWorldXML(sceneDirectory, worldElement);
+    this->getEntitiesFromWorldXML(sceneDirectory, loadedModels, worldElement);
 }
 
 const tinyxml2::XMLElement *Scene::getOnlyOneNodeFromXML(const tinyxml2::XMLNode *parent,
@@ -100,17 +101,28 @@ void Scene::getCameraFromXML(const tinyxml2::XMLElement *worldElement) {
     this->camera = Camera(position, lookAt, up, fov, near, far);
 }
 
-void Scene::getEntitiesFromWorldXML(const std::filesystem::path &sceneDirectory,
-                                    const tinyxml2::XMLElement *worldElement) {
+void Scene::getEntitiesFromWorldXML(
+    const std::filesystem::path &sceneDirectory,
+    std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels,
+    const tinyxml2::XMLElement *worldElement) {
+
     const tinyxml2::XMLElement *groupElement = worldElement->FirstChildElement("group");
     while (groupElement) {
-        this->getEntitiesFromGroupXML(sceneDirectory, groupElement);
+        this->getEntitiesFromGroupXML(sceneDirectory, loadedModels, groupElement);
         groupElement = worldElement->NextSiblingElement("group");
     }
 }
 
-void Scene::getEntitiesFromGroupXML(const std::filesystem::path &sceneDirectory,
-                                    const tinyxml2::XMLElement *groupElement) {
+void Scene::getEntitiesFromGroupXML(
+    const std::filesystem::path &sceneDirectory,
+    std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels,
+    const tinyxml2::XMLElement *groupElement) {
+
+    const tinyxml2::XMLElement *innerGroupElement = groupElement->FirstChildElement("group");
+    while (innerGroupElement) {
+        this->getEntitiesFromGroupXML(sceneDirectory, loadedModels, innerGroupElement);
+        innerGroupElement = innerGroupElement->NextSiblingElement("group");
+    }
 
     const tinyxml2::XMLElement *modelsElement = groupElement->FirstChildElement("models");
     if (!modelsElement)
@@ -123,18 +135,22 @@ void Scene::getEntitiesFromGroupXML(const std::filesystem::path &sceneDirectory,
             throw std::runtime_error("Invalid <model> in scene XML file");
         }
 
-        utils::WavefrontOBJ object(sceneDirectory / file);
-        std::shared_ptr<Model> model = std::make_shared<Model>(object);
+        std::string modelPath = std::filesystem::canonical(sceneDirectory / file);
+        auto it = loadedModels.find(modelPath);
+        std::shared_ptr<Model> model;
+        if (it == loadedModels.end()) {
+            utils::WavefrontOBJ object(modelPath);
+            model = std::make_shared<Model>(object);
+            loadedModels[modelPath] = model;
+        } else {
+            model = it->second;
+        }
+
+        // TODO - color
         std::unique_ptr<Entity> entity = std::make_unique<Entity>(model, glm::vec4(1.0f));
         entities.push_back(std::move(entity));
 
         modelElement = modelElement->NextSiblingElement("model");
-    }
-
-    const tinyxml2::XMLElement *innerGroupElement = groupElement->FirstChildElement("group");
-    while (innerGroupElement) {
-        this->getEntitiesFromGroupXML(sceneDirectory, innerGroupElement);
-        innerGroupElement = innerGroupElement->NextSiblingElement("group");
     }
 }
 

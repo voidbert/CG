@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <tinyxml2.h>
+#include <unordered_map>
 #include <vector>
 
 #include "engine/Camera.hpp"
@@ -55,10 +56,14 @@ private:
     void getWindowFromXML(const tinyxml2::XMLElement *worldElement);
     void getCameraFromXML(const tinyxml2::XMLElement *worldElement);
 
-    void getEntitiesFromWorldXML(const std::filesystem::path &sceneDirectory,
-                                 const tinyxml2::XMLElement *worldElement);
-    void getEntitiesFromGroupXML(const std::filesystem::path &sceneDirectory,
-                                 const tinyxml2::XMLElement *groupdElement);
+    void getEntitiesFromWorldXML(
+        const std::filesystem::path &sceneDirectory,
+        std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels,
+        const tinyxml2::XMLElement *worldElement);
+    void getEntitiesFromGroupXML(
+        const std::filesystem::path &sceneDirectory,
+        std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels,
+        const tinyxml2::XMLElement *groupdElement);
 };
 
 }
