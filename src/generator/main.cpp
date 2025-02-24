@@ -17,8 +17,8 @@
 #include <sstream>
 
 #include "generator/figures/Box.hpp"
-#include "generator/figures/Cylinder.hpp"
 #include "generator/figures/Cone.hpp"
+#include "generator/figures/Cylinder.hpp"
 #include "generator/figures/Plane.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "utils/WavefrontOBJ.hpp"
