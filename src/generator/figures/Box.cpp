@@ -66,9 +66,9 @@ Box::Box(float size, int divisions) {
                 int idx = offset + i * (divisions + 1) + j;
 
                 if (positiveCoordinateFace) {
-                     this->faces.push_back(utils::TriangleFace(idx + 1, idx + divisions + 1, idx));
-                     this->faces.push_back(
-                         utils::TriangleFace(idx + 1, idx + divisions + 2, idx + divisions + 1));
+                    this->faces.push_back(utils::TriangleFace(idx + 1, idx + divisions + 1, idx));
+                    this->faces.push_back(
+                        utils::TriangleFace(idx + 1, idx + divisions + 2, idx + divisions + 1));
                 } else {
                     this->faces.push_back(utils::TriangleFace(idx + 1, idx, idx + divisions + 1));
                     this->faces.push_back(
