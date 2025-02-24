@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <cmath>
+
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator::figures {

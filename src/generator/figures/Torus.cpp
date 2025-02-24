@@ -13,40 +13,35 @@
 /// limitations under the License.
 
 #include <cmath>
+#include <glm/trigonometric.hpp>
+#include <glm/vec3.hpp>
 
 #include "generator/figures/Torus.hpp"
 
 namespace generator::figures {
 
 Torus::Torus(float majorRadius, float minorRadius, int slices, int stacks) {
-    float sliceStep = 2.0f * M_PI / slices;
-    float stackStep = 2.0f * M_PI / stacks;
+    for (int i = 0; i <= slices; i++) {
+        float theta = i * 2 * M_PI / slices;
+        glm::vec3 circleCenter = glm::vec3(glm::cos(theta), 0.0f, glm::sin(theta)) * majorRadius;
 
-    for (int iStack = 0; iStack <= stacks; iStack++) {
-        float v = iStack * stackStep;
-        float cosV = cosf(v);
-        float sinV = sinf(v);
-
-        for (int jSlice = 0; jSlice <= slices; jSlice++) {
-            float u = jSlice * sliceStep;
-            float cosU = cosf(u);
-            float sinU = sinf(u);
-
-            float x = (majorRadius + minorRadius * cosV) * cosU;
-            float y = minorRadius * sinV;
-            float z = (majorRadius + minorRadius * cosV) * sinU;
-
-            this->positions.push_back(glm::vec4(x, y, z, 1.0f));
+        for (int j = 0; j <= stacks; j++) {
+            float phi = j * 2 * M_PI / stacks;
+            glm::vec3 normal = glm::vec3(glm::cos(theta) * glm::cos(phi),
+                                         glm::sin(phi),
+                                         glm::sin(theta) * glm::cos(phi));
+            glm::vec3 vertex = -circleCenter + normal * minorRadius;
+            this->positions.push_back(glm::vec4(vertex, 1.0f));
         }
     }
 
-    for (int iStack = 0; iStack < stacks; iStack++) {
-        for (int jSlice = 0; jSlice < slices; jSlice++) {
-            int curr = iStack * (slices + 1) + jSlice;
-            int next = (iStack + 1) * (slices + 1) + jSlice;
+    for (int i = 0; i < slices; i++) {
+        for (int j = 0; j < stacks; j++) {
+            int idx = i * (stacks + 1) + j;
+            int nextIdx = ((i + 1) % slices) * (stacks + 1) + j;
 
-            this->faces.push_back(utils::TriangleFace(curr, next, next + 1));
-            this->faces.push_back(utils::TriangleFace(curr, curr + 1, next + 1));
+            this->faces.push_back(utils::TriangleFace(idx, nextIdx, idx + 1));
+            this->faces.push_back(utils::TriangleFace(nextIdx, nextIdx + 1, idx + 1));
         }
     }
 }
