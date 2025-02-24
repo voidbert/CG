@@ -14,26 +14,13 @@
 
 #pragma once
 
-#include <memory>
+#include "utils/WavefrontOBJ.hpp"
 
-#include "engine/Axis.hpp"
-#include "engine/RenderPipeline.hpp"
-#include "engine/Scene.hpp"
-#include "engine/Window.hpp"
+namespace generator::figures {
 
-namespace engine {
-class SceneWindow : public Window {
-private:
-    RenderPipeline pipeline;
-    Scene scene;
-    Axis xAxis, yAxis, zAxis;
-
+class Cylinder : public utils::WavefrontOBJ {
 public:
-    SceneWindow(const std::string &sceneFile);
-
-protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
+    Cylinder(float radius, float height, int slices, int stacks);
 };
+
 }
