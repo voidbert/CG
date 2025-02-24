@@ -12,34 +12,20 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
+#include "engine/Entity.hpp"
 
-#include <GLFW/glfw3.h>
-#include <string>
+#include "engine/Model.hpp"
 
 namespace engine {
-class Window {
-private:
-    GLFWwindow *handle;
-    int width, height;
 
-public:
-    Window(const std::string &title, int _width, int _height);
-    Window(const Window &window) = delete;
-    Window(Window &&window) = delete;
-    ~Window();
+Entity::Entity(std::shared_ptr<Model> _model, const glm::vec4 &_color) {
+    this->model = _model;
+    this->color = _color;
+}
 
-    void runLoop();
-    void resize(int _width, int _height);
+void Entity::draw(const RenderPipeline &pipeline) const {
+    pipeline.setColor(color);
+    this->model->draw();
+}
 
-    int getWidth() const;
-    int getHeight() const;
-
-protected:
-    GLFWwindow *getHandle();
-
-    virtual void onUpdate(float time, float timeElapsed) = 0;
-    virtual void onRender() = 0;
-    virtual void onResize(int _width, int _height) = 0;
-};
 }

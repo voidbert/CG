@@ -17,6 +17,8 @@
 #include <sstream>
 
 #include "generator/figures/Box.hpp"
+#include "generator/figures/Cylinder.hpp"
+#include "generator/figures/Plane.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
 #include "utils/WavefrontOBJ.hpp"
@@ -24,10 +26,13 @@
 namespace generator {
 void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
-    std::cerr << "  " << programName << " plane  <length> <divisions> <file>" << std::endl;
-    std::cerr << "  " << programName << " box    <length> <grid>      <file>" << std::endl;
-    std::cerr << "  " << programName << " sphere <radius> <slices>    <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName << " cone   <radius> <height>    <slices> <stacks> <file>"
+    std::cerr << "  " << programName << " plane    <length> <divisions> <file>" << std::endl;
+    std::cerr << "  " << programName << " box      <length> <grid>      <file>" << std::endl;
+    std::cerr << "  " << programName << " sphere   <radius> <slices>    <stacks> <file>"
+              << std::endl;
+    std::cerr << "  " << programName << " cone     <radius> <height>    <slices> <stacks> <file>"
+              << std::endl;
+    std::cerr << "  " << programName << " cylinder <radius> <height>    <slices> <stacks> <file>"
               << std::endl;
     std::cerr << "  " << programName
               << " torus  <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
@@ -61,7 +66,9 @@ int main(int argc, char **argv) {
             double length = stringToDouble(args.at(2));
             int divisions = stringToInt(args.at(3));
             std::string file = args.at(4);
-            // generatePlane(length,divisions,file)
+
+            figures::Plane plane(length, divisions);
+            plane.writeToFile(file);
         } else if (args.at(1) == "box") {
             double length = stringToDouble(args.at(2));
             double grid = stringToDouble(args.at(3));
@@ -84,6 +91,14 @@ int main(int argc, char **argv) {
             int stacks = stringToInt(args.at(5));
             std::string file = args.at(6);
             // generateCone(radius,height,slices,stacks,file)
+        } else if (args.at(1) == "cylinder") {
+            float radius = stringToDouble(args.at(2));
+            float height = stringToDouble(args.at(3));
+            int slices = stringToInt(args.at(4));
+            int stacks = stringToInt(args.at(5));
+            std::string file = args.at(6);
+            figures::Cylinder cylinder(radius, height, slices, stacks);
+            cylinder.writeToFile(file);
         } else if (args.at(1) == "torus") {
             double majorRadius = stringToDouble(args.at(2));
             double minorRadius = stringToDouble(args.at(3));

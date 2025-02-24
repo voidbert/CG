@@ -18,8 +18,10 @@
 #include "engine/Window.hpp"
 
 namespace engine {
+
 Window::Window(const std::string &title, int argWidth, int argHeight) :
     width(argWidth), height(argHeight) {
+
     if (!glfwInit()) {
         throw std::runtime_error("Failed to initialize GLFW");
     }
@@ -27,6 +29,7 @@ Window::Window(const std::string &title, int argWidth, int argHeight) :
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     this->handle = glfwCreateWindow(argWidth, argHeight, title.c_str(), NULL, NULL);
     if (!this->handle) {
         glfwTerminate();
@@ -51,8 +54,10 @@ Window::~Window() {
 }
 
 void Window::runLoop() {
-    double time = glfwGetTime();
+    glfwShowWindow(this->handle);
     this->onResize(this->width, this->height);
+
+    double time = glfwGetTime();
     while (!glfwWindowShouldClose(this->handle)) {
         glfwSetWindowSizeCallback(this->handle, [](GLFWwindow *_handle, int _width, int _height) {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(_handle));
@@ -71,11 +76,15 @@ void Window::runLoop() {
     }
 }
 
-int Window::getWidth() {
+void Window::resize(int _width, int _height) {
+    glfwSetWindowSize(this->handle, _width, _height);
+}
+
+int Window::getWidth() const {
     return this->width;
 }
 
-int Window::getHeight() {
+int Window::getHeight() const {
     return this->height;
 }
 

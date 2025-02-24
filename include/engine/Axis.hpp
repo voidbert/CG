@@ -14,32 +14,23 @@
 
 #pragma once
 
-#include <GLFW/glfw3.h>
-#include <string>
+#include <glm/vec4.hpp>
+
+#include "engine/RenderPipeline.hpp"
 
 namespace engine {
-class Window {
+class Axis {
 private:
-    GLFWwindow *handle;
-    int width, height;
+    GLuint vao, vbo;
+    glm::vec4 color;
 
 public:
-    Window(const std::string &title, int _width, int _height);
-    Window(const Window &window) = delete;
-    Window(Window &&window) = delete;
-    ~Window();
+    Axis(const glm::vec3 &direction);
 
-    void runLoop();
-    void resize(int _width, int _height);
+    Axis(const Axis &model) = delete;
+    Axis(Axis &&) = delete;
+    ~Axis();
 
-    int getWidth() const;
-    int getHeight() const;
-
-protected:
-    GLFWwindow *getHandle();
-
-    virtual void onUpdate(float time, float timeElapsed) = 0;
-    virtual void onRender() = 0;
-    virtual void onResize(int _width, int _height) = 0;
+    void draw(const RenderPipeline &pipeline) const;
 };
 }

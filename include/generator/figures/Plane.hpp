@@ -14,32 +14,13 @@
 
 #pragma once
 
-#include <GLFW/glfw3.h>
-#include <string>
+#include "utils/WavefrontOBJ.hpp"
 
-namespace engine {
-class Window {
-private:
-    GLFWwindow *handle;
-    int width, height;
+namespace generator::figures {
 
+class Plane : public utils::WavefrontOBJ {
 public:
-    Window(const std::string &title, int _width, int _height);
-    Window(const Window &window) = delete;
-    Window(Window &&window) = delete;
-    ~Window();
-
-    void runLoop();
-    void resize(int _width, int _height);
-
-    int getWidth() const;
-    int getHeight() const;
-
-protected:
-    GLFWwindow *getHandle();
-
-    virtual void onUpdate(float time, float timeElapsed) = 0;
-    virtual void onRender() = 0;
-    virtual void onResize(int _width, int _height) = 0;
+    Plane(float size, int divisions);
 };
+
 }

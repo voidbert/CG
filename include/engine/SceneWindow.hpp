@@ -16,23 +16,20 @@
 
 #include <memory>
 
-#include "engine/Camera.hpp"
-#include "engine/Model.hpp"
+#include "engine/Axis.hpp"
 #include "engine/RenderPipeline.hpp"
+#include "engine/Scene.hpp"
 #include "engine/Window.hpp"
 
 namespace engine {
 class SceneWindow : public Window {
 private:
     RenderPipeline pipeline;
-    Camera camera;
-
-    // TODO - remove, these are for testing purposes only
-    std::unique_ptr<Model> model;
-    glm::vec3 translate;
+    Scene scene;
+    Axis xAxis, yAxis, zAxis;
 
 public:
-    SceneWindow();
+    SceneWindow(const std::string &sceneFile);
 
 protected:
     void onUpdate(float time, float timeElapsed);

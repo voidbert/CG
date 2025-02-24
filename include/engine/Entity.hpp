@@ -14,32 +14,21 @@
 
 #pragma once
 
-#include <GLFW/glfw3.h>
-#include <string>
+#include <glm/vec4.hpp>
+#include <memory>
+
+#include "engine/Model.hpp"
+#include "engine/RenderPipeline.hpp"
 
 namespace engine {
-class Window {
-private:
-    GLFWwindow *handle;
-    int width, height;
+class Entity {
+protected:
+    std::shared_ptr<Model> model;
+    glm::vec4 color;
+    // TODO - Phase 2 – Add Geometric Transforms
 
 public:
-    Window(const std::string &title, int _width, int _height);
-    Window(const Window &window) = delete;
-    Window(Window &&window) = delete;
-    ~Window();
-
-    void runLoop();
-    void resize(int _width, int _height);
-
-    int getWidth() const;
-    int getHeight() const;
-
-protected:
-    GLFWwindow *getHandle();
-
-    virtual void onUpdate(float time, float timeElapsed) = 0;
-    virtual void onRender() = 0;
-    virtual void onResize(int _width, int _height) = 0;
+    Entity(std::shared_ptr<Model> _model, const glm::vec4 &color);
+    void draw(const RenderPipeline &pipeline) const;
 };
 }
