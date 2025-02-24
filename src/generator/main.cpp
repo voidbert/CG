@@ -40,8 +40,8 @@ double stringToDouble(const std::string &str) {
     double ret = std::stod(str, &charactersParsed);
     if (charactersParsed != str.length())
         throw std::invalid_argument("str is not a double");
-    if (ret < 0)
-        throw std::invalid_argument("str is negative");
+    if (ret <= 0)
+        throw std::invalid_argument("str is not positive");
     return ret;
 }
 
@@ -50,8 +50,8 @@ int stringToInt(const std::string &str) {
     int ret = std::stoi(str, &charactersParsed);
     if (charactersParsed != str.length())
         throw std::invalid_argument("str is not an integer");
-    if (ret < 0)
-        throw std::invalid_argument("str is negative");
+    if (ret <= 0)
+        throw std::invalid_argument("str is not positive");
     return ret;
 }
 
