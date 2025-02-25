@@ -55,11 +55,17 @@ int stringToInt(const std::string &str) {
     return ret;
 }
 
+void validateArgumentCount(int providedArgs, int expectedArgs) {
+    if (providedArgs != expectedArgs)
+        throw std::invalid_argument("wrong number of arguments");
+}
+
 int main(int argc, char **argv) {
     std::vector<std::string> args(argv, argv + argc);
 
     try {
         if (args.at(1) == "plane") {
+            validateArgumentCount(argc,5);
             double length = stringToDouble(args.at(2));
             int divisions = stringToInt(args.at(3));
             std::string file = args.at(4);
@@ -67,6 +73,7 @@ int main(int argc, char **argv) {
             figures::Plane plane(length, divisions);
             plane.writeToFile(file);
         } else if (args.at(1) == "box") {
+            validateArgumentCount(argc,5);
             double length = stringToDouble(args.at(2));
             double grid = stringToDouble(args.at(3));
             std::string file = args.at(4);
@@ -74,6 +81,7 @@ int main(int argc, char **argv) {
             figures::Box box(length, grid);
             box.writeToFile(file);
         } else if (args.at(1) == "sphere") {
+            validateArgumentCount(argc,6);
             double radius = stringToDouble(args.at(2));
             int slices = stringToInt(args.at(3));
             int stacks = stringToInt(args.at(4));
@@ -82,6 +90,7 @@ int main(int argc, char **argv) {
             figures::Sphere sphere(radius, slices, stacks);
             sphere.writeToFile(file);
         } else if (args.at(1) == "cone") {
+            validateArgumentCount(argc,7);
             double radius = stringToDouble(args.at(2));
             double height = stringToDouble(args.at(3));
             int slices = stringToInt(args.at(4));
@@ -89,6 +98,7 @@ int main(int argc, char **argv) {
             std::string file = args.at(6);
             // generateCone(radius,height,slices,stacks,file)
         } else if (args.at(1) == "cylinder") {
+            validateArgumentCount(argc,7);
             float radius = stringToDouble(args.at(2));
             float height = stringToDouble(args.at(3));
             int slices = stringToInt(args.at(4));
