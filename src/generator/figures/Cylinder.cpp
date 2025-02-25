@@ -18,15 +18,15 @@
 
 namespace generator::figures {
 Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
-    float sliceStep = 2 * M_PI / slices;
-    float stackStep = height / stacks;
+    float stackstep = 2 * M_PI / stacks;
+    float slicestep = height / slices;
     float halfHeight = height / 2.0f;
 
-    for (int iStack = 0; iStack <= stacks; iStack++) {
-        float y = iStack * stackStep;
+    for (int iSlice = 0; iSlice <= slices; iSlice++) {
+        float y = iSlice * slicestep;
 
-        for (int jSlice = 0; jSlice < slices; jSlice++) {
-            float phi = jSlice * sliceStep;
+        for (int jStack = 0; jStack < stacks; jStack++) {
+            float phi = jStack * stackstep;
             float x = radius * cosf(phi);
             float z = radius * sinf(phi);
 
@@ -34,16 +34,16 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
         }
     }
 
-    for (int iStack = 0; iStack < stacks; iStack++) {
-        int topStart = iStack * slices;
-        int bottomStart = (iStack + 1) * slices;
+    for (int iSlice = 0; iSlice < slices; iSlice++) {
+        int topStart = iSlice * stacks;
+        int bottomStart = (iSlice + 1) * stacks;
 
-        for (int jSlice = 0; jSlice < slices; jSlice++) {
-            int nextSlice = (jSlice + 1) % slices;
-            int topNext = topStart + jSlice;
+        for (int jStack = 0; jStack < stacks; jStack++) {
+            int nextSlice = (jStack + 1) % stacks;
+            int topNext = topStart + jStack;
             int bottomNext = bottomStart + nextSlice;
 
-            this->faces.push_back(utils::TriangleFace(topNext, bottomStart + jSlice, bottomNext));
+            this->faces.push_back(utils::TriangleFace(topNext, bottomStart + jStack, bottomNext));
             this->faces.push_back(utils::TriangleFace(topNext, bottomNext, topStart + nextSlice));
         }
     }
@@ -53,16 +53,16 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
     int bottomCenter = this->positions.size();
     this->positions.push_back(glm::vec4(0, 0, 0, 1.0f));
 
-    int topBaseIndex = stacks * slices;
+    int topBaseIndex = slices * stacks;
     int baseIndex = 0;
 
-    for (int jSlice = 0; jSlice < slices; jSlice++) {
-        int nextSlice = (jSlice + 1) % slices;
+    for (int jStack = 0; jStack < stacks; jStack++) {
+        int nextSlice = (jStack + 1) % stacks;
 
         this->faces.push_back(
-            utils::TriangleFace(topCenter, topBaseIndex + nextSlice, topBaseIndex + jSlice));
+            utils::TriangleFace(topCenter, topBaseIndex + nextSlice, topBaseIndex + jStack));
         this->faces.push_back(
-            utils::TriangleFace(bottomCenter, baseIndex + jSlice, baseIndex + nextSlice));
+            utils::TriangleFace(bottomCenter, baseIndex + jStack, baseIndex + nextSlice));
     }
 }
 }
