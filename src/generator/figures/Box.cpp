@@ -41,8 +41,8 @@ Box::Box(float size, int divisions) {
             // Top and bottom
             case 4:
             case 5:
-                ivec = glm::vec3(1.0f, 0.0f, 0.0f);
-                jvec = glm::vec3(0.0f, 0.0f, 1.0f);
+                ivec = glm::vec3(0.0f, 0.0f, 1.0f);
+                jvec = glm::vec3(1.0f, 0.0f, 0.0f);
                 break;
         }
 
@@ -65,9 +65,15 @@ Box::Box(float size, int divisions) {
             for (int j = 0; j < divisions; j++) {
                 int idx = offset + i * (divisions + 1) + j;
 
-                this->faces.push_back(utils::TriangleFace(idx, idx + 1, idx + divisions + 1));
-                this->faces.push_back(
-                    utils::TriangleFace(idx + 1, idx + divisions + 2, idx + divisions + 1));
+                if (positiveCoordinateFace) {
+                    this->faces.push_back(utils::TriangleFace(idx + 1, idx + divisions + 1, idx));
+                    this->faces.push_back(
+                        utils::TriangleFace(idx + 1, idx + divisions + 2, idx + divisions + 1));
+                } else {
+                    this->faces.push_back(utils::TriangleFace(idx + 1, idx, idx + divisions + 1));
+                    this->faces.push_back(
+                        utils::TriangleFace(idx + divisions + 2, idx + 1, idx + divisions + 1));
+                }
             }
         }
     }
