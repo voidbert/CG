@@ -17,7 +17,7 @@
 #include "generator/figures/Cylinder.hpp"
 
 namespace generator::figures {
-Cylinder::Cylinder(float radius, float height, int stacks, int slices) {
+Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
     float sliceStep = 2 * M_PI / slices;
     float stackStep = height / stacks;
     float halfHeight = height / 2.0f;
