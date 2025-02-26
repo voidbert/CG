@@ -17,6 +17,7 @@
 #include <sstream>
 
 #include "generator/figures/Box.hpp"
+#include "generator/figures/Cone.hpp"
 #include "generator/figures/Cylinder.hpp"
 #include "generator/figures/Plane.hpp"
 #include "generator/figures/Sphere.hpp"
@@ -87,6 +88,8 @@ int main(int argc, char **argv) {
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
             std::string file = args.at(6);
+            figures::Cone cone(radius, height, slices, stacks);
+            cone.writeToFile(file);
             // generateCone(radius,height,slices,stacks,file)
         } else if (args.at(1) == "cylinder") {
             float radius = stringToDouble(args.at(2));
