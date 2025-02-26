@@ -28,7 +28,7 @@ Sphere::Sphere(float radius, int slices, int stacks) {
         float y = radius * cosf(theta);
         float xz = radius * sinf(theta);
 
-        for (int jSlice = 0; jSlice <= slices; jSlice++) {
+        for (int jSlice = 0; jSlice < slices; jSlice++) {
             float phi = jSlice * sliceStep;
             float x = xz * sinf(phi);
             float z = xz * cosf(phi);
@@ -46,24 +46,24 @@ Sphere::Sphere(float radius, int slices, int stacks) {
     }
 
     for (int iStack = 0; iStack < stacks - 2; ++iStack) {
-        int topStart = 1 + iStack * (slices + 1);
-        int bottomStart = 1 + (iStack + 1) * (slices + 1);
+        int topStart = 1 + iStack * slices;
+        int bottomStart = 1 + (iStack + 1) * slices;
 
         for (int jSlice = 0; jSlice < slices; ++jSlice) {
             int currentTop = topStart + jSlice;
-            int nextTop = topStart + (jSlice + 1) % (slices + 1);
+            int nextTop = topStart + (jSlice + 1) % slices;
             int currentBottom = bottomStart + jSlice;
-            int nextBottom = bottomStart + (jSlice + 1) % (slices + 1);
+            int nextBottom = bottomStart + (jSlice + 1) % slices;
 
             faces.push_back(utils::TriangleFace(currentTop, currentBottom, nextBottom));
             faces.push_back(utils::TriangleFace(currentTop, nextBottom, nextTop));
         }
     }
 
-    int bottom = 1 + (stacks - 2) * (slices + 1);
+    int bottom = 1 + (stacks - 2) * slices;
     for (int jSlice = 0; jSlice < slices; jSlice++) {
         int current = bottom + jSlice;
-        int next = bottom + (jSlice + 1) % (slices + 1);
+        int next = bottom + (jSlice + 1) % slices;
         this->faces.push_back(utils::TriangleFace(southPoleIndex, next, current));
     }
 }
