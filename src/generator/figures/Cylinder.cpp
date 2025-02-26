@@ -24,6 +24,7 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
 
     for (int iStack = 0; iStack <= stacks; iStack++) {
         float y = iStack * stackStep;
+
         for (int jSlice = 0; jSlice < slices; jSlice++) {
             float phi = jSlice * sliceStep;
             float x = radius * cosf(phi);
@@ -56,6 +57,7 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {
         int nextSlice = (jSlice + 1) % slices;
+        
         this->faces.push_back(
             utils::TriangleFace(topCenter, topBaseIndex + nextSlice, topBaseIndex + jSlice));
         this->faces.push_back(
