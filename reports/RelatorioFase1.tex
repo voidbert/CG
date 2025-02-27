@@ -61,7 +61,23 @@
 
 \section{\emph{Engine}}
 
-\textbf{\color{red} TODO - \emph{engine}}
+\subsection{Criação da janela}
+
+Para a criação da janela, a biblioteca GLFW foi utilizada \cite{glfw}, escolhida principalmente pela
+sua API moderna. Ao contrário do GLUT \cite{glut}, utilizado nas aulas práticas da UC, a API do GLFW
+não obriga a guardar o estado da aplicação em variáveis globais para que os métodos associados à
+janela lhe possam aceder. Isto possibilita a criação de abstrações RAII em torno da janela criada, o
+que por sua vez permite a utilização das várias funcionalidades de C++ para gestão automática de
+memória. Ademais, a API do GFLW também permite um maior controlo sobre o ciclo de resposta a eventos
+e renderização.
+
+Já na primeira fase do projeto, optou-se por utilizar uma versão do OpenGL mais atual do que a que é
+utilizada nas aulas práticas, o \emph{core profile} do OpenGL 4.6. Apesar do seu uso exigir um maior
+esforço na primeira fase, com a utilização obrigatória de VBOs e de \emph{shaders}, esta versão
+suporta mais funcionalidades do que as versões anteriores, permite obter um melhor desempenho, e é
+suportada por depuradores como RenderDoc \cite{renderdoc}. Para utilizar esta versão de OpenGL, um
+\emph{loader} é necessário, e o GLAD \cite{glad} foi escolhido devido ao seu elevado grau de
+personalização.
 
 \section{Resultados obtidos}
 
@@ -76,8 +92,18 @@
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{exemplo}
-        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
+    \bibitem{glfw}
+        "An OpenGL library."{} GLFW. Accessed: Feb. 27, 2025. [Online.] Available:
+        \url{https://www.glfw.org}
+    \bibitem{glut}
+        "About."{} The freeglut project. Accessed: Feb. 27, 2025. [Online.] Available:
+        \url{https://freeglut.sourceforge.net/}
+    \bibitem{renderdoc}
+        "RenderDoc."{} RenderDoc Accessed: Feb. 28, 2025. [Online.] Available:
+        \url{https://renderdoc.org/}
+    \bibitem{glad}
+        "Glad - Multi-Language GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs."{}
+        Feb. 28, 2025. [Online.] Available: \url{https://glad.dav1d.de/}
 \end{thebibliography}
 \endgroup
 
