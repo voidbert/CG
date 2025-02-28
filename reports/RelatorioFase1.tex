@@ -1,5 +1,6 @@
 \documentclass[12pt, a4paper]{article}
 
+\usepackage{amsmath}
 \usepackage{array}
 \usepackage[portuguese]{babel}
 \usepackage{chngpage}
@@ -136,6 +137,114 @@ T_1 = (P_1, P_4, P_0)
 \hspace{1cm}
 T_2 = (P_1, P_5, P_4)
 $$
+
+\subsection{Cubo}
+
+De um modo simples, o processo de geração de um cubo consiste na repetição da geração de um plano
+seis vezes, uma vez para cada face. No entanto, algumas diferenças devem ser evidenciadas. Tal como
+no plano, após ser calculado o comprimento de uma divisão do cubo, são definidos os vetores
+diretores dos vários planos que são as faces do cubo. Há três pares de vetores diretores, cada um
+utilizado para gerar duas faces opostas:
+
+$$
+\begin{array}{ll>{\hspace{1cm}}ll>{\hspace{1cm}}c}
+    \vec{\imath_1} &= (1, 0, 0) &
+    \vec{\jmath_1} &= (0, 1, 0) &
+    (\text{faces dianteira e traseira}) \\
+    \vec{\imath_2} &= (0, 1, 0) &
+    \vec{\jmath_2} &= (0, 0, 1) &
+    (\text{faces esquerda e direita}) \\
+    \vec{\imath_3} &= (0, 0, 1) &
+    \vec{\jmath_3} &= (1, 0, 0) &
+    (\text{faces superior e inferior})
+\end{array}
+$$
+
+Ao contrário do que acontece no plano, estes vetores encontram-se normalizados, o que é útil para
+determinar o ponto de cada face a partir do qual os seus restantes pontos serão gerados. Tal como
+acontece no plano, para o cubo estar centrado na origem, é necessário que todas as coordenadas deste
+ponto inicial estejam a uma distância de $\frac{L}{2}$ da origem, onde $L$ representa o comprimento
+do lado do cubo. Por exemplo, para o primeiro par de vetores diretores, os pontos são os seguintes,
+correspondentes às faces traseira e dianteira, respetivamente:
+
+$$
+P_{1^-} = \left ( -\frac{L}{2}, -\frac{L}{2}, -\frac{L}{2} \right )
+\hspace{1cm}
+P_{1^+} = \left ( -\frac{L}{2}, -\frac{L}{2}, +\frac{L}{2} \right )
+$$
+
+De um modo geral, nas coordenadas onde $\vec{\imath}$ ou $\vec{\jmath}$ têm um valor não nulo, a
+coordenada do ponto inicial é $-\frac{L}{2}$. A coordenada restante pode assumir, conforme a face,
+ou $\frac{L}{2}$ ou $-\frac{L}{2}$. Matematicamente, o vetor perpendicular à face é dado por:
+
+$$
+\vec{n} = (1, 1, 1) - \vec{\imath} - \vec{\jmath}
+$$
+
+A partir deste vetor, os pontos iniciais das faces são dados por:
+
+$$
+P_{1^-} = -\frac{L}{2} \left ( \vec{\imath} + \vec{\jmath} + \vec{n} \right )
+\hspace{1cm}
+P_{1^+} = -\frac{L}{2} \left ( \vec{\imath} + \vec{\jmath} - \vec{n} \right )
+$$
+
+Com os vetores diretores e os pontos iniciais de cada face, é possível normalizar os vetores
+diretores e gerar os pontos de cada face, seguindo o mesmo processo utilizado para o plano. Abaixo,
+apresenta-se um exemplo da nuvem de pontos de um cubo gerado:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/figures/CubePoints.pdf}
+    \caption{
+        \onehalfspacing
+        Nuvem de pontos resultante da geração de um cubo de três divisões. Os pontos das faces
+        ocultas não foram representados nesta figura.
+    }
+\end{figure}
+
+Depois de gerada a nuvem de pontos, o processo de geração dos triângulos de cada face é muito
+semelhante ao do plano. No entanto, a ordem dos vértices de cada triângulo difere conforme a face do
+cubo a ser construída. Considere-se o exemplo abaixo, o das faces superior e inferior de um cubo com
+apenas uma divisão:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/figures/CubeFaces.pdf}
+    \caption{Faces superior e inferior de um cubo de apenas uma divisão.}
+\end{figure}
+
+Para que os triângulos da face inferior estejam voltados para o exterior do cubo, ou seja, para
+baixo, os seus pontos são ordenados no sentido dos ponteiros do relógio:
+
+$$
+T_1 = (P_1, P_2, P_0)
+\hspace{1cm}
+T_2 = (P_1, P_3, P_2)
+$$
+
+Na face superior, a ordem dos pontos dos triângulos é contrária, no sentido contrário ao dos
+ponteiros do relógio:
+
+$$
+T_1' = (P_5, P_4, P_6)
+\hspace{1cm}
+T_2' = (P_7, P_5, P_6)
+$$
+
+Para cada par de faces opostas, cada face será sujeita, conforme o seu vetor normal, a uma ordenação
+distinta dos pontos dos seus triângulos. Após aplicar o processo de geração de triângulos a todas as
+faces, é dada por concluída a construção do modelo do cubo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/figures/CubeTriangles.pdf}
+    \caption{
+        \onehalfspacing
+        Triângulos resultantes da geração de um cubo de três divisões. As faces ocultas não foram
+        representadas nesta figura.
+    }
+\end{figure}
 
 \section{\emph{Engine}}
 
