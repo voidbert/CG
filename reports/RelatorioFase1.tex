@@ -124,8 +124,8 @@ teria abcissa e cota nulas.
 
 Depois, começamos por calcular os vértices do cone.
 
-O primeiro vértice é a origem e o último vértice tem abscissa e cota nulas e
-tem ordenada igual à altura do cone.
+O primeiro vértice é a origem e o último vértice está localizado no topo do cone,
+tendo abscissa e cota nulas e tendo ordenada igual à altura do cone.
 $$
 P_0 = (0, 0, 0)
 \hspace{1cm}
@@ -152,11 +152,12 @@ vértices, sendo X o número de slices.
 \end{figure}
 
 Como podemos ver pela imagem os vértices calculados para uma stack,
-teem todos a mesma ordenada. Podemos obter a ordenada da seguinte forma,
-considerando que começamos pela iteração 0:
+teem todos a mesma ordenada. Podemos obter a ordenada da seguinte forma:
 $$
-y = \frac{height}{stacks} \times iteracao
+y = \frac{height}{stacks} \times iStack
 $$
+iStack representa o índice da stack, começando de 0.
+
 Para cada stack, ainda obtemos o raio da circunferência formada pelos vértices dessa stack,
 que será usado posteriormente para calcular abcissas e cotas.
 Para obter o raio, utilizamos a regra da semelhança de triângulos que nos diz que triângulos
@@ -167,12 +168,23 @@ $$
 Depois, ainda numa stack, por cada slice vamos calcular então um vértice.
 
 Já calculamos a ordenada do vértice, agora iremos calcular a abcissa e a cota do
-vértice. Para isso precisamos de saber o angulo do slice inicial ao slice atual,
-considerando que a primeira iteração pelos slices é a 0:
+vértice. Para calcular isso, primeiro precisamos de determinar um ângulo.
+
+A circunferência completa tem um ângulo total de $2\pi$ radianos (360°).
+Se dividirmos essa circunferência em slices, cada slice terá um ângulo de:
 $$
-angle = \frac{(2 \times \pi)}{slices}\times iteracao
+\frac{2 \times \pi}{slices}
 $$
-Depois com este angulo, conseguimos calcular a abcissa e cota do vértice:
+Agora, para um slice específico, o ângulo acumulado desde o ponto inicial é:
+$$
+angle = \frac{(2 \times \pi)}{slices}\times iSlice
+$$
+iSlice representa O índice do slice, começando de 0.
+
+Isso significa que conforme avançamos pelos slices, o ângulo vai aumentando progressivamente.
+
+Depois com este angulo e com o raio anteriormente obtido, conseguimos calcular a abcissa e
+a cota do vértice, usando trignometria:
 $$
 x = newRadius \times \cos(angle)
 $$
@@ -201,10 +213,11 @@ outro vértice da base e o vértice que vem a seguir deste.
 
 Em segundo lugar, calculamos as faces triângulares laterais do cone, exceto as da última stack
 (a stack de maior ordenada), garantindo que estão viradas para fora. Para cada stack, calculamos
-2*X faces, sendo X o número de slices. Ou seja, numa stack, por cada slice, calculamos 2 faces.
-A primeira face terá um vértice, o vértice em cima deste e o vértice ao lado do anterior.
-A segunda face terá o vértice inicial, o vértice na diagonal desse e o vértice ao lado do
-inicial.
+$2 \times X$ faces, sendo X o número de slices. Ou seja, numa stack, por cada slice, calculamos
+2 faces. A primeira face terá um vértice inicial, o vértice em cima deste e o vértice ao lado do
+anterior. A segunda face terá o vértice inicial, o vértice em cima e ao lado desse (na diagonal) e o
+vértice ao lado do inicial. Por exemplo, na figura abaixo, a primeira face tem os vértices P1,
+P9 e P10 e a segunda face tem os vértices P1, P10 e P2.
 
 \begin{figure}[H]
     \centering
@@ -217,8 +230,8 @@ inicial.
 
 Em terceiro lugar, calculamos as faces triângulares laterais do cone da última stack, garantindo
 que estão viradas para fora. Desta vez, a stack terá apenas X faces, sendo X o número de slices.
-Nesta stack, por cada slice, calculamos 1 face. Essa face terá um vértice, o ultimo vértice e o
-vértice ao lado do inicial.
+Nesta stack, por cada slice, calculamos 1 face. Essa face terá um vértice inicial, o ultimo
+vértice de todos (a ponta do cone) e o vértice ao lado do inicial.
 
 \begin{figure}[H]
     \centering
