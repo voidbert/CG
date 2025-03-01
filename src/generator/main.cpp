@@ -36,8 +36,7 @@ void printUsage(const std::string &programName) {
     std::cerr << "  " << programName
               << " cone     <radius>      <height>      <slices> <stacks> <file>" << std::endl;
     std::cerr << "  " << programName
-              << " cylinder <radius>      <height>      <slices> <stacks> <file>"
-              << std::endl;
+              << " cylinder <radius>      <height>      <slices> <stacks> <file>" << std::endl;
     std::cerr << "  " << programName
               << " torus    <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
 }
