@@ -37,6 +37,7 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
     for (int iStack = 0; iStack < stacks; iStack++) {
         int topStart = iStack * slices;
         int bottomStart = (iStack + 1) * slices;
+
         for (int jSlice = 0; jSlice < slices; jSlice++) {
             int nextSlice = (jSlice + 1) % slices;
             int topNext = topStart + jSlice;

@@ -28,15 +28,18 @@ namespace generator {
 void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
     std::cerr << "  " << programName
-              << " plane  <length>      <divisions>                     <file>" << std::endl;
+              << " plane    <length>      <divisions>                     <file>" << std::endl;
     std::cerr << "  " << programName
-              << " box    <length>      <grid>                          <file>" << std::endl;
+              << " box      <length>      <grid>                          <file>" << std::endl;
     std::cerr << "  " << programName
-              << " sphere <radius>      <slices>      <stacks>          <file>" << std::endl;
+              << " sphere   <radius>      <slices>      <stacks>          <file>" << std::endl;
     std::cerr << "  " << programName
-              << " cone   <radius>      <height>      <slices> <stacks> <file>" << std::endl;
+              << " cone     <radius>      <height>      <slices> <stacks> <file>" << std::endl;
     std::cerr << "  " << programName
-              << " torus  <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
+              << " cylinder <radius>      <height>      <slices> <stacks> <file>"
+              << std::endl;
+    std::cerr << "  " << programName
+              << " torus    <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
 }
 
 double stringToDouble(const std::string &str) {
