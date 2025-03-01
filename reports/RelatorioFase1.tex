@@ -110,15 +110,17 @@ f 1 2 3
 \subsection{Cone}
 Para gerar um cone temos de indicar o raio da base do cone (radius), a altura do
 cone (height), o número de slices, o número de stacks e o caminho relativo para o
-ficheiro que iremos criar com os vértices e faces triangulares do cone (file).
+ficheiro que iremos criar com os vértices e faces triângulares do cone (file).
 
-Para calcular os vértices e as faces triangulares de um cone, primeiro tivemos
+Para calcular os vértices e as faces triângulares de um cone, primeiro tivemos
 de tomar uma decisão. No enunciado apenas diz que a base do cone deve estar no
 plano XZ. Assim, sabemos que a ordenada (y) do centro da base do cone é nula
 mas nada nos é dito sobre a abscissa (x) e sobre a cota (z) do centro da base
 do cone. Para o cone estar consistente com as restantes figuras e para facilitar
 os cálculos, decidimos que a base do cone estaria centrada na origem, ou seja,
 teria abcissa e cota nulas.
+
+\subsubsection{Vértices}
 
 Depois, começamos por calcular os vértices do cone.
 
@@ -153,19 +155,82 @@ Como podemos ver pela imagem os vértices calculados para uma stack,
 teem todos a mesma ordenada. Podemos obter a ordenada da seguinte forma,
 considerando que começamos pela iteração 0:
 $$
-y = (height/stacks) * iteracao
+y = \frac{height}{stacks} \times iteracao
 $$
 Para cada stack, ainda obtemos o raio da circunferência formada pelos vértices dessa stack,
 que será usado posteriormente para calcular abcissas e cotas.
-Para obter o raio, utilizamos a regra de semelhança de triangulos que nos diz que triangulos
+Para obter o raio, utilizamos a regra da semelhança de triângulos que nos diz que triângulos
 semelhantes teem o comprimento dos lados proporcionais:
 $$
-new_radius = ((height - y) * radius) / height
+newRadius = \frac{(height - y)}{height}\times radius
 $$
 Depois, ainda numa stack, por cada slice vamos calcular então um vértice.
-Depois de termos os vértices, falta calcular as faces triangulares. Primeiro vamos calcular
-as faces da base do cone, depois vamos calcular as faces laterais do cone e por fim iremos
-calcular
+
+Já calculamos a ordenada do vértice, agora iremos calcular a abcissa e a cota do
+vértice. Para isso precisamos de saber o angulo do slice inicial ao slice atual,
+considerando que a primeira iteração pelos slices é a 0:
+$$
+angle = \frac{(2 \times \pi)}{slices}\times iteracao
+$$
+Depois com este angulo, conseguimos calcular a abcissa e cota do vértice:
+$$
+x = newRadius \times \cos(angle)
+$$
+$$
+z = newRadius \times \sin(angle)
+$$
+Assim, conseguimos calcular os vértices do cone, sem repetições.
+
+\subsubsection{Faces triângulares}
+
+Depois de termos os vértices, falta calcular as faces triângulares. Primeiro vamos calcular
+as faces da base do cone, depois vamos calcular as faces laterais do cone exceto as da
+última stack e por fim iremos calcular as faces laterais da última stack.
+
+Em primeiro lugar, calculamos as faces triângulares da base do cone, garantindo que estão viradas
+para baixo. Para cada slice, calculamos uma face, que terá sempre como vértices a origem,
+outro vértice da base e o vértice que vem a seguir deste.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/figures/Cone3.pdf}
+    \caption{
+        Primeira iteração para formar a primeira face da base de um cone com 8 slices e 2 stacks.
+    }
+\end{figure}
+
+Em segundo lugar, calculamos as faces triângulares laterais do cone, exceto as da última stack
+(a stack de maior ordenada), garantindo que estão viradas para fora. Para cada stack, calculamos
+2*X faces, sendo X o número de slices. Ou seja, numa stack, por cada slice, calculamos 2 faces.
+A primeira face terá um vértice, o vértice em cima deste e o vértice ao lado do anterior.
+A segunda face terá o vértice inicial, o vértice na diagonal desse e o vértice ao lado do
+inicial.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/figures/Cone4.pdf}
+    \caption{
+        Primeira iteração para formar as duas primeiras faces laterais (que
+        não são da última stack) de um cone com 8 slices e 2 stacks.
+    }
+\end{figure}
+
+Em terceiro lugar, calculamos as faces triângulares laterais do cone da última stack, garantindo
+que estão viradas para fora. Desta vez, a stack terá apenas X faces, sendo X o número de slices.
+Nesta stack, por cada slice, calculamos 1 face. Essa face terá um vértice, o ultimo vértice e o
+vértice ao lado do inicial.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/figures/Cone5.pdf}
+    \caption{
+        Primeira iteração para formar a primeira face da última stack de um cone com 8 slices
+        e 2 stacks.
+    }
+\end{figure}
+
+Temos estas 3 etapas para garantir que não repetimos faces (podiamos ter apenas 2 mas iríamos
+repetir faces).
 
 \section{\emph{Engine}}
 
