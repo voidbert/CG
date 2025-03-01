@@ -7,8 +7,27 @@
 \usepackage[a4paper, margin=2cm]{geometry}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{listings}
 \usepackage{setspace}
 \usepackage{xcolor}
+
+\lstdefinestyle{codestyle}{
+    language=c++,
+    commentstyle=\color{teal},
+    keywordstyle=\color{blue},
+    numberstyle=\ttfamily\color{gray},
+    stringstyle=\color{red},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=false,
+    keepspaces=true,
+    numbers=none,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4
+}
+\lstset{style=codestyle}
 
 \title{\Huge \textbf{Computação Gráfica \\ \Large Trabalho Prático -- Fase I}}
 \date{2 de março 2025}
@@ -78,6 +97,35 @@ suporta mais funcionalidades do que as versões anteriores, permite obter um mel
 suportada por depuradores como RenderDoc \cite{renderdoc}. Para utilizar esta versão de OpenGL, um
 \emph{loader} é necessário, e o GLAD \cite{glad} foi escolhido devido ao seu elevado grau de
 personalização.
+
+\subsection{Comportamento da \emph{engine}}
+
+O primeiro passo na execução da \emph{engine} é a criação da janela e do seu contexto OpenGL. Este é
+necessário para os passos seguintes: a leitura da cena, onde é necessário criar VBOs para os
+modelos 3D, a instanciação dos eixos do sistema de coordenadas, também suportados por VBOs, e a
+criação dos \emph{shaders} de vértices e de fragmentos. Uma vez que os VBOs e os \emph{shaders} não
+são um objetivo da primeira fase deste trabalho, o seu funcionamento só será descrito em detalhe num
+relatório futuro.
+
+Estando inicializada a \emph{engine}, segue-se um ciclo em que a janela reage a eventos e desenha os
+seus conteúdos. Neste ciclo, são suportados os eventos de passagem de tempo, necessidade de
+atualizar os conteúdos da janela, e redimensionamento da janela. Para se subscrever a um evento,
+basta sobrescrever o seu método correspondente na classe \texttt{Window}:
+
+\begin{lstlisting}
+
+virtual void onUpdate(float time, float timeElapsed) = 0;
+virtual void onRender() = 0;
+virtual void onResize(int width, int height) = 0;
+\end{lstlisting}
+
+De momento, apenas os métodos \texttt{onRender} e \texttt{onResize} são utilizados. Nestes,
+desenham-se os conteúdos da janela e atualiza-se a matriz de projeção da câmara, respetivamente. Em
+relação ao processo de renderização, este consiste no envio da matriz da câmara para o \emph{shader}
+de vértices, na renderização dos eixos usando \texttt{glDrawArrays}, e na iteração por todos os
+objetos da cena, usando \texttt{glDrawElements} para desenhar cada um. No futuro, serão adicionados
+métodos de resposta a eventos de \emph{input} do utilizador, que o permitirão executar ações como,
+por exemplo, mover a câmara.
 
 \section{Resultados obtidos}
 
