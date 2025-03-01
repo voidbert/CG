@@ -65,37 +65,27 @@
 
 \subsection{Torus}
 
-O processo de criação do modelo 3D de um torus é dividido em duas fases: a geração do conjunto de
-pontos que o constitui e o seu agrupamento em faces triangulares. Esta divisão tem origem na
-estrutura de um ficheiro \texttt{.3d}, que separa os vértices de um modelo das suas faces.
-
-O primeiro passo para a geração da nuvem de pontos de um torus é a definição das suas dimensões,
-com o raio maior $R$ e o raio menor $r$. Como o torus é gerado a partir de uma parametrização
-trigonométrica, cada ponto pode ser representado pelas seguintes equações:
+Matematicamente, as coordenadas de um ponto do \emph{torus} são definidas do seguinte modo
+\cite{torus}:
 
 $$
-x = (-R + r \cos \phi) \cos \theta,
+x = (-R + r \cos \phi) \cos \theta
 \hspace{1cm}
-y = r \sin \phi,
+y = r \sin \phi
 \hspace{1cm}
-z = (-R + r \cos \phi) \sin \theta.
+z = (-R + r \cos \phi) \sin \theta
 $$
 
-Onde $\theta$ representa o ângulo responsável por percorrer a circunferência maior do torus,
-controlando a posição do ponto ao longo do anel principal, e $\phi$ representa o ângulo que
-percorre a circunferência menor, determinando a posição do ponto dentro da secção transversal do
-tubo. Ambos os ângulos variam no intervalo $[0, 2\pi]$.
+$R$ e $r$ são os parâmetros dados para a geração do \emph{torus}, os raios maior e menor,
+respetivamente. Os ângulos $\theta$ e $\phi$ variam ambos no intervalo $[0, 2\pi]$.
 
 O ângulo $\theta$ define a rotação do ponto em torno do eixo central do torus, percorrendo o
 círculo principal de raio $R$. Assim, ao variar $\theta$, o ponto desloca-se ao longo do anel do
-torus, mantendo-se sempre na mesma posição relativa dentro do tubo.
+torus, mantendo-se sempre na mesma posição relativa dentro do tubo. Já o ângulo $\phi$ determina a
+posição do ponto dentro da secção transversal do tubo, que tem raio $r$. Ao variar $\phi$, o ponto
+descreve um movimento circular dentro do tubo, movendo-se ao longo da circunferência menor do torus.
 
-Já o ângulo $\phi$ determina a posição do ponto dentro da secção transversal do tubo, que tem raio
-$r$. Ao variar $\phi$, o ponto descreve um movimento circular dentro do tubo, movendo-se ao longo
-da circunferência menor do torus. Enquanto $\theta$ define onde o ponto se encontra ao longo do
-torus, $\phi$ determina como o ponto está posicionado dentro da secção circular do tubo.
-
-Para gerar uma malha de pontos distribuída uniformemente no torus, dividem-se os ângulos em fatias
+Para gerar uma nuvem de pontos uniformemente distribuídos, dividem-se os ângulos em fatias
 ($slices$) e segmentos ($stacks$), utilizando:
 
 $$
@@ -107,9 +97,9 @@ $$
 $$
 
 Assim, o torus é gerado iterando sobre os valores inteiros possíveis de $i$ e $j$, incrementando
-primeiro $j$ e só depois $i$, o que dá origem a uma nuvem de pontos.
+primeiro $j$ e só depois $i$, o que dá origem à nuvem de pontos desejada.
 
-Depois de gerados, os vértices são agrupados em triângulos que compõem a superfície do torus. Para
+Depois de gerados, os vértices são agrupados nos triângulos que compõem a superfície do torus. Para
 isso, considera-se um vértice de referência, como $P_1$, juntamente com o vértice adjacente na
 mesma fatia ($P_2$) e os dois vértices correspondentes na fila seguinte da grelha ($P_3$ e $P_4$).
 Este processo repete-se para todos os vértices aplicáveis, garantindo que cada célula quadrangular
@@ -119,40 +109,35 @@ da malha e a organização dos triângulos resultantes.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{res/figures/TorusTriangle.pdf}
-    \caption{
-        Triângulos de um torus gerado, mostrando a subdivisão da malha.
-    }
+    \caption{Triângulos de um torus gerado. As faces ocultas não são apresentadas.}
 \end{figure}
 
-Uma otimização feita pela \emph{engine} é \emph{face culling}, ou seja, desenhar apenas as faces
-voltadas para a câmara. No caso do torus, deseja-se que os seus triângulos estejam voltados para
-fora, pelo que os seus vértices devem estar ordenados na ordem contrária à dos ponteiros do
-relógio. Para os quatro pontos apresentados acima, os triângulos gerados são os seguintes:
+Deseja-se que os triângulos do \emph{torus} estejam voltados para fora, pelo que os seus vértices
+devem estar ordenados na ordem contrária à dos ponteiros do relógio. Para os quatro pontos
+apresentados acima, os triângulos gerados são os seguintes:
 
 $$
 T_1 = (P_1, P_2, P_4)
 \hspace{1cm}
-T_2 = (P_1, P_3, P_4).
+T_2 = (P_4, P_1, P_3).
 $$
 
-\subsubsection{Normais e a ilusão de visibilidade da parte interna}
+O \emph{torus} é a única superfície côncava gerada, o que trás problemas relativos à orientação das
+suas normais. As normais de todas as faces apontam para "fora"{} do \emph{torus}, ou seja, as das
+faces interiores ("do buraco"{}) apontam para o centro do \emph{torus}, e as das faces exteriores
+apontam no sentido contrário.
 
-O \emph{torus} é uma superfície fechada e convexa, o que significa que cada ponto da sua superfície
-tem uma normal bem definida, apontando para fora. Como a superfície é suavemente curvada, as
-normais da parte externa do \emph{torus} apontam para fora do modelo, enquanto as normais da parte
-interna do seu buraco também apontam para fora, seguindo a continuidade da superfície.
+Idealmente, a parte interna do \emph{torus} não deveria ser visível quando este é observado de fora,
+pois a própria geometria bloquearia essa visão. No entanto, como apenas os contornos das faces são
+desenhados, e a direção das normais é o único critério utilizado de momento para determinar se uma
+face é ou não desenhada, pode ocorrer um efeito onde a parte interna do \emph{torus} é visível, como
+mostra a figura abaixo. Esse fenómeno acontece porque as normais da parte interna apontam para a
+câmara, tal como as normais das faces que a deveriam cobrir.
 
-Em um modelo 3D ideal, a parte interna do \emph{torus} não deveria ser visível quando observado de
-fora, pois a própria geometria bloquearia essa visão. No entanto, devido à forma como as normais
-são orientadas, pode ocorrer um efeito onde a parte interna parece visível. Esse fenómeno acontece,
-porque as normais da parte interna podem continuar alinhadas com as normais externas, fazendo com
-que a renderização não diferencie corretamente o interior e o exterior.
+\textbf{\color{red} TODO - figura com a cena do torus}
 
-Na prática, este problema pode ser mitigado através da aplicação de técnicas de
-\emph{back-face culling}, que eliminam automaticamente as faces voltadas para longe da câmara,
-garantindo que apenas a parte visível do modelo seja desenhada. Outra abordagem seria modificar o
-material da superfície interna para diferenciar a iluminação, tornando a parte interna menos
-visível quando renderizada.
+Este problema será mitigado na fase 4 do trabalho, onde a superfície dos polígonos será preenchida
+por completo, e as faces internas do \emph{torus} serão cobertas pelas faces externas.
 
 \section{Resultados obtidos}
 
@@ -167,8 +152,9 @@ visível quando renderizada.
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{exemplo}
-        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
+    \bibitem{torus}
+        "Torus."{} Wolfram MathWorld. Accessed: Mar. 1, 2025. [Online.] Available:
+        \url{https://mathworld.wolfram.com/Torus.html}
 \end{thebibliography}
 \endgroup
 
