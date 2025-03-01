@@ -74,14 +74,16 @@ int main(int argc, char **argv) {
             validateArgumentCount(argc, 5);
             double length = stringToDouble(args.at(2));
             int divisions = stringToInt(args.at(3));
-            std::string file = args.at(4);
+            const std::string &file = args.at(4);
+
             figures::Plane plane(length, divisions);
             plane.writeToFile(file);
         } else if (args.at(1) == "box") {
             validateArgumentCount(argc, 5);
             double length = stringToDouble(args.at(2));
             double grid = stringToDouble(args.at(3));
-            std::string file = args.at(4);
+            const std::string &file = args.at(4);
+
             figures::Box box(length, grid);
             box.writeToFile(file);
         } else if (args.at(1) == "sphere") {
@@ -89,7 +91,8 @@ int main(int argc, char **argv) {
             double radius = stringToDouble(args.at(2));
             int slices = stringToInt(args.at(3));
             int stacks = stringToInt(args.at(4));
-            std::string file = args.at(5);
+            const std::string &file = args.at(5);
+
             figures::Sphere sphere(radius, slices, stacks);
             sphere.writeToFile(file);
         } else if (args.at(1) == "cone") {
@@ -98,7 +101,8 @@ int main(int argc, char **argv) {
             double height = stringToDouble(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
-            std::string file = args.at(6);
+
+            const std::string &file = args.at(6);
             figures::Cone cone(radius, height, slices, stacks);
             cone.writeToFile(file);
         } else if (args.at(1) == "cylinder") {
@@ -107,7 +111,8 @@ int main(int argc, char **argv) {
             float height = stringToDouble(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
-            std::string file = args.at(6);
+            const std::string &file = args.at(6);
+
             figures::Cylinder cylinder(radius, height, slices, stacks);
             cylinder.writeToFile(file);
         } else if (args.at(1) == "torus") {
@@ -116,7 +121,8 @@ int main(int argc, char **argv) {
             double minorRadius = stringToDouble(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
-            std::string file = args.at(6);
+            const std::string &file = args.at(6);
+
             figures::Torus torus(majorRadius, minorRadius, slices, stacks);
             torus.writeToFile(file);
         } else {
@@ -132,4 +138,5 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
 }
