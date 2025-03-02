@@ -7,6 +7,7 @@
 \usepackage[a4paper, margin=2cm]{geometry}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{listings}
 \usepackage{setspace}
 \usepackage{xcolor}
 
@@ -61,68 +62,65 @@
 
 \section{\emph{Engine}}
 
-\subsection{Cena (Scene)}
+\subsection{Cena (\texttt{Scene})}
 
-A classe \texttt{Scene} assume um papel importante, pois interpreta e organiza as informações
-contidas no ficheiro de cena \texttt{XML}. A biblioteca \texttt{TinyXML2} é a ferramenta utilizada
-para analisar a estrutura do ficheiro, permitindo à \texttt{Scene} extrair dados importantes como as
-dimensões da janela de visualização, as propriedades da câmara e a lista de entidades a serem
-renderizadas.
+A classe \texttt{Scene} assume um papel fulcral na \texttt{engine}, pois é responsável por
+interpretar ficheiros XML com os conteúdos que devem ser renderizados. Para a sua análise sintática
+destes ficheiros, a biblioteca \texttt{TinyXML2} \cite{tinyxml2} é utilizada. Segue um exemplo de
+uma cena em formato XML:
 
-O ficheiro de cena \texttt{XML} serve como um guião para a engine, define a estrutura e o conteúdo
-da cena a ser renderizada. A sua estrutura hierárquica permite a organização de objetos em grupos,
-facilitando a criação de cenas complexas.
-O processo de análise inicia-se com a leitura do elemento raiz \texttt{<world>}, que contêm todos os
-elementos de configuração. A \texttt{Scene} extrai as dimensões da janela a partir do
-elemento \texttt{<window>}, definindo a largura e altura da área de renderização. As propriedades da
-câmara, incluindo a sua posição no espaço, o ponto para o qual está a olhar (\texttt{lookAt}), o
-vetor que define a sua orientação vertical (\texttt{up}), o campo de visão (\texttt{FOV}) e os
-planos de recorte próximo e distante, são obtidas do elemento \texttt{<camera>}.
+% TODO - adjust listing style and syntax highlighting after merging
 
-Os elementos \texttt{<group>} podem conter outros elementos \texttt{<group>} ou elementos
-\texttt{<models>}, que especificam os modelos 3D a serem carregados e renderizados. Esta organização
-hierárquica facilita a criação de cenas complexas, onde objetos podem ser agrupados e transformados
-em conjunto.
+\begin{lstlisting}
 
-O carregamento dos modelos 3D é realizado de forma eficiente, com recurso a um
-\texttt{std::unordered\_map} para armazenar os modelos já carregados. Quando um elemento
-\texttt{<model>} é encontrado, o ficheiro especificado no atributo \texttt{file} é lido.
-Se o modelo já foi carregado anteriormente, ele é reutilizado; caso contrário, um novo modelo é
-carregado e armazenado no mapa. Esta estratégia evita a duplicação de dados e melhora o desempenho
-da engine.
+<world>
+    <window width="512" height="512" />
+    <camera>
+        <position x="3" y="2" z="1" />
+        <lookAt x="0" y="0" z="0" />
+        <up x="0" y="1" z="0" />
+        <projection fov="60" near="1" far="1000" />
+    </camera>
+    <group>
+        <models>
+            <model file="../models/box.3d" />
+        </models>
+    </group>
+</world>
+\end{lstlisting}
 
-Cada modelo é encapsulado numa instância da classe \texttt{Entity}, que representa um
-objeto na cena. A \texttt{Scene} mantém uma lista de \texttt{std::unique\_ptr<Entity>}, assegurando
-a gestão eficiente da memória das entidades. A utilização de \texttt{std::unique\_ptr} assegura que
-as entidades são destruídas automaticamente quando a cena é destruída.
+O processo de análise inicia-se com a leitura do elemento raiz, \texttt{<world>}, que contêm todos
+os elementos de configuração. A \texttt{Scene} começa por extrair as dimensões da janela a partir do
+elemento \texttt{<window>} e as propriedades da câmara a partir do elemento \texttt{<camera>}.
+Depois, prossegue à leitura dos objetos presentes na cena. Os elementos \texttt{<group>} podem
+conter outros elementos \texttt{<group>}, ou então elementos \texttt{<model>}, que especificam os
+modelos 3D a serem carregados e renderizados. Nesta primeira fase, por simplicidade, esta estrutura
+hierárquica é linearizada durante o carregamento de uma cena (a \texttt{engine} armazena um
+\texttt{std::vector} de modelos), mas isto é algo que terá de ser mudado para suportar as
+transformações geométricas da próxima fase.
 
-A cena interage com outros componentes da engine para renderizá-la corretamente. A câmara,
-representada pela classe \texttt{Camera}, fornece a matriz de visualização e projeção, que é
-utilizada pela \texttt{RenderPipeline} para transformar os vértices dos modelos.
+O leitor de cenas procura evitar o carregamento do mesmo modelo mais do que uma vez. Com recurso a
+um dicionário (\texttt{std::unordered\_map}), são armazenados os modelos já carregados. Quando um
+elemento \texttt{<model>} é encontrado, caso este refira um ficheiro \texttt{.3d} carregado
+anteriormente, ele é reutilizado; caso contrário, um novo modelo é carregado e armazenado no
+dicionário.
 
-A organização modular da engine permite a fácil expansão e manutenção do código, facilitando a
-adição de novas funcionalidades e a otimização do desempenho.
+A classe \texttt{Scene} também é responsável por desenhar os conteúdos de uma cena. Para o fazer,
+começa por configurar a matriz da câmara no \emph{shader} de vértices, e itera por todas as
+entidades, desenhando cada uma.
 
-\subsection{Entidade (Entity)}
+\subsection{Entidade (\texttt{Entity})}
 
-A classe \texttt{Entity} representa um objeto 3D individual na cena, combina um modelo
-(\texttt{Model}) com uma cor associada. Esta é responsável por renderizar o modelo com recurso à
-\textit{pipeline} de renderização (\texttt{RenderPipeline}).
+A classe \texttt{Entity} representa um objeto 3D individual na cena, combinando um modelo
+(\texttt{Model}) com outra informação relevante como, por exemplo, a sua cor. Esta classe é também
+responsável por renderizar cada objeto corretamente, transformando o seu modelo de acordo com os
+atributos definidos.
 
-O construtor da \texttt{Entity} recebe um \texttt{std::shared\_ptr<Model>} e um \texttt{glm::vec4}
-representando a cor da entidade. O modelo é armazenado internamente, e a cor é utilizada durante a
-renderização. A utilização de um \texttt{std::shared\_ptr} permite que múltiplos objetos na cena
-partilhem o mesmo modelo, reduzindo o consumo de memória.
-
-O método \texttt{draw} da entidade recebe uma referência à \texttt{RenderPipeline} e realiza a
-renderização do modelo. Primeiro, a cor da entidade é definida na \textit{pipeline}, com recurso ao
-método \texttt{setColor}. Em seguida, o método \texttt{draw} do \texttt{Model} é chamado para
-renderizar o modelo no ecrã.
-
-A separação entre \texttt{Scene} e \texttt{Entity} promove uma organização clara e modular do código
-, facilitando a criação e gestão de cenas complexas. A \texttt{Scene} lida com a interpretação do
-ficheiro \texttt{XML} e a organização das entidades, enquanto a \texttt{Entity} é responsável pela
-renderização individual de cada objeto.
+Uma otimização feita à \texttt{Entity} é o uso de um \texttt{std::shared\_ptr<Model>} para
+referenciar o modelo associado a cada objeto. Este apontador inteligente permite a partilha do mesmo
+modelo por várias entidades que o usem, reduzindo o consumo de memória da GPU. Ademais, o uso de
+contagem de referências permite a libertação automática de memória, seguindo os princípios RAII de
+C++.
 
 \section{Resultados obtidos}
 
@@ -137,8 +135,9 @@ renderização individual de cada objeto.
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{exemplo}
-        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
+    \bibitem{tinyxml2}
+        "TinyXML-2."{} GitHub. Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/leethomason/tinyxml2}
 \end{thebibliography}
 \endgroup
 
