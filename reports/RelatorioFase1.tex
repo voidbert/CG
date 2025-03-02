@@ -85,19 +85,19 @@ torus, mantendo-se sempre na mesma posição relativa dentro do tubo. Já o âng
 posição do ponto dentro da secção transversal do tubo, que tem raio $r$. Ao variar $\phi$, o ponto
 descreve um movimento circular dentro do tubo, movendo-se ao longo da circunferência menor do torus.
 
-Para gerar uma nuvem de pontos uniformemente distribuídos, dividem-se os ângulos em fatias
+Para gerar uma núvem de pontos uniformemente distribuídos, dividem-se os ângulos em fatias
 ($slices$) e segmentos ($stacks$), utilizando:
 
 $$
-\theta_i = i \cdot \frac{2\pi}{slices}, \quad i \in \{0, 1, \ldots, slices-1\}
+\theta_i = i \cdot \frac{2\pi}{slices}, \quad i \in \{0, 1, \ldots, slices\}
 $$
 
 $$
-\phi_j = j \cdot \frac{2\pi}{stacks}, \quad j \in \{0, 1, \ldots, stacks-1\}
+\phi_j = j \cdot \frac{2\pi}{stacks}, \quad j \in \{0, 1, \ldots, stacks\}
 $$
 
 Assim, o torus é gerado iterando sobre os valores inteiros possíveis de $i$ e $j$, incrementando
-primeiro $j$ e só depois $i$, o que dá origem à nuvem de pontos desejada.
+primeiro $j$ e só depois $i$, o que dá origem à núvem de pontos desejada.
 
 Após a geração dos vértices, estes são agrupados nos triângulos que compõem a superfície do torus.
 Para isso, considera-se um vértice de referência, como $P_1$, juntamente com o vértice adjacente
