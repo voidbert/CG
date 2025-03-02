@@ -751,10 +751,14 @@ face é ou não desenhada, pode ocorrer um efeito onde a parte interna do \emph{
 mostra a figura abaixo. Esse fenómeno acontece porque as normais da parte interna apontam para a
 câmara, tal como as normais das faces que a deveriam cobrir.
 
-\textbf{\color{red} TODO - figura com a cena do torus}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.25\textwidth]{res/figures/TorusVisibleFaces.png}
+    \caption{Faces do interior do \emph{torus} visíveis.}
+\end{figure}
 
 Este problema será mitigado na fase 4 do trabalho, onde a superfície dos polígonos será preenchida
-por completo, e as faces internas do \emph{torus} serão cobertas pelas faces externas.
+por completo, e as faces internas do \emph{torus} serão cobertas pelas faces externas frontais.
 
 \section{\emph{Engine}}
 
@@ -1006,9 +1010,9 @@ lidar com modelos de alta complexidade, com um grande número de faces (871 mil)
 
 A primeira fase do projeto foi concluída com sucesso, de modo que os objetivos previamente definidos
 foram alcançados. Ademais, também implementámos a geração de mais figuras geométricas (o cilindro e
-o torus), e a implementação de Vertex Buffer Objects (VBOs) já nesta fase melhorou o desempenho da
-\texttt{engine} e permitiu o uso de versões mais recentes de OpenGL, com outras funcionalidades que
-podem vir a ser usadas no futuro.
+o \emph{torus}), e a implementação de Vertex Buffer Objects (VBOs) já nesta fase melhorou o
+desempenho da \texttt{engine} e permitiu o uso de versões mais recentes de OpenGL, com outras
+funcionalidades que podem vir a ser usadas no futuro.
 
 Em relação ao trabalho futuro, pretendemos realizar uma reestruturação da organização interna das
 cenas. A abordagem atual, que armazena os objetos numa estrutura linear, será substituída por um
