@@ -67,29 +67,33 @@
 
 A câmara é responsável por definir a perspetiva e o enquadramento da cena 3D. A sua configuração
 segue um modelo de câmara em primeira pessoa, com a posição, orientação e projeção definidas a
-partir de um ficheiro XML.
+partir do ficheiro XML da cena.
 
-A posição da câmara é representada pelo vetor $position$, que define a sua localização no espaço
-tridimensional. A direção para onde a câmara está orientada é determinada pelo vetor $lookAt$, que
-aponta para o alvo da visualização. O vetor $up$ especifica a orientação vertical da câmara,
-garantindo a sua correta rotação no espaço. Estes três vetores são utilizados para calcular a
-matriz de visualização através da função $glm::lookAt$.
+A posição da câmara é representada pelo vetor \texttt{position}, que define a sua localização no
+espaço tridimensional. A direção para onde a câmara está orientada é determinada pelo vetor
+\texttt{lookAt}, um ponto no espaço para onde a lente da câmara aponta. O vetor \texttt{up}
+especifica a orientação vertical da câmara, garantindo a sua correta rotação no espaço. Estes três
+vetores são utilizados para calcular a matriz de visualização.
 
-A projeção da câmara é controlada pelo campo de visão ($Field \ of \ View$ - $FOV$) e pelos planos
-de recorte próximo e distante ($near$ e $far \ plane$). O $FOV$ define o ângulo de abertura da
+Uma vez que este projeto usa \emph{shaders}, não é possível utilizar a função \texttt{gluLookAt}
+\cite{gluLookAt}, usada nas aulas práticas para o cálculo da matriz de visualização. No entanto,
+como utilizamos a biblioteca \texttt{glm} \cite{glm}, é usada a função equivalente
+\texttt{glm::lookAt}, que devolve uma matriz que pode ser passada ao \emph{shader} de vértices.
+
+A projeção da câmara é controlada pelo campo de visão (\emph{Field of View} -- FOV) e pelos planos
+de recorte próximo e distante (\texttt{near} e \texttt{far}). O FOV define o ângulo de abertura da
 câmara, influenciando a sensação de profundidade da cena, enquanto os planos de recorte estabelecem
-os limites mínimo e máximo da região visível. A matriz de projeção perspetiva é calculada com
-$glm::perspective$, que utiliza o $FOV$, a relação de aspeto e os planos de recorte para definir a
-forma como os objetos são projetados no espaço 3D.
+os limites mínimo e máximo da região visível. A matriz de projeção é calculada com a função
+\texttt{glm::perspective}, que utiliza o $FOV$, o \emph{aspect ratio} da janela, e os planos de
+recorte para definir a forma como os objetos são projetados no espaço 3D.
 
-O sistema de movimento da câmara será implementado na segunda fase do projeto.
+A matriz final da câmara resulta da multiplicação da matriz de projeção pela matriz de visualização,
+e é atualizada sempre que a janela é redimensionada. É utilizada para transformar todos os objetos
+da cena, garantindo um enquadramento adequado dos mesmos e a renderização correta da cena.
 
-A matriz final da câmara resulta da multiplicação da matriz de visualização pela matriz de
-projeção, permitindo a correta renderização da cena. Esta matriz é atualizada em cada iteração do
-ciclo de renderização e aplicada ao sistema de coordenadas da cena, garantindo um enquadramento
-adequado dos modelos gerados.
-
-Com esta abordagem, a câmara proporciona um sistema eficiente de visualização no ambiente 3D.
+De momento, a \texttt{engine} não suporta que o utilizador controle a posição da câmara
+dinamicamente, movendo-a após a leitura do ficheiro XML. No entanto, pretendemos implementar esta
+funcionalidade na segunda fase do projeto.
 
 \section{Resultados obtidos}
 
@@ -104,6 +108,12 @@ Com esta abordagem, a câmara proporciona um sistema eficiente de visualização
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
+    \bibitem{gluLookAt}
+        "gluLookAt."{} Khronos Registry. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml}
+    \bibitem{glm}
+        "glm."{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/g-truc/glm}
     \bibitem{exemplo}
         \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
 \end{thebibliography}
