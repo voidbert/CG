@@ -476,55 +476,6 @@ ao eliminar automaticamente as faces voltadas para trás.
 Este método resulta numa representação eficiente e precisa do cilindro, mantendo uma boa
 distribuição das faces sobre a sua superfície.
 
-\section{\emph{Engine}}
-
-\subsection{Criação da janela}
-
-Para a criação da janela, a biblioteca GLFW foi utilizada \cite{glfw}, escolhida principalmente pela
-sua API moderna. Ao contrário do GLUT \cite{glut}, utilizado nas aulas práticas da UC, a API do GLFW
-não obriga a guardar o estado da aplicação em variáveis globais para que os métodos associados à
-janela lhe possam aceder. Isto possibilita a criação de abstrações RAII em torno da janela criada, o
-que por sua vez permite a utilização das várias funcionalidades de C++ para gestão automática de
-memória. Ademais, a API do GFLW também permite um maior controlo sobre o ciclo de resposta a eventos
-e renderização.
-
-Já na primeira fase do projeto, optou-se por utilizar uma versão do OpenGL mais atual do que a que é
-utilizada nas aulas práticas, o \emph{core profile} do OpenGL 4.6. Apesar do seu uso exigir um maior
-esforço na primeira fase, com a utilização obrigatória de VBOs e de \emph{shaders}, esta versão
-suporta mais funcionalidades do que as versões anteriores, permite obter um melhor desempenho, e é
-suportada por depuradores como RenderDoc \cite{renderdoc}. Para utilizar esta versão de OpenGL, um
-\emph{loader} é necessário, e o GLAD \cite{glad} foi escolhido devido ao seu elevado grau de
-personalização.
-
-\subsection{Comportamento da \emph{engine}}
-
-O primeiro passo na execução da \emph{engine} é a criação da janela e do seu contexto OpenGL. Este é
-necessário para os passos seguintes: a leitura da cena, onde é necessário criar VBOs para os
-modelos 3D, a instanciação dos eixos do sistema de coordenadas, também suportados por VBOs, e a
-criação dos \emph{shaders} de vértices e de fragmentos. Uma vez que os VBOs e os \emph{shaders} não
-são um objetivo da primeira fase deste trabalho, o seu funcionamento só será descrito em detalhe num
-relatório futuro.
-
-Estando inicializada a \emph{engine}, segue-se um ciclo em que a janela reage a eventos e desenha os
-seus conteúdos. Neste ciclo, são suportados os eventos de passagem de tempo, necessidade de
-atualizar os conteúdos da janela, e redimensionamento da janela. Para se subscrever a um evento,
-basta sobrescrever o seu método correspondente na classe \texttt{Window}:
-
-\begin{lstlisting}
-
-virtual void onUpdate(float time, float timeElapsed) = 0;
-virtual void onRender() = 0;
-virtual void onResize(int width, int height) = 0;
-\end{lstlisting}
-
-De momento, apenas os métodos \texttt{onRender} e \texttt{onResize} são utilizados. Nestes,
-desenham-se os conteúdos da janela e atualiza-se a matriz de projeção da câmara, respetivamente. Em
-relação ao processo de renderização, este consiste no envio da matriz da câmara para o \emph{shader}
-de vértices, na renderização dos eixos usando \texttt{glDrawArrays}, e na iteração por todos os
-objetos da cena, usando \texttt{glDrawElements} para desenhar cada um. No futuro, serão adicionados
-métodos de resposta a eventos de \emph{input} do utilizador, que o permitirão executar ações como,
-por exemplo, mover a câmara.
-
 \subsection{Torus}
 
 Matematicamente, as coordenadas de um ponto do \emph{torus} são definidas do seguinte modo
@@ -602,6 +553,87 @@ câmara, tal como as normais das faces que a deveriam cobrir.
 Este problema será mitigado na fase 4 do trabalho, onde a superfície dos polígonos será preenchida
 por completo, e as faces internas do \emph{torus} serão cobertas pelas faces externas.
 
+\section{\emph{Engine}}
+
+\subsection{Criação da janela}
+
+Para a criação da janela, a biblioteca GLFW foi utilizada \cite{glfw}, escolhida principalmente pela
+sua API moderna. Ao contrário do GLUT \cite{glut}, utilizado nas aulas práticas da UC, a API do GLFW
+não obriga a guardar o estado da aplicação em variáveis globais para que os métodos associados à
+janela lhe possam aceder. Isto possibilita a criação de abstrações RAII em torno da janela criada, o
+que por sua vez permite a utilização das várias funcionalidades de C++ para gestão automática de
+memória. Ademais, a API do GFLW também permite um maior controlo sobre o ciclo de resposta a eventos
+e renderização.
+
+Já na primeira fase do projeto, optou-se por utilizar uma versão do OpenGL mais atual do que a que é
+utilizada nas aulas práticas, o \emph{core profile} do OpenGL 4.6. Apesar do seu uso exigir um maior
+esforço na primeira fase, com a utilização obrigatória de VBOs e de \emph{shaders}, esta versão
+suporta mais funcionalidades do que as versões anteriores, permite obter um melhor desempenho, e é
+suportada por depuradores como RenderDoc \cite{renderdoc}. Para utilizar esta versão de OpenGL, um
+\emph{loader} é necessário, e o GLAD \cite{glad} foi escolhido devido ao seu elevado grau de
+personalização.
+
+\subsection{Comportamento da \emph{engine}}
+
+O primeiro passo na execução da \emph{engine} é a criação da janela e do seu contexto OpenGL. Este é
+necessário para os passos seguintes: a leitura da cena, onde é necessário criar VBOs para os
+modelos 3D, a instanciação dos eixos do sistema de coordenadas, também suportados por VBOs, e a
+criação dos \emph{shaders} de vértices e de fragmentos. Uma vez que os VBOs e os \emph{shaders} não
+são um objetivo da primeira fase deste trabalho, o seu funcionamento só será descrito em detalhe num
+relatório futuro.
+
+Estando inicializada a \emph{engine}, segue-se um ciclo em que a janela reage a eventos e desenha os
+seus conteúdos. Neste ciclo, são suportados os eventos de passagem de tempo, necessidade de
+atualizar os conteúdos da janela, e redimensionamento da janela. Para se subscrever a um evento,
+basta sobrescrever o seu método correspondente na classe \texttt{Window}:
+
+\begin{lstlisting}
+
+virtual void onUpdate(float time, float timeElapsed) = 0;
+virtual void onRender() = 0;
+virtual void onResize(int width, int height) = 0;
+\end{lstlisting}
+
+De momento, apenas os métodos \texttt{onRender} e \texttt{onResize} são utilizados. Nestes,
+desenham-se os conteúdos da janela e atualiza-se a matriz de projeção da câmara, respetivamente. Em
+relação ao processo de renderização, este consiste no envio da matriz da câmara para o \emph{shader}
+de vértices, na renderização dos eixos usando \texttt{glDrawArrays}, e na iteração por todos os
+objetos da cena, usando \texttt{glDrawElements} para desenhar cada um. No futuro, serão adicionados
+métodos de resposta a eventos de \emph{input} do utilizador, que o permitirão executar ações como,
+por exemplo, mover a câmara.
+
+\subsection{Câmara}
+
+A câmara é responsável por definir a perspetiva e o enquadramento da cena 3D. A sua configuração
+segue um modelo de câmara em primeira pessoa, com a posição, orientação e projeção definidas a
+partir do ficheiro XML da cena.
+
+A posição da câmara é representada pelo vetor \texttt{position}, que define a sua localização no
+espaço tridimensional. A direção para onde a câmara está orientada é determinada pelo vetor
+\texttt{lookAt}, um ponto no espaço para onde a lente da câmara aponta. O vetor \texttt{up}
+especifica a orientação vertical da câmara, garantindo a sua correta rotação no espaço. Estes três
+vetores são utilizados para calcular a matriz de visualização.
+
+Uma vez que este projeto usa \emph{shaders}, não é possível utilizar a função \texttt{gluLookAt}
+\cite{gluLookAt}, usada nas aulas práticas para o cálculo da matriz de visualização. No entanto,
+como utilizamos a biblioteca \texttt{glm} \cite{glm}, é usada a função equivalente
+\texttt{glm::lookAt}, que devolve uma matriz que pode ser passada ao \emph{shader} de vértices.
+
+A projeção da câmara é controlada pelo campo de visão (\emph{Field of View} -- FOV) e pelos planos
+de recorte próximo e distante (\texttt{near} e \texttt{far}). O FOV define o ângulo de abertura da
+câmara, influenciando a sensação de profundidade da cena, enquanto os planos de recorte estabelecem
+os limites mínimo e máximo da região visível. A matriz de projeção é calculada com a função
+\texttt{glm::perspective}, que utiliza o $FOV$, o \emph{aspect ratio} da janela, e os planos de
+recorte para definir a forma como os objetos são projetados no espaço 3D.
+
+A matriz final da câmara resulta da multiplicação da matriz de projeção pela matriz de visualização,
+e é atualizada sempre que a janela é redimensionada. É utilizada para transformar todos os objetos
+da cena, garantindo um enquadramento adequado dos mesmos e a renderização correta da cena.
+
+De momento, a \texttt{engine} não suporta que o utilizador controle a posição da câmara
+dinamicamente, movendo-a após a leitura do ficheiro XML. No entanto, pretendemos implementar esta
+funcionalidade na segunda fase do projeto.
+
 \section{Resultados obtidos}
 
 \textbf{\color{red} TODO - resultados}
@@ -630,6 +662,14 @@ por completo, e as faces internas do \emph{torus} serão cobertas pelas faces ex
     \bibitem{glut}
         "About."{} The freeglut project. Accessed: Feb. 27, 2025. [Online.] Available:
         \url{https://freeglut.sourceforge.net/}
+    \bibitem{gluLookAt}
+        "gluLookAt."{} Khronos Registry. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml}
+    \bibitem{glm}
+        "glm."{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/g-truc/glm}
+    \bibitem{exemplo}
+        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
     \bibitem{renderdoc}
         "RenderDoc."{} RenderDoc Accessed: Feb. 28, 2025. [Online.] Available:
         \url{https://renderdoc.org/}
