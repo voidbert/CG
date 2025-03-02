@@ -72,7 +72,15 @@
 \pagebreak
 
 \begin{abstract}
-    \textbf{\color{red} TODO - resumo}
+    Para a realização deste trabalho prático, desenvolvemos duas aplicações, o \texttt{generator} e
+    a \texttt{engine}. O \texttt{generator} é capaz de gerar modelos 3D de planos, cubos, esferas,
+    e cones, como requirido pelo enunciado, mas também de outras figuras, como cilindros e tori. A
+    \texttt{engine} é um programa que usa OpenGL \cite{opengl} para apresentar cenas definidas em
+    formato XML, contendo modelos no formato Wavefront OBJ \cite{wavefront-obj}, incluindo os
+    criados pelo \texttt{generator}. Nesta fase, o nosso foco foi o de desenvolver uma arquitetura
+    sólida para estes programas, utilizando já conceitos de OpenGL moderno, como VBOs e
+    \emph{shaders}. Esta arquitetura será expandida nas próximas fases, para suportar diversas
+    outras funcionalidades, como transformações geométricas e movimento da câmara.
 \end{abstract}
 
 \section{\emph{Generator}}
@@ -1027,6 +1035,9 @@ experiência do utilizador, e permitirá a exploração de diferentes estilos de
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
+    \bibitem{opengl}
+        "The Industry's Foundation for High Performance Graphics."{}. OpenGL. Accessed:
+        Mar. 2, 2025. [Online.] Available: \url{https://www.opengl.org/}
     \bibitem{wavefront-obj}
         "Wavefront OBJ File Format Summary."{} FileFormat.Info. Accessed: Mar. 2, 2025. [Online.]
         Available: \url{https://www.fileformat.info/format/wavefrontobj/egff.htm}
