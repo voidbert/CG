@@ -1,5 +1,6 @@
 \documentclass[12pt, a4paper]{article}
 
+\usepackage{amsmath}
 \usepackage{array}
 \usepackage[portuguese]{babel}
 \usepackage{chngpage}
@@ -120,142 +121,151 @@ f 1 2 3
 \end{verbatim}
 
 \subsection{Cone}
-Para gerar um cone temos de indicar o raio da base do cone (radius), a altura do
-cone (height), o número de slices, o número de stacks e o caminho relativo para o
-ficheiro que iremos criar com os vértices e faces triângulares do cone (file).
 
-Para calcular os vértices e as faces triângulares de um cone, primeiro tivemos
-de tomar uma decisão. No enunciado apenas diz que a base do cone deve estar no
-plano XZ. Assim, sabemos que a ordenada (y) do centro da base do cone é nula
-mas nada nos é dito sobre a abscissa (x) e sobre a cota (z) do centro da base
-do cone. Para o cone estar consistente com as restantes figuras e para facilitar
-os cálculos, decidimos que a base do cone estaria centrada na origem, ou seja,
-teria abcissa e cota nulas.
+Para gerar a nuvem de pontos do cone, é necessário ter em atenção dois vértices especiais, o centro
+da sua base e o vértice do seu topo, com as coordenadas abaixo:
 
-\subsubsection{Vértices}
-
-Depois, começamos por calcular os vértices do cone.
-
-O primeiro vértice é a origem e o último vértice está localizado no topo do cone,
-tendo abscissa e cota nulas e tendo ordenada igual à altura do cone.
 $$
 P_0 = (0, 0, 0)
 \hspace{1cm}
-P_n = (0, height, 0)
+P_n = (0, H, 0)
+\hspace{1cm}
+\text{, onde $H$ representa a altura do cone}
 $$
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{res/figures/Cone1.pdf}
-    \caption{
-        Cone gerado, o seu primeiro vértice ($P_0$) e o seu último vértice ($P_n$).
-    }
+    \includegraphics[width=0.35\textwidth]{res/figures/Cone1.pdf}
+    \caption{Primeiro vértice ($P_0$) e último vértice ($P_n$) de um cone.}
 \end{figure}
 
-Também calculamos os restantes vértices. Para cada stack, calculamos X
-vértices, sendo X o número de slices.
+Os restantes vértices são todos obtidos do mesmo modo: para cada \emph{stack}, geram-se tantos
+vértices quantos o número de \emph{slices}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{res/figures/Cone2.pdf}
     \caption{
-        Cone com 2 stacks e os vértices (visíveis) calculados em cada stack.
+        Duas \emph{stacks} de um cone. Não são apresentados vértices ocultados pelas faces visíveis.
     }
 \end{figure}
 
-Como podemos ver pela imagem os vértices calculados para uma stack,
-teem todos a mesma ordenada. Podemos obter a ordenada da seguinte forma:
-$$
-y = \frac{height}{stacks} \times iStack
-$$
-iStack representa o índice da stack, começando de 0.
+Para que as \emph{stacks} sejam equidistantes uma da outra, a distância entre \emph{stacks} será
+o quociente entre a altura do cone e o número de \emph{stacks}. Por conseguinte, a coordenada $y$ da
+$i$-ésima \emph{stack} será:
 
-Para cada stack, ainda obtemos o raio da circunferência formada pelos vértices dessa stack,
-que será usado posteriormente para calcular abcissas e cotas.
-Para obter o raio, utilizamos a regra da semelhança de triângulos que nos diz que triângulos
-semelhantes teem o comprimento dos lados proporcionais:
 $$
-newRadius = \frac{(height - y)}{height}\times radius
+y_i = \frac{H}{N_{stacks}} \times i
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_{stacks} - 1 \right \rbrace
 $$
-Depois, ainda numa stack, por cada slice vamos calcular então um vértice.
 
-Já calculamos a ordenada do vértice, agora iremos calcular a abcissa e a cota do
-vértice. Para calcular isso, primeiro precisamos de determinar um ângulo.
+Cada \emph{stack} no modelo será uma aproximação da secção transversal do cone por um plano
+horizontal, ou seja uma circunferência. Na base do cone, o raio desta circunferência é o dado pelo
+utilizador, $r$. Este raio tende para 0 à medida que se caminha para o vértice do topo do cone.
+Logo, para a \emph{stack} $i$, o raio da circunferência a aproximar pode ser calculado por uma
+interpolação linear:
 
-A circunferência completa tem um ângulo total de $2\pi$ radianos (360°).
-Se dividirmos essa circunferência em slices, cada slice terá um ângulo de:
 $$
-\frac{2 \times \pi}{slices}
+r_i = \frac{H - y_i}{H}\times r
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_{stacks} - 1 \right \rbrace
 $$
-Agora, para um slice específico, o ângulo acumulado desde o ponto inicial é:
-$$
-angle = \frac{(2 \times \pi)}{slices}\times iSlice
-$$
-iSlice representa O índice do slice, começando de 0.
 
-Isso significa que conforme avançamos pelos slices, o ângulo vai aumentando progressivamente.
+Dentro de cada $\emph{slice}$, as coordenadas $x$ e $z$ de cada ponto são determinadas de acordo
+com a equação trigonométrica de uma circunferência:
 
-Depois com este angulo e com o raio anteriormente obtido, conseguimos calcular a abcissa e
-a cota do vértice, usando trignometria:
 $$
-x = newRadius \times \cos(angle)
+x = r_i \cos(\theta)
+\hspace{1cm}
+z = r_i \sin(\theta)
+\hspace{1cm}
+\theta \in \left [ 0, 2 \pi \right [
 $$
-$$
-z = newRadius \times \sin(angle)
-$$
-Assim, conseguimos calcular os vértices do cone, sem repetições.
 
-\subsubsection{Faces triângulares}
+Para se obterem tantos pontos quantas \emph{slices}, e para que estes estejam uniformemente
+distribuídos pelo perímetro da circunferência, o ângulo $\theta$ é sempre incrementado em
+$\frac{2 \pi}{N_{slices}}$ até o perímetro da circunferência ter sido coberto, dando origem à
+seguinte equação de geração de pontos:
 
-Depois de termos os vértices, falta calcular as faces triângulares. Primeiro vamos calcular
-as faces da base do cone, depois vamos calcular as faces laterais do cone exceto as da
-última stack e por fim iremos calcular as faces laterais da última stack.
+$$
+x = r_i \cos \left ( \frac{2 \pi}{N_{slices}} \times j \right )
+\hspace{1cm}
+z = r_i \sin \left ( \frac{2 \pi}{N_{slices}} \times j \right )
+\hspace{1cm}
+j \in \left \lbrace 0, 1, \ldots, N_{slices} - 1 \right \rbrace
+$$
 
-Em primeiro lugar, calculamos as faces triângulares da base do cone, garantindo que estão viradas
-para baixo. Para cada slice, calculamos uma face, que terá sempre como vértices a origem,
-outro vértice da base e o vértice que vem a seguir deste.
+Depois de estar criada a nuvem de pontos, constroem-se, em primeiro lugar, as faces triangulares da
+base do cone. Para cada \emph{slice}, gera-se uma face, que tem  como vértices a origem ($P_0$), um
+vértice da base ($P_1$), e o vértice da \emph{slice} seguinte ($P_2$), como mostra a figura abaixo:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{res/figures/Cone3.pdf}
     \caption{
-        Primeira iteração para formar a primeira face da base de um cone com 8 slices e 2 stacks.
+        \onehalfspacing
+        Primeira iteração da construção das faces da base de um cone (com 8 \emph{slices} e 2
+        \emph{stacks}).
     }
 \end{figure}
 
-Em segundo lugar, calculamos as faces triângulares laterais do cone, exceto as da última stack
-(a stack de maior ordenada), garantindo que estão viradas para fora. Para cada stack, calculamos
-$2 \times X$ faces, sendo X o número de slices. Ou seja, numa stack, por cada slice, calculamos
-2 faces. A primeira face terá um vértice inicial, o vértice em cima deste e o vértice ao lado do
-anterior. A segunda face terá o vértice inicial, o vértice em cima e ao lado desse (na diagonal) e o
-vértice ao lado do inicial. Por exemplo, na figura abaixo, a primeira face tem os vértices P1,
-P9 e P10 e a segunda face tem os vértices P1, P10 e P2.
+Para que a normal desta face esteja voltada para fora do cone, ou seja, para baixo, os vértices do
+triângulo são ordenados do seguinte modo, lembrando que esta ordem também se aplica aos restantes
+vértices da base:
+
+$$
+T = (P_0, P_1, P_2)
+$$
+
+De seguida, constroem-se as faces laterais do cone, com exceção das da última \emph{stack} (a de
+maior ordenada). É construído um quadrilátero (dois triângulos) por cada \emph{slice} na
+\emph{stack}, utilizando um vértice da \emph{stack} ($P_1$), o seu adjacente seguinte na
+\emph{stack} ($P_2$), e os dois pontos correspondentes a estes vértices na \emph{stack} seguinte
+($P_9$ e $P_{10}$). A figura abaixo mostra os vértices utilizados na primeira iteração deste
+processo:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{res/figures/Cone4.pdf}
     \caption{
-        Primeira iteração para formar as duas primeiras faces laterais (que
-        não são da última stack) de um cone com 8 slices e 2 stacks.
+        \onehalfspacing
+        Primeira iteração da construção das faces laterais de um cone (com 8 \emph{slices} e 2
+        \emph{stacks}).
     }
 \end{figure}
 
-Em terceiro lugar, calculamos as faces triângulares laterais do cone da última stack, garantindo
-que estão viradas para fora. Desta vez, a stack terá apenas X faces, sendo X o número de slices.
-Nesta stack, por cada slice, calculamos 1 face. Essa face terá um vértice inicial, o ultimo
-vértice de todos (a ponta do cone) e o vértice ao lado do inicial.
+Para que os vetores normais destas faces apontem para fora do cone, utiliza-se a seguinte ordem para
+os pontos dos triângulos, nesta e noutras iterações:
+
+$$
+T_1 = (P_1, P_9, P_{10})
+\hspace{1cm}
+T_2 = (P_1, P_{10}, P_2)
+$$
+
+Por último, constroem-se as faces da última \emph{stack}. Ao contrário do que acontece com as
+restantes \emph{stacks}, já não se constroem quadriláteros, mas sim triângulos. Para cada
+\emph{slice}, constrói-se um triângulo, formado pelo vértice do cone ($P_{17}$), por um vértice da
+última \emph{stack} ($P_9$) e pelo vértice seguinte nessa \emph{stack} ($P_{10}$), como mostra a
+figura abaixo:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{res/figures/Cone5.pdf}
     \caption{
-        Primeira iteração para formar a primeira face da última stack de um cone com 8 slices
-        e 2 stacks.
+        \onehalfspacing
+        Primeira iteração da construção das faces da última \emph{stack} de um cone (com 8
+        \emph{slices} e 2 \emph{stacks}).
     }
 \end{figure}
 
-Temos estas 3 etapas para garantir que não repetimos faces (podiamos ter apenas 2 mas iríamos
-repetir faces).
+Para que estas faces sejam visíveis do exterior do cone, os seus vértices são ordenados do seguinte
+modo:
+
+$$
+T = (P_9, P_{17}, P_{10})
+$$
 
 \section{\emph{Engine}}
 
