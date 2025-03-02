@@ -57,22 +57,16 @@
 
 \section{\emph{Generator}}
 
-\subsection{Gerador de primitivas gráficas}
-O generator é responsável por gerar primitivas gráficas criando ficheiros com os
-vértices e faces triângulares dessas mesmas primitivas.
+\subsection{Funcionamento do programa}
 
-Para gerar primitivas gráficas, o generator recebe um argumento com o nome
-da primitiva que iremos gerar, mais argumentos como altura, raio, slices e stacks,
-dependendo da primitiva, e por fim recebe ainda um último argumento com o caminho relativo
-do ficheiro que iremos criar.
-\subsection{Figuras}
-Neste fase o generator deve conseguir gerar as seguintes figuras: um plano, um cubo,
-uma esfera e um cone. Como extra, também desenvolvemos a geração do cilíndro e do torus.
+O programa \texttt{generator} é responsável por gerar modelos 3D de sólidos geométricos, ou seja,
+ficheiros com os vértices e as faces triangulares destes sólidos. Nesta fase, o \texttt{generator}
+deve ser capaz de gerar as seguintes figuras: planos, cubos, esferas e cones. Além de implementarmos
+a geração destas figuras, como funcionalidade adicional, também desenvolvemos um gerador de
+cilindros e de tori. As várias possibilidades de uso do comando \texttt{generator} são enumeradas
+abaixo:
 
-A forma como o utilizador deve executar o generator é descrita na mensagem de erro, quando
-o utilizador não utiliza o generator corretamente:
 \begin{verbatim}
-Wrong usage. Here's the correct one:
 ./generator plane    <length>      <divisions>                     <file>
 ./generator box      <length>      <grid>                          <file>
 ./generator sphere   <radius>      <slices>      <stacks>          <file>
@@ -80,29 +74,47 @@ Wrong usage. Here's the correct one:
 ./generator cylinder <radius>      <height>      <slices> <stacks> <file>
 ./generator torus    <majorRadius> <minorRadius> <slices> <stacks> <file>
 \end{verbatim}
-Devemos primeiro ir para a diretoria build e depois executar o generator, como descrito em cima.
 
-No generator vemos se o número de argumentos é válido conforme a figura e vemos se alguns valores
-inseridos são inteiros ou doubles e se são números positivos. Se algo for inválido é nos mostrada
-a mensagem de erro apresentada anteriormente.
+Internamente, o \texttt{generator} começa por interpretar os argumentos dados, saindo com a mensagem
+acima em caso de erro. Caso contrário, gera, em memória, os conjuntos de vértices e de faces que
+constituem o modelo 3D que, por fim, são escritos para um ficheiro no formato descrito abaixo.
 
-\subsection{Ficheiro}
-Depois de gerarmos a figura, vamos guardar a informação no ficheiro pedido.
+\subsection{Formato \texttt{.3d}}
 
-Para o formato dos ficheiros gerados, decidimos seguir o formato Wavefront OBJ (OBJ ou .OBJ),
-um formato de ficheiro usado para representar geometria 3D, muito usado na indústria 3D.
-Este formato tem a vantagem de, para definir faces, não termos de repetir as coordenadas dos
-vértices, apenas temos de indicar o índice dos vértices dessa face, o que diminui o tamanho do
-ficheiro.
+Decidimos que o formato de saída do \texttt{generator} seria o Wavefront OBJ \cite{wavefront-obj}.
+O uso de um formato já existente apresentou diversas vantagens:
 
-Neste formato, para definir um vértice colocamos 'v' seguido das coordenadas do vértice.
-Por exemplo, para representar a origem, o vértice de coordenadas (0,0,0), fazemos:
+\begin{itemize}
+    \item Foi possível desenvolver a \texttt{engine} e o \texttt{generator} em paralelo: os
+        desenvolvedores do \texttt{generator} não precisavam de ter a \texttt{engine} funcional para
+        testar o seu código, visto que já existem diversas ferramentas para visualizar os ficheiros
+        OBJ exportados pelo \texttt{generator}.
+
+    \item Foi possível, sem qualquer código adicional, apresentar na \texttt{engine} modelos 3D
+        oriundos de ferramentas de modelação, muito mais complexos do que os gerados pelo
+        \texttt{generator}.
+
+    \item A forma de representação de faces triangulares neste formato é facilmente mapeável para
+        \emph{index buffers} do OpenGL. Deste modo, não seriam necessárias alterações ao
+        \texttt{generator} quando estes fossem implementados (algo que já foi feito nesta fase do
+        trabalho).
+\end{itemize}
+
+O \emph{parser} desenvolvido para este formato suporta apenas o essencial para o funcionamento desta
+primeira fase: posições de vértices e constituições de faces triangulares. O formato OBJ é textual,
+e representar um vértice é tão simples como ter uma linha começada por um \texttt{v}, ao qual se
+seguem as coordenadas do vértice separadas por espaços. O exemplo abaixo representa as coordenadas
+$(0, 0.5, 1)$:
+
 \begin{verbatim}
-v 0 0 0
+v 0 0.5 1
 \end{verbatim}
-Para definir uma face triângular colocamos 'f' seguido dos 3 índices dos vértices dessa face.
-Por exemplo, para representar uma face triângular, formada pelo primeiro, segundo e terceiro
-vértice do ficheiro, fazemos:
+
+Faces triangulares são representadas em linhas começadas por um \texttt{f}, ao qual se seguem os
+índices dos três vértices da face. É de notar que a contagem dos índices começa em 1, e não em 0.
+Por exemplo, para representar uma face triangular, formada pelo primeiro, segundo e terceiro
+vértices do ficheiro, tem-se:
+
 \begin{verbatim}
 f 1 2 3
 \end{verbatim}
@@ -262,8 +274,9 @@ repetir faces).
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{exemplo}
-        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
+    \bibitem{wavefront-obj}
+        "Wavefront OBJ File Format Summary."{} FileFormat.Info. Accessed: Mar. 2, 2025. [Online.]
+        Available: \url{https://www.fileformat.info/format/wavefrontobj/egff.htm}
 \end{thebibliography}
 \endgroup
 
