@@ -527,7 +527,122 @@ por exemplo, mover a câmara.
 
 \section{Resultados obtidos}
 
-\textbf{\color{red} TODO - resultados}
+Nesta fase inicial do projeto, o foco principal foi o desenvolvimento da infraestrutura da
+\emph{engine}, incluindo a implementação da \emph{pipeline} de renderização e o carregamento de
+modelos 3D. Para demonstrar a funcionalidade da \emph{engine}, foram gerados e carregados diversos
+modelos 3D, tanto primitivos geométricos bem como modelos mais complexos obtidos pela internet.
+
+\subsection{Modelos Primitivos Gerados}
+
+Os seguintes modelos primitivos foram criados utilizando o \emph{generator} implementado:
+
+\begin{itemize}
+    \item Plano: Figura \ref{fig:imagePlane};
+    \item Cubo: Figura \ref{fig:imageBox};
+    \item Esfera: Figura \ref{fig:imageSphere};
+    \item Cone: Figura \ref{fig:imageCone};
+    \item Torus: Figura \ref{fig:imageTorus};
+    \item Cilindro: Figura \ref{fig:imageCylinder}.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Plane.png}
+        \caption{Plano (Plane)}
+        \label{fig:imagePlane}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Box.png}
+        \caption{Cubo (Box)}
+        \label{fig:imageBox}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Sphere.png}
+        \caption{Esfera (Sphere)}
+        \label{fig:imageSphere}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Cylinder.png}
+        \caption{Cilindro (Cylinder)}
+        \label{fig:imageCylinder}
+    \end{minipage}
+\end{figure}
+
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Cone.png}
+        \caption{Cone}
+        \label{fig:imageCone}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Torus.png}
+        \caption{Torus}
+        \label{fig:imageTorus}
+    \end{minipage}
+\end{figure}
+
+
+\subsection{Modelos 3D Complexos}
+
+Para testar a capacidade da \emph{engine} de carregar modelos mais complexos, foram obtidos os
+seguintes modelos 3D da internet:
+
+\begin{itemize}
+    \item Homer Simpson: Figura \ref{fig:imageHomer};
+    \item Coelho (Bunny): Figura \ref{fig:imageBunny};
+    \item Vaca (Cow): Figura \ref{fig:imageCow};
+    \item Dragão (Dragon): Figura \ref{fig:imageDragon};
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Homer.png}
+        \caption{Homer}
+        \label{fig:imageHomer}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Bunny.png}
+        \caption{Coelho}
+        \label{fig:imageBunny}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Cow.png}
+        \caption{Vaca}
+        \label{fig:imageCow}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Dragon.png}
+        \caption{Dragão}
+        \label{fig:imageDragon}
+    \end{minipage}
+\end{figure}
+
+Em particular, a renderização do modelo do dragão, demonstrou a capacidade da \emph{engine} de
+lidar com modelos de alta complexidade, com um grande número de vértices. A visualização correta de
+todos os modelos valida a funcionalidade da \emph{pipeline} de renderização e a capacidade da
+\emph{engine} de carregar e exibir os modelos 3D de diferentes formatos e complexidades.
 
 \section{Conclusão e Trabalho Futuro}
 
