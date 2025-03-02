@@ -647,27 +647,20 @@ todos os modelos valida a funcionalidade da \emph{pipeline} de renderização e 
 \section{Conclusão e Trabalho Futuro}
 
 A primeira fase do projeto foi concluída com sucesso, de modo que os objetivos previamente definidos
-foram alcançados. A implementação de Vertex Buffer Objects (VBOs) para a otimização da renderização
-representa um avanço significativo na eficiência do engine, permitindo um processamento mais rápido
-e eficaz dos dados dos vértices.
+foram alcançados. Ademais, também implementámos a geração de mais figuras geométricas (o cilindro e
+o torus), e a implementação de Vertex Buffer Objects (VBOs) já nesta fase melhorou o desempenho da
+\texttt{engine} e permitiu o uso de versões mais recentes de OpenGL, com outras funcionalidades que
+podem vir a ser usadas no futuro.
 
-Em relação ao trabalho futuro, pretendemos realizar uma reestruturação da organização hierárquica do
-mundo. A abordagem inicial, que privilegiava uma estrutura linear, será substituída por um sistema
-de grupos que permitirá a aplicação de transformações a conjuntos de modelos de forma simultânea.
-Esta alteração, motivada pela análise das fases subsequentes do projeto, possibilitará a gestão
-eficiente de objetos relacionados.
+Em relação ao trabalho futuro, pretendemos realizar uma reestruturação da organização interna das
+cenas. A abordagem atual, que armazena os objetos numa estrutura linear, será substituída por um
+sistema de grupos, que permitirá a aplicação de transformações (translações, rotações, e escalas) a
+conjuntos de modelos de forma simultânea.
 
-Adicionalmente, tencionámos expandir as capacidades da câmara, implementando três modos distintos de
+Adicionalmente, tencionamos expandir as capacidades da câmara, implementando três modos distintos de
 visualização: orbital, livre e em terceira pessoa. Esta diversidade de perspetivas enriquecerá a
-experiência do utilizador e permitirá a exploração de diferentes estilos de interação com as cenas
+experiência do utilizador, e permitirá a exploração de diferentes estilos de interação com as cenas
 3D.
-
-A implementação das transformações geométricas solicitadas na segunda fase – translação, rotação e
-escala – é um objetivo prioritário. Estas funcionalidades são essenciais para uma manipulação
-precisa dos objetos na cena.
-
-Acreditámos que estas melhorias e adições consolidarão o engine como uma ferramenta robusta e
-versátil para a criação de mundos 3D.
 
 \begingroup
 \section{Bibliografia}
