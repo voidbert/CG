@@ -17,10 +17,19 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace engine {
+namespace engine::camera {
+
+enum class MovementDirection {
+    Up,
+    Down,
+    Left,
+    Right,
+    Forward,
+    Backward
+};
 
 class Camera {
-private:
+protected:
     glm::vec3 position;
     glm::vec3 lookAt;
     glm::vec3 up;
@@ -29,15 +38,15 @@ private:
     float farPlane;
 
 public:
-    Camera();
     Camera(const glm::vec3 &position,
            const glm::vec3 &lookAt,
            const glm::vec3 &up,
            float fov,
            float nearPlane,
            float farPlane);
+    virtual ~Camera() = default;
 
-    void move(const glm::vec3 &direction, float deltaTime);
+    virtual void move(MovementDirection direction, float deltaTime) = 0;
     glm::mat4 getCameraMatrix(float aspectRatio) const;
 };
 

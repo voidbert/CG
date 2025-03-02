@@ -15,7 +15,9 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
+#include <map>
 
+#include "engine/camera/Camera.hpp"
 #include "engine/SceneWindow.hpp"
 
 namespace engine {
@@ -41,17 +43,24 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
 }
 
 void SceneWindow::onUpdate(float time, float timeElapsed) {
-    static_cast<void>(time);
-    static_cast<void>(timeElapsed);
+    static_cast<void>(time); // Evita warning de parâmetro não usado
 
-    /*
-    GLFWwindow *const windowHandle = this->getHandle();
+    GLFWwindow *windowHandle = this->getHandle();
 
-    const int up = glfwGetKey(windowHandle, GLFW_KEY_W);
-    const int down = glfwGetKey(windowHandle, GLFW_KEY_S);
-    const int left = glfwGetKey(windowHandle, GLFW_KEY_A);
-    const int right = glfwGetKey(windowHandle, GLFW_KEY_D);
-    */
+    std::map<int, camera::MovementDirection> keyMapping = {
+        { GLFW_KEY_W, camera::MovementDirection::Up       },
+        { GLFW_KEY_S, camera::MovementDirection::Down     },
+        { GLFW_KEY_A, camera::MovementDirection::Left     },
+        { GLFW_KEY_D, camera::MovementDirection::Right    },
+        { GLFW_KEY_F, camera::MovementDirection::Forward  },
+        { GLFW_KEY_B, camera::MovementDirection::Backward }
+    };
+
+    for (const auto &[key, direction] : keyMapping) {
+        if (glfwGetKey(windowHandle, key) == GLFW_PRESS) {
+            scene.getCamera().move(direction, timeElapsed);
+        }
+    }
 }
 
 void SceneWindow::onRender() {
