@@ -2,6 +2,7 @@
 
 \usepackage{amsmath}
 \usepackage{array}
+\usepackage{amsmath}
 \usepackage[portuguese]{babel}
 \usepackage{chngpage}
 \usepackage{float}
@@ -246,6 +247,216 @@ faces, é dada por concluída a construção do modelo do cubo.
     }
 \end{figure}
 
+\subsection{Esfera}
+
+Para a construção da esfera, utilizámos um sistema de coordenadas esféricas,
+no qual a posição de cada ponto na esfera é determinada por dois ângulos: o
+ângulo polar \( \theta \) e o ângulo azimutal \( \phi \).
+
+A parametrização de um ponto sobre uma esfera de raio \( r \) pode ser definida pelas seguintes
+equações:
+\[
+x = r \sin(\theta) \cos(\phi)
+\]
+\[
+y = r \cos(\theta)
+\]
+\[
+z = r \sin(\theta) \sin(\phi)
+\]
+onde:
+\begin{itemize}
+\item \( \theta \) é o ângulo polar, que varia entre \( 0 \) (pólo norte) e \( \pi \)
+(pólo sul), que determina a latitude do ponto na esfera;
+\item \( \phi \) é o ângulo azimutal que varia entre \( 0 \) e \( 2\pi \), que define a
+longitude do ponto.
+\end{itemize}
+
+Este modelo matemático permite gerar uma esfera distribuída no espaço tridimensional.
+No entanto, para a sua implementação computacional, é necessário discretizar estes valores e
+definir um conjunto finito de pontos e faces que aproximem à sua forma contínua.
+
+\subsubsection{Geração dos Vértices}
+Para discretizar a superfície da esfera, divide-se o intervalo de \( \theta \) em stacks
+(fatias horizontais) e o intervalo de \( \phi \) em slices (segmentos verticais). Assim,
+as incrementações angulares são calculados da seguinte forma:
+\[
+\Delta\theta = \frac{\pi}{\text{stacks}}, \quad \Delta\phi = \frac{2\pi}{\text{slices}}
+\]
+Ao percorrer os valores de \( \theta \) e \( \phi \), é possível gerar um conjunto ordenado
+de pontos distribuídos sobre a esfera.
+
+De modo que, a construção dos vértices segue os seguintes passos:
+
+1. Criação do pólo norte: O primeiro ponto criado é o pólo norte, localizado em
+\( (0, r, 0) \).
+
+2. Geração dos Pontos Intermédios: Para cada stack (exceto as extremidades, que
+são os pólos), iterámos sobre os valores de \( \theta \), determinámos a altura \( y \) do ponto
+e o raio da secção circular correspondente:
+\[
+y = r \cos(\theta)
+\]
+\[
+r_{\text{secção}} = r \sin(\theta)
+\]
+Para cada slice, iterámos sobre os valores de \( \phi \), é calculada a posição dos pontos
+na secção circular:
+\[
+x = r_{\text{secção}} \cos(\phi)
+\]
+\[
+z = r_{\text{secção}} \sin(\phi)
+\]
+
+3. Criação do pólo sul: Após a geração das stacks intermédias, é criado o pólo sul
+em \( (0, -r, 0) \).
+
+\subsubsection{Construção das Faces}
+Após a geração dos vértices, é necessário definir as faces triangulares que compõem a superfície
+esférica. A triangulação é realizada da seguinte forma:
+
+1. Ligação ao pólo norte: Cada ponto da primeira stack (exceto o pólo norte) forma um
+triângulo com o pólo norte e o ponto seguinte na mesma stack. Para garantir a continuidade circular,
+o último ponto da stack liga-se novamente ao primeiro, ou seja, os vértices são ligados de forma a
+criar uma face triangular:
+\[
+T_1 = (P_1, P_3, P_2)
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/figures/polosSphere.pdf}
+    \caption{
+        Ilustração da ligação dos vértices da primeira stack ao pólo norte, formando os triângulos
+        iniciais da esfera e a seguinte iteração.
+    }
+\end{figure}
+
+2. Ligação das stacks intermédias:
+Para cada fatia horizontal da esfera, os vértices são ligados de forma a criar duas faces
+triangulares por quadrilátero:
+\[
+T_1 = (P_1, P_3, P_4)
+\]
+\[
+T_2 = (P_1, P_4, P_2)
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/figures/sphere.pdf}
+    \caption{
+        Triângulos de uma esfera gerada, e os pontos utilizados numa iteração do ciclo de geração
+        de triângulos e na seguinte.
+    }
+\end{figure}
+
+Este método assegura uma ligação contínua entre os pontos e evita a repetição de vértices
+desnecessários.
+
+3. Ligação ao pólo sul: O mesmo processo utilizado para o pólo norte é aplicado à stack
+mais próxima do pólo sul, assim, garante que todas as fatias inferiores são corretamente ligadas ao
+vértice final.
+No entanto, a ordem dos vértices nos triângulos é invertida em comparação com o pólo norte.
+Esta inversão garante que a normal de cada triângulo aponta para baixo, conforme ilustrado nos
+círculos da primeira figura. No pólo norte, os vértices são ordenados no sentido anti-horário
+(por exemplo, $P_1$, $P_3$, $P_2$), enquanto que no pólo sul, a ordem é invertida
+($P_1$, $P_2$, $P_3$).
+
+Este método proporciona uma representação eficiente e visualmente precisa, garante uma
+boa distribuição das faces ao longo da sua superfície.
+
+\subsection{Cilindro}
+
+Para a construção do cilindro, utilizámos um sistema de coordenadas cilíndricas, onde a
+posição de cada ponto é determinada pelo raio, pelo ângulo azimutal \( \phi \) e
+pela altura \( y \).
+
+A parametrização de um vértice sobre um cilindro de raio \( r \) e altura \( h \) pode ser definida
+pelas seguintes equações:
+\[
+x = r \cos(\phi)
+\]
+\[
+y = h
+\]
+\[
+z = r \sin(\phi)
+\]
+onde:
+\begin{itemize}
+\item \( \phi \) é o ângulo azimutal, varia entre \( 0 \) e \( 2\pi \), que determina a
+posição do ponto ao longo da circunferência da base.
+\item \( y \) representa a altura, varia entre \( 0 \) (base inferior) e \( h \)
+(base superior).
+\end{itemize}
+
+Este modelo matemático permite representar um cilindro tridimensionalmente. Para a sua implementação
+computacional, discretizamos estes valores, onde é gerado um conjunto finito de pontos e faces que
+aproximam à sua forma contínua.
+
+\subsubsection{Geração dos Vértices}
+Para discretizar a superfície do cilindro, o intervalo de \( \phi \) é dividido em slices
+(segmentos verticais), enquanto a altura \( y \) é dividida em stacks (fatias horizontais).
+Assim, os incrementos são calculados da seguinte forma:
+\[
+\Delta \phi = \frac{2\pi}{\text{slices}}, \quad \Delta y = \frac{h}{\text{stacks}}
+\]
+
+Os vértices são gerados da seguinte forma:
+
+1. Criação da superfície lateral: Para cada stack ao longo da altura, iterámos
+sobre os valores de \( \phi \), determinando a posição dos pontos na circunferência da secção
+correspondente.
+
+2. Criação dos vértices centrais das bases: Após gerar os pontos da superfície lateral,
+adicionamos dois vértices centrais:
+\begin{itemize}
+\item O centro da base superior, localizado em \( (0, h, 0) \).
+\item O centro da base inferior, localizado em \( (0, 0, 0) \).
+\end{itemize}
+
+\subsubsection{Construção das Faces}
+Após a geração dos vértices, definimos as faces triangulares que compõem o cilindro. Esta etapa
+é realizada em três partes:
+
+1. Construção da superfície lateral:
+Cada quadrilátero entre duas stacks sucessivas é dividido em duas faces triangulares:
+\[
+T_1 = (P_4, P_6, P_7)
+\]
+\[
+T_2 = (P_4, P_7, P_5)
+\]
+Isto garante uma cobertura uniforme da superfície do cilindro.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/figures/cylinder.pdf}
+    \caption{
+        Triângulos de uma esfera gerada, e os pontos utilizados numa iteração do ciclo de geração
+        de triângulos e na seguinte.
+    }
+\end{figure}
+
+2. Construção da base superior:
+Cada ponto da última stack é ligado ao vértice central da base superior, de modo a formar
+triângulos radiais:
+\[
+T = (P_1, P_2, P_3)
+\]
+
+3. Construção da base inferior:
+O mesmo processo é repetido para a base inferior, o que garante o desenho correto da estrutura.
+
+A ordem dos vértices cumpre a regra da orientação anti-horária, onde a correta
+aplicação da técnica de face culling cumpre-se, que otimiza o processo de renderização
+ao eliminar automaticamente as faces voltadas para trás.
+
+Este método resulta numa representação eficiente e precisa do cilindro, mantendo uma boa
+distribuição das faces sobre a sua superfície.
+
 \section{\emph{Engine}}
 
 \textbf{\color{red} TODO - \emph{engine}}
@@ -265,6 +476,12 @@ faces, é dada por concluída a construção do modelo do cubo.
 \begin{thebibliography}{9}
     \bibitem{exemplo}
         \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
+    \bibitem{esfera}
+        "OpenGL Sphere."{} Songho CA. Accessed: Mar. 1, 2025. [Online.] Available:
+        \url{https://www.songho.ca/opengl/gl_sphere.html}
+    \bibitem{cilindro}
+        "OpenGL Cylinder, Prism \& Pipe."{} Songho CA. Accessed: Mar. 1, 2025. [Online.] Available:
+        \url{https://www.songho.ca/opengl/gl_cylinder.html}
 \end{thebibliography}
 \endgroup
 
