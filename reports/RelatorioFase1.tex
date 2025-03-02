@@ -211,7 +211,7 @@ valores de $x$ ou de $z$ possíveis.
     }
 \end{figure}
 
-Uma otimização feita pela \emph{engine} é \emph{face culling}, ou seja, desenhar apenas as faces
+Uma otimização feita pela \texttt{engine} é \emph{face culling}, ou seja, desenhar apenas as faces
 voltadas para a câmara. No caso do plano, deseja-se que os seus triângulos estejam voltados para
 cima, pelo que os seus vértices devem estar ordenados na ordem contrária à dos ponteiros do
 relógio. Para os quatro pontos apresentados acima, os triângulos gerados são os seguintes:
@@ -355,7 +355,7 @@ Este modelo matemático permite gerar uma esfera no espaço tridimensional. No e
 implementação computacional, é necessário discretizar estes valores e definir um conjunto finito de
 pontos e faces que aproximem à sua forma contínua.
 
-\subsubsection{Geração dos Vértices}
+\subsubsection{Geração dos vértices}
 
 Para discretizar a superfície da esfera, divide-se o intervalo de $\theta$ em \emph{stacks} (fatias
 horizontais), e o intervalo de $\phi$ em \emph{slices} (segmentos verticais). Assim, as
@@ -389,7 +389,7 @@ $$z = r_{\text{secção}} \sin(\phi)$$
 3. Criação do pólo sul: Após a geração das \emph{stacks} intermédias, é criado o pólo sul em
 $(0, -r, 0)$.
 
-\subsubsection{Construção das Faces}
+\subsubsection{Construção das faces}
 
 Após a geração dos vértices, é necessário definir as faces triangulares que compõem a superfície
 esférica. A triangulação é realizada da seguinte forma:
@@ -610,7 +610,7 @@ Este modelo matemático permite representar um cilindro tridimensionalmente. Par
 computacional, discretizam-se estes valores, e geram-se conjuntos finitos de pontos e faces que
 aproximam a sua forma contínua.
 
-\subsubsection{Geração dos Vértices}
+\subsubsection{Geração dos vértices}
 
 Para discretizar a superfície do cilindro, o intervalo de $\phi$ é dividido em \emph{slices}
 (segmentos verticais), enquanto que a altura $y$ é dividida em \emph{stacks} (fatias horizontais).
@@ -635,7 +635,7 @@ dois vértices centrais:
     \item O centro da base inferior, localizado em $(0, 0, 0)$.
 \end{itemize}
 
-\subsubsection{Construção das Faces}
+\subsubsection{Construção das faces}
 
 Após a geração dos vértices, constroem-se as faces triangulares que compõem o cilindro. Esta etapa
 é realizada em três partes:
@@ -863,17 +863,17 @@ De momento, a \texttt{engine} não suporta que o utilizador controle a posição
 dinamicamente, movendo-a após a leitura do ficheiro XML. No entanto, pretendemos implementar esta
 funcionalidade na segunda fase do projeto.
 
-\subsection{Comportamento da \emph{engine}}
+\subsection{Comportamento da \texttt{engine}}
 
-O primeiro passo na execução da \emph{engine} é a criação da janela e do seu contexto OpenGL. Este é
-necessário para os passos seguintes: a leitura da cena, onde é necessário criar VBOs para os
+O primeiro passo na execução da \texttt{engine} é a criação da janela e do seu contexto OpenGL. Este
+é necessário para os passos seguintes: a leitura da cena, onde é necessário criar VBOs para os
 modelos 3D, a instanciação dos eixos do sistema de coordenadas, também suportados por VBOs, e a
 criação dos \emph{shaders} de vértices e de fragmentos. Uma vez que os VBOs e os \emph{shaders} não
 são um objetivo da primeira fase deste trabalho, o seu funcionamento só será descrito em detalhe num
 relatório futuro.
 
-Estando inicializada a \emph{engine}, segue-se um ciclo em que a janela reage a eventos e desenha os
-seus conteúdos. Neste ciclo, são suportados os eventos de passagem de tempo, necessidade de
+Estando inicializada a \texttt{engine}, segue-se um ciclo em que a janela reage a eventos e desenha
+os seus conteúdos. Neste ciclo, são suportados os eventos de passagem de tempo, necessidade de
 atualizar os conteúdos da janela, e redimensionamento da janela. Para se subscrever a um evento,
 basta sobrescrever o seu método correspondente na classe \texttt{Window}:
 
@@ -896,121 +896,111 @@ por exemplo, mover a câmara.
 \section{Resultados obtidos}
 
 Nesta fase inicial do projeto, o foco principal foi o desenvolvimento da infraestrutura da
-\emph{engine}, incluindo a implementação da \emph{pipeline} de renderização e o carregamento de
-modelos 3D. Para demonstrar a funcionalidade da \emph{engine}, foram gerados e carregados diversos
-modelos 3D, tanto primitivos geométricos bem como modelos mais complexos obtidos pela internet.
+\texttt{engine}, incluindo a implementação da \emph{pipeline} de renderização e o carregamento de
+modelos 3D. Para demonstrar a funcionalidade da \texttt{engine}, foram gerados e carregados diversos
+modelos 3D, tanto simples figuras geométricas como modelos mais complexos obtidos na Internet.
 
-\subsection{Modelos Primitivos Gerados}
+\subsection{Figuras geométricas geradas}
 
-Os seguintes modelos primitivos foram criados utilizando o \emph{generator} implementado:
+Os seguintes modelos foram criados utilizando o \texttt{generator} implementado:
 
-\begin{itemize}
-    \item Plano: Figura \ref{fig:imagePlane};
-    \item Cubo: Figura \ref{fig:imageBox};
-    \item Esfera: Figura \ref{fig:imageSphere};
-    \item Cone: Figura \ref{fig:imageCone};
-    \item Torus: Figura \ref{fig:imageTorus};
-    \item Cilindro: Figura \ref{fig:imageCylinder}.
-\end{itemize}
-
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Plane.png}
-        \caption{Plano (Plane)}
-        \label{fig:imagePlane}
+        \caption{Plano (\texttt{plane})}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Box.png}
-        \caption{Cubo (Box)}
-        \label{fig:imageBox}
+        \caption{Cubo (\texttt{box})}
     \end{minipage}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Sphere.png}
-        \caption{Esfera (Sphere)}
-        \label{fig:imageSphere}
+        \caption{Esfera (\texttt{sphere})}
     \end{minipage}\hfill
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{res/results/Cylinder.png}
-        \caption{Cilindro (Cylinder)}
-        \label{fig:imageCylinder}
-    \end{minipage}
-\end{figure}
-
-
-\begin{figure}[h]
-    \centering
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Cone.png}
-        \caption{Cone}
-        \label{fig:imageCone}
+        \caption{Cone (\texttt{cone})}
     \end{minipage}\hfill
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Cylinder.png}
+        \caption{Cilindro (\texttt{cylinder})}
+    \end{minipage}
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Torus.png}
-        \caption{Torus}
-        \label{fig:imageTorus}
+        \caption{Torus (\texttt{torus})}
     \end{minipage}
 \end{figure}
 
+\subsection{Cenas fornecidas pela docência da UC}
 
-\subsection{Modelos 3D Complexos}
+A docência da UC forneceu, juntamente com o enunciado do trabalho, algumas cenas a serem testadas no
+trabalho. A \texttt{engine} renderizou-as como esperado:
 
-Para testar a capacidade da \emph{engine} de carregar modelos mais complexos, foram obtidos os
-seguintes modelos 3D da internet:
+\begin{figure}[H]
+    \begin{adjustwidth}{-2cm}{-2cm} % These values only need to be large enough to center the figure
+        \centering
+        \includegraphics[width=0.20\textwidth]{res/results/Test1.png}
+        \includegraphics[width=0.20\textwidth]{res/results/Test2.png}
+        \includegraphics[width=0.20\textwidth]{res/results/Test3.png}
+        \includegraphics[width=0.20\textwidth]{res/results/Test4.png}
+        \includegraphics[width=0.20\textwidth]{res/results/Test5.png}
+        \caption{Renderização das cenas de teste fornecidas pela docência da UC.}
+    \end{adjustwidth}
+\end{figure}
 
-\begin{itemize}
-    \item Homer Simpson: Figura \ref{fig:imageHomer};
-    \item Coelho (Bunny): Figura \ref{fig:imageBunny};
-    \item Vaca (Cow): Figura \ref{fig:imageCow};
-    \item Dragão (Dragon): Figura \ref{fig:imageDragon};
-\end{itemize}
+Em particular, o último caso de teste demostra a capacidade da \texttt{engine} de apresentar
+corretamente cenas com mais de um objeto.
 
-\begin{figure}[h]
+\subsection{Modelos 3D complexos}
+
+Para testar a capacidade da \texttt{engine} de carregar modelos mais complexos, foram obtidos os
+seguintes modelos 3D da Internet \cite{models}:
+
+\begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Homer.png}
         \caption{Homer}
-        \label{fig:imageHomer}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Bunny.png}
-        \caption{Coelho}
-        \label{fig:imageBunny}
+        \caption{Coelho de Stanford}
     \end{minipage}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Cow.png}
         \caption{Vaca}
-        \label{fig:imageCow}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{res/results/Dragon.png}
-        \caption{Dragão}
-        \label{fig:imageDragon}
+        \caption{Dragão de Stanford}
     \end{minipage}
 \end{figure}
 
-Em particular, a renderização do modelo do dragão, demonstrou a capacidade da \emph{engine} de
-lidar com modelos de alta complexidade, com um grande número de vértices. A visualização correta de
-todos os modelos valida a funcionalidade da \emph{pipeline} de renderização e a capacidade da
-\emph{engine} de carregar e exibir os modelos 3D de diferentes formatos e complexidades.
+Em particular, a renderização do modelo do dragão demonstrou a capacidade da \texttt{engine} de
+lidar com modelos de alta complexidade, com um grande número de faces (871 mil).
 
 \section{Conclusão e Trabalho Futuro}
 
@@ -1071,6 +1061,9 @@ experiência do utilizador, e permitirá a exploração de diferentes estilos de
     \bibitem{glm}
         "glm."{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
         \url{https://github.com/g-truc/glm}
+    \bibitem{models}
+        "common-3d-test-models"{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/alecjacobson/common-3d-test-models}
 \end{thebibliography}
 \endgroup
 
