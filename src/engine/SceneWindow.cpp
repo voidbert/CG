@@ -33,7 +33,6 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
     // Only do this once, as we have a single shader program
     this->pipeline.use();
 
-    // TODO - remove when all of the figures are using the right-hand rule
     glFrontFace(GL_CCW);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -42,23 +41,22 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
 }
 
 void SceneWindow::onUpdate(float time, float timeElapsed) {
+    static_cast<void>(time);
+    static_cast<void>(timeElapsed);
+
+    /*
     GLFWwindow *const windowHandle = this->getHandle();
 
     const int up = glfwGetKey(windowHandle, GLFW_KEY_W);
     const int down = glfwGetKey(windowHandle, GLFW_KEY_S);
     const int left = glfwGetKey(windowHandle, GLFW_KEY_A);
     const int right = glfwGetKey(windowHandle, GLFW_KEY_D);
-
-    const glm::vec3 direction((right - left), 0.0f, (down - up));
-    this->scene.getCamera().move(direction, timeElapsed);
+    */
 }
 
 void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
-
-    float time = glfwGetTime() * 100;
-    glm::mat4 rot = glm::rotate(glm::mat4(1.0f), glm::radians(time), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 cameraMatrix =
         scene.getCamera().getCameraMatrix(static_cast<float>(this->getWidth()) / this->getHeight());
@@ -68,7 +66,6 @@ void SceneWindow::onRender() {
     this->yAxis.draw(this->pipeline);
     this->zAxis.draw(this->pipeline);
 
-    this->pipeline.setCameraMatrix(cameraMatrix * rot);
     this->scene.draw(this->pipeline);
 }
 
