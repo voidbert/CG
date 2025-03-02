@@ -20,7 +20,6 @@ namespace generator::figures {
 Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
     float sliceStep = 2 * M_PI / slices;
     float stackStep = height / stacks;
-    float halfHeight = height / 2.0f;
 
     for (int iStack = 0; iStack <= stacks; iStack++) {
         float y = iStack * stackStep;
