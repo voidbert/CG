@@ -99,12 +99,13 @@ $$
 Assim, o torus é gerado iterando sobre os valores inteiros possíveis de $i$ e $j$, incrementando
 primeiro $j$ e só depois $i$, o que dá origem à nuvem de pontos desejada.
 
-Depois de gerados, os vértices são agrupados nos triângulos que compõem a superfície do torus. Para
-isso, considera-se um vértice de referência, como $P_1$, juntamente com o vértice adjacente na
-mesma fatia ($P_2$) e os dois vértices correspondentes na fila seguinte da grelha ($P_3$ e $P_4$).
+Após a geração dos vértices, estes são agrupados nos triângulos que compõem a superfície do torus.
+Para isso, considera-se um vértice de referência, como $P_1$, juntamente com o vértice adjacente
+na mesma fatia ($P_3$) e os dois vértices correspondentes na fila seguinte da fatia ($P_2$ e
+$P_4$).
 Este processo repete-se para todos os vértices aplicáveis, garantindo que cada célula quadrangular
 seja subdividida em dois triângulos. A figura seguinte ilustra esse processo, mostrando a estrutura
-da malha e a organização dos triângulos resultantes.
+da núvem e a organização dos triângulos resultantes.
 
 \begin{figure}[H]
     \centering
@@ -112,7 +113,7 @@ da malha e a organização dos triângulos resultantes.
     \caption{Triângulos de um torus gerado. As faces ocultas não são apresentadas.}
 \end{figure}
 
-Deseja-se que os triângulos do \emph{torus} estejam voltados para fora, pelo que os seus vértices
+Pretende-se que os triângulos do \emph{torus} estejam voltados para fora, pelo que os seus vértices
 devem estar ordenados na ordem contrária à dos ponteiros do relógio. Para os quatro pontos
 apresentados acima, os triângulos gerados são os seguintes:
 
