@@ -5,6 +5,7 @@ on:
             - '.github/workflows/**'
             - 'scripts/formatlatex.sh'
             - 'reports/**'
+            - 'Makefile'
 jobs:
     build-reports:
         runs-on: ubuntu-latest
