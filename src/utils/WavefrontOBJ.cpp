@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
@@ -57,10 +58,12 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
     }
 
     for (const TriangleFace &face : this->faces) {
-        for (const uint32_t &positionIndex : face.positions) {
-            if (positionIndex >= this->positions.size()) {
-                throw std::runtime_error("Invalid data in OBJ file: " + filename);
-            }
+        if (std::any_of(face.positions.cbegin(),
+                        face.positions.cend(),
+                        [this](const uint32_t &positionIndex) {
+                            return positionIndex >= this->positions.size();
+                        })) {
+            throw std::runtime_error("Invalid data in OBJ file: " + filename);
         }
     }
 }

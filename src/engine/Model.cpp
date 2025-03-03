@@ -18,7 +18,7 @@
 
 namespace engine {
 
-Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> indices) {
+Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices) {
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
 

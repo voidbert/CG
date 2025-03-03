@@ -29,7 +29,7 @@ protected:
 
 public:
     WavefrontOBJ();
-    WavefrontOBJ(const std::string &filename);
+    explicit WavefrontOBJ(const std::string &filename);
 
     void writeToFile(const std::string &filename) const;
     std::pair<std::vector<Vertex>, std::vector<uint32_t>> getIndexedVertices() const;

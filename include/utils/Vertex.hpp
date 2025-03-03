@@ -21,7 +21,7 @@ namespace utils {
 struct Vertex {
     glm::vec4 position;
 
-    Vertex(const glm::vec4 &_position);
+    explicit Vertex(const glm::vec4 &_position);
     Vertex(float x, float y, float z);
 
     bool operator==(const Vertex &) const = default;
