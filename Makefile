@@ -129,3 +129,13 @@ install: $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME)
 .PHONY: uninstall
 uninstall:
 	rm $(PREFIX)/bin/cgmain $(PREFIX)/bin/$(ENGINE_EXENAME) $(PREFIX)/bin/$(GENERATOR_EXENAME)
+
+.PHONY: cppcheck
+cppcheck:
+	cppcheck \
+		--enable=all --suppress=missingIncludeSystem --suppress=unusedFunction \
+		--library=opengl --library=posix --library=tinyxml2 \
+		--check-level=exhaustive \
+		--error-exitcode=1 \
+		-Iinclude \
+		src

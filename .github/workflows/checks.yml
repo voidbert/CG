@@ -45,4 +45,4 @@ jobs:
 
             # Don't fail on empty include (not tracked by git)
             - run: if ! [ -d include ]; then mkdir include; fi
-            - run: cppcheck src -I include -I /usr/include/tinyxml2
+            - run: make cppcheck
