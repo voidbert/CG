@@ -19,19 +19,19 @@ namespace engine::camera {
 
 class OrbitalCamera : public Camera {
 private:
-    float radius;
     float azimuth;
     float polar;
+    float radius;
 
     void updatePosition();
 
 public:
-    OrbitalCamera(const glm::vec3 &position,
-                  const glm::vec3 &lookAt,
-                  const glm::vec3 &up,
-                  float fov,
-                  float near,
-                  float far);
+    OrbitalCamera(const glm::vec3 &_position,
+                  const glm::vec3 &_lookAt,
+                  const glm::vec3 &_up,
+                  float _fov,
+                  float _near,
+                  float _far);
 
     void move(MovementDirection direction, float deltaTime) override;
 };

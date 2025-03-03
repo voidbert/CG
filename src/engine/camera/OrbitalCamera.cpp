@@ -19,20 +19,20 @@
 
 namespace engine::camera {
 
-OrbitalCamera::OrbitalCamera(const glm::vec3 &position,
-                             const glm::vec3 &lookAt,
-                             const glm::vec3 &up,
-                             float fov,
-                             float near,
-                             float far) :
-    Camera(position, lookAt, up, fov, near, far) {
-    const glm::vec3 delta = position - this->lookAt;
+OrbitalCamera::OrbitalCamera(const glm::vec3 &_position,
+                             const glm::vec3 &_lookAt,
+                             const glm::vec3 &_up,
+                             float _fov,
+                             float _near,
+                             float _far) :
+    Camera(_position, _lookAt, _up, _fov, _near, _far) {
+    const glm::vec3 delta = _position - this->lookAt;
     radius = glm::length(delta);
 
     if (radius > 0.0f) {
         const glm::vec3 dir = glm::normalize(delta);
-        polar = acos(dir.y);
-        azimuth = atan2(dir.z, dir.x);
+        azimuth = atan2f(dir.z, dir.x);
+        polar = acosf(dir.y);
     } else {
         polar = azimuth = 0.0f;
     }
@@ -40,9 +40,9 @@ OrbitalCamera::OrbitalCamera(const glm::vec3 &position,
 
 void OrbitalCamera::updatePosition() {
     this->position = this->lookAt +
-        glm::vec3(radius * sin(polar) * cos(azimuth),
-                  radius * cos(polar),
-                  radius * sin(polar) * sin(azimuth));
+        glm::vec3(radius * sinf(polar) * cosf(azimuth),
+                  radius * cosf(polar),
+                  radius * sinf(polar) * sinf(azimuth));
 }
 
 void OrbitalCamera::move(MovementDirection dir, float delta) {
@@ -70,8 +70,8 @@ void OrbitalCamera::move(MovementDirection dir, float delta) {
             break;
     }
 
-    polar = glm::clamp(polar, 0.01f, glm::pi<float>() - 0.01f);
     azimuth = glm::mod(azimuth, glm::two_pi<float>());
+    polar = glm::clamp(polar, 0.01f, glm::pi<float>() - 0.01f);
     radius = glm::clamp(radius, 0.5f, 100.0f);
     updatePosition();
 }
