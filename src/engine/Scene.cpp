@@ -98,15 +98,15 @@ void Scene::getCameraFromXML(const tinyxml2::XMLElement *worldElement) {
         throw std::runtime_error("Invalid <projection> in scene XML file");
     }
 
-    const tinyxml2::XMLElement *typeElement = this->getOnlyOneNodeFromXML(cameraElement, "type");
-    const char *cameraType = typeElement->Attribute("t");
+    // Type of camera
+    std::string cameraType = cameraElement->Attribute("type");
 
-    if (strcmp(cameraType, "orbital") == 0) {
+    if (cameraType == "orbital") {
         this->camera =
             std::make_unique<camera::OrbitalCamera>(position, lookAt, up, fov, near, far);
-    } else if (strcmp(cameraType, "free") == 0) {
+    } else if (cameraType == "free") {
         // TODO - Sara - FreeCamera
-    } else if (strcmp(cameraType, "thirdperson") == 0) {
+    } else if (cameraType == "thirdperson") {
         // TODO - Ana - ThirdPersonCamera
     } else {
         throw std::runtime_error("Invalid camera type in scene XML file");
