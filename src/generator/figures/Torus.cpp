@@ -40,8 +40,8 @@ Torus::Torus(float majorRadius, float minorRadius, int slices, int stacks) {
             int idx = i * (stacks + 1) + j;
             int nextIdx = ((i + 1) % slices) * (stacks + 1) + j;
 
-            this->faces.push_back(utils::TriangleFace(idx, nextIdx, idx + 1));
-            this->faces.push_back(utils::TriangleFace(nextIdx, nextIdx + 1, idx + 1));
+            this->faces.push_back(utils::TriangleFace(idx, nextIdx, nextIdx + 1));
+            this->faces.push_back(utils::TriangleFace(idx, nextIdx + 1, idx + 1));
         }
     }
 }

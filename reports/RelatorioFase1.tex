@@ -9,8 +9,26 @@
 \usepackage[a4paper, margin=2cm]{geometry}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{listings}
 \usepackage{setspace}
 \usepackage{xcolor}
+
+\lstdefinestyle{codestyle}{
+    commentstyle=\color{teal},
+    keywordstyle=\color{blue},
+    numberstyle=\ttfamily\color{gray},
+    stringstyle=\color{red},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=false,
+    keepspaces=true,
+    numbers=none,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4
+}
+\lstset{style=codestyle}
 
 \title{\Huge \textbf{Computação Gráfica \\ \Large Trabalho Prático -- Fase I}}
 \date{2 de março 2025}
@@ -54,22 +72,86 @@
 \pagebreak
 
 \begin{abstract}
-    \textbf{\color{red} TODO - resumo}
+    Para a realização deste trabalho prático, desenvolvemos duas aplicações, o \texttt{generator} e
+    a \texttt{engine}. O \texttt{generator} é capaz de gerar modelos 3D de planos, cubos, esferas,
+    e cones, como requirido pelo enunciado, mas também de outras figuras, como cilindros e tori. A
+    \texttt{engine} é um programa que usa OpenGL \cite{opengl} para apresentar cenas definidas em
+    formato XML, contendo modelos no formato Wavefront OBJ \cite{wavefront-obj}, incluindo os
+    criados pelo \texttt{generator}. Nesta fase, o nosso foco foi o de desenvolver uma arquitetura
+    sólida para estes programas, utilizando já conceitos de OpenGL moderno, como VBOs e
+    \emph{shaders}. Esta arquitetura será expandida nas próximas fases, para suportar diversas
+    outras funcionalidades, como transformações geométricas e movimento da câmara.
 \end{abstract}
 
 \section{\emph{Generator}}
 
-\subsection{Descrição e uso}
+\subsection{Funcionamento do programa}
 
-\textbf{\color{red} TODO - descrição e uso do programa}
+O programa \texttt{generator} é responsável por gerar modelos 3D de figuras geométricas, ou seja,
+ficheiros com os vértices e as faces triangulares destas figuras. Nesta fase, o \texttt{generator}
+deve ser capaz de gerar as seguintes figuras: planos, cubos, esferas e cones. Além de implementarmos
+a geração destas figuras, como funcionalidade adicional, também desenvolvemos um gerador de
+cilindros e de tori. As várias possibilidades de uso do comando \texttt{generator} são enumeradas
+abaixo:
+
+\begin{verbatim}
+./generator plane    <length>      <divisions>                     <file>
+./generator box      <length>      <grid>                          <file>
+./generator sphere   <radius>      <slices>      <stacks>          <file>
+./generator cone     <radius>      <height>      <slices> <stacks> <file>
+./generator cylinder <radius>      <height>      <slices> <stacks> <file>
+./generator torus    <majorRadius> <minorRadius> <slices> <stacks> <file>
+\end{verbatim}
+
+Internamente, o \texttt{generator} começa por interpretar os argumentos dados, saindo com a mensagem
+acima em caso de erro. Caso contrário, gera, em memória, os conjuntos de vértices e de faces que
+constituem o modelo 3D que, por fim, são escritos para um ficheiro no formato descrito abaixo.
 
 \subsection{Formato \texttt{.3d}}
 
+Decidimos que o formato de saída do \texttt{generator} seria o Wavefront OBJ \cite{wavefront-obj}.
+O uso de um formato já existente apresentou diversas vantagens:
+
+\begin{itemize}
+    \item Foi possível desenvolver a \texttt{engine} e o \texttt{generator} em paralelo: os
+        desenvolvedores do \texttt{generator} não precisavam de ter a \texttt{engine} funcional para
+        testar o seu código, visto que já existem diversas ferramentas para visualizar os ficheiros
+        OBJ exportados pelo \texttt{generator}.
+
+    \item Foi possível, sem qualquer código adicional, apresentar na \texttt{engine} modelos 3D
+        oriundos de ferramentas de modelação, muito mais complexos do que os gerados pelo
+        \texttt{generator}.
+
+    \item A forma de representação de faces triangulares neste formato é facilmente mapeável para
+        \emph{index buffers} do OpenGL. Deste modo, não seriam necessárias alterações ao
+        \texttt{generator} quando estes fossem implementados (algo que já foi feito nesta fase do
+        trabalho).
+\end{itemize}
+
+O \emph{parser} desenvolvido para este formato suporta apenas o essencial para o funcionamento desta
+primeira fase: posições de vértices e constituições de faces triangulares. O formato OBJ é textual,
+e representar um vértice é tão simples como ter uma linha começada por um \texttt{v}, ao qual se
+seguem as coordenadas do vértice separadas por espaços. O exemplo abaixo representa as coordenadas
+$(0, 0.5, 1)$:
+
+\begin{verbatim}
+v 0 0.5 1
+\end{verbatim}
+
+Faces triangulares são representadas em linhas começadas por um \texttt{f}, ao qual se seguem os
+índices dos três vértices da face. É de notar que a contagem dos índices começa em 1, e não em 0.
+Por exemplo, para representar uma face triangular, formada pelo primeiro, segundo e terceiro
+vértices do ficheiro, tem-se:
+
+\begin{verbatim}
+f 1 2 3
+\end{verbatim}
+
 Visto que a estrutura de um ficheiro \texttt{.3d} separa os vértices de um modelo das suas faces, o
-processo de criação dos modelos 3D dos vários sólidos é dividido em duas fases: a geração do
+processo de criação dos modelos 3D das várias figuras é dividido em duas fases: a geração do
 conjunto de pontos que os constituem, e o seu agrupamento em faces triangulares.
 
-\subsection{Plano}
+\subsection{Plano horizontal}
 
 O primeiro passo para a geração da nuvem de pontos de um plano é o cálculo do comprimento de uma
 divisão, $d = \frac{L}{N}$, onde $L$ simboliza o comprimento do plano e $N$ o número de divisões.
@@ -123,12 +205,13 @@ valores de $x$ ou de $z$ possíveis.
     \centering
     \includegraphics[width=0.4\textwidth]{res/figures/PlaneTriangles.pdf}
     \caption{
+        \onehalfspacing
         Triângulos de um plano gerado, e pontos utilizados na primeira iteração do ciclo de geração
         de triângulos.
     }
 \end{figure}
 
-Uma otimização feita pela \emph{engine} é \emph{face culling}, ou seja, desenhar apenas as faces
+Uma otimização feita pela \texttt{engine} é \emph{face culling}, ou seja, desenhar apenas as faces
 voltadas para a câmara. No caso do plano, deseja-se que os seus triângulos estejam voltados para
 cima, pelo que os seus vértices devem estar ordenados na ordem contrária à dos ponteiros do
 relógio. Para os quatro pontos apresentados acima, os triângulos gerados são os seguintes:
@@ -196,7 +279,7 @@ apresenta-se um exemplo da nuvem de pontos de um cubo gerado:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.35\textwidth]{res/figures/CubePoints.pdf}
+    \includegraphics[width=0.32\textwidth]{res/figures/CubePoints.pdf}
     \caption{
         \onehalfspacing
         Nuvem de pontos resultante da geração de um cubo de três divisões. Os pontos das faces
@@ -239,7 +322,7 @@ faces, é dada por concluída a construção do modelo do cubo.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.35\textwidth]{res/figures/CubeTriangles.pdf}
+    \includegraphics[width=0.32\textwidth]{res/figures/CubeTriangles.pdf}
     \caption{
         \onehalfspacing
         Triângulos resultantes da geração de um cubo de três divisões. As faces ocultas não foram
@@ -249,239 +332,742 @@ faces, é dada por concluída a construção do modelo do cubo.
 
 \subsection{Esfera}
 
-Para a construção da esfera, utilizámos um sistema de coordenadas esféricas,
-no qual a posição de cada ponto na esfera é determinada por dois ângulos: o
-ângulo polar \( \theta \) e o ângulo azimutal \( \phi \).
+Para a construção da esfera, utilizámos um sistema de coordenadas esféricas, no qual a posição de
+cada ponto na esfera é determinada por dois ângulos: o ângulo polar, $\theta$, e o ângulo azimutal,
+$\phi$.
 
 A parametrização de um ponto sobre uma esfera de raio \( r \) pode ser definida pelas seguintes
-equações:
-\[
-x = r \sin(\theta) \cos(\phi)
-\]
-\[
-y = r \cos(\theta)
-\]
-\[
-z = r \sin(\theta) \sin(\phi)
-\]
+equações \cite{sphere}:
+
+$$x = r \sin(\theta) \cos(\phi)$$
+$$y = r \cos(\theta)$$
+$$z = r \sin(\theta) \sin(\phi)$$
+
 onde:
 \begin{itemize}
-\item \( \theta \) é o ângulo polar, que varia entre \( 0 \) (pólo norte) e \( \pi \)
-(pólo sul), que determina a latitude do ponto na esfera;
-\item \( \phi \) é o ângulo azimutal que varia entre \( 0 \) e \( 2\pi \), que define a
-longitude do ponto.
+    \item $\theta$ é o ângulo polar, que varia entre $0$ (pólo norte) e $\pi$ (pólo sul), e que
+        determina a latitude do ponto na esfera;
+    \item $\phi$ é o ângulo azimutal, que varia entre $0$ e $2\pi$, e que define a longitude do
+        ponto.
 \end{itemize}
 
-Este modelo matemático permite gerar uma esfera distribuída no espaço tridimensional.
-No entanto, para a sua implementação computacional, é necessário discretizar estes valores e
-definir um conjunto finito de pontos e faces que aproximem à sua forma contínua.
+Este modelo matemático permite gerar uma esfera no espaço tridimensional. No entanto, para a sua
+implementação computacional, é necessário discretizar estes valores e definir um conjunto finito de
+pontos e faces que aproximem à sua forma contínua.
 
-\subsubsection{Geração dos Vértices}
-Para discretizar a superfície da esfera, divide-se o intervalo de \( \theta \) em stacks
-(fatias horizontais) e o intervalo de \( \phi \) em slices (segmentos verticais). Assim,
-as incrementações angulares são calculados da seguinte forma:
-\[
-\Delta\theta = \frac{\pi}{\text{stacks}}, \quad \Delta\phi = \frac{2\pi}{\text{slices}}
-\]
-Ao percorrer os valores de \( \theta \) e \( \phi \), é possível gerar um conjunto ordenado
-de pontos distribuídos sobre a esfera.
+\subsubsection{Geração dos vértices}
 
-De modo que, a construção dos vértices segue os seguintes passos:
+Para discretizar a superfície da esfera, divide-se o intervalo de $\theta$ em \emph{stacks} (fatias
+horizontais), e o intervalo de $\phi$ em \emph{slices} (segmentos verticais). Assim, as
+incrementações angulares são calculadas da seguinte forma:
 
-1. Criação do pólo norte: O primeiro ponto criado é o pólo norte, localizado em
-\( (0, r, 0) \).
+$$
+\Delta\theta = \frac{\pi}{N_\text{stacks}}
+\hspace{1cm}
+\Delta\phi = \frac{2\pi}{N_\text{slices}}
+$$
 
-2. Geração dos Pontos Intermédios: Para cada stack (exceto as extremidades, que
-são os pólos), iterámos sobre os valores de \( \theta \), determinámos a altura \( y \) do ponto
-e o raio da secção circular correspondente:
-\[
-y = r \cos(\theta)
-\]
-\[
-r_{\text{secção}} = r \sin(\theta)
-\]
-Para cada slice, iterámos sobre os valores de \( \phi \), é calculada a posição dos pontos
-na secção circular:
-\[
-x = r_{\text{secção}} \cos(\phi)
-\]
-\[
-z = r_{\text{secção}} \sin(\phi)
-\]
+Ao percorrer os valores de $\theta$ e $\phi$, é possível gerar um conjunto ordenado de pontos
+distribuídos sobre a esfera. A construção dos vértices segue os seguintes passos:
 
-3. Criação do pólo sul: Após a geração das stacks intermédias, é criado o pólo sul
-em \( (0, -r, 0) \).
+1. Criação do pólo norte: o primeiro ponto criado é o pólo norte, localizado em $(0, r, 0)$.
 
-\subsubsection{Construção das Faces}
+2. Geração dos pontos intermédios: para cada \emph{stack} com exceção das extremidades (que são os
+pólos), ou seja, iterando-se sobre os valores de $\theta$, determina-se a altura $y$ dos pontos e o
+raio da secção circular correspondente:
+
+$$y = r \cos(\theta)$$
+$$r_{\text{secção}} = r \sin(\theta)$$
+
+Para cada \emph{slice}, ou seja, iterando-se sobre os valores de $\phi$, é calculada a posição dos
+pontos da secção circular:
+
+$$x = r_{\text{secção}} \cos(\phi)$$
+$$z = r_{\text{secção}} \sin(\phi)$$
+
+
+3. Criação do pólo sul: Após a geração das \emph{stacks} intermédias, é criado o pólo sul em
+$(0, -r, 0)$.
+
+\subsubsection{Construção das faces}
+
 Após a geração dos vértices, é necessário definir as faces triangulares que compõem a superfície
 esférica. A triangulação é realizada da seguinte forma:
 
-1. Ligação ao pólo norte: Cada ponto da primeira stack (exceto o pólo norte) forma um
-triângulo com o pólo norte e o ponto seguinte na mesma stack. Para garantir a continuidade circular,
-o último ponto da stack liga-se novamente ao primeiro, ou seja, os vértices são ligados de forma a
-criar uma face triangular:
-\[
+1. Ligação ao pólo norte: cada ponto da primeira \emph{stack} (depois da do pólo norte) forma um
+triângulo com o pólo norte e o ponto seguinte na mesma \emph{stack}. Para garantir a continuidade
+circular, o último ponto da \emph{stack} liga-se novamente ao primeiro:
+
+$$
 T_1 = (P_1, P_3, P_2)
-\]
+$$
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{res/figures/polosSphere.pdf}
+    \includegraphics[width=0.6\textwidth]{res/figures/polosSphere.pdf}
     \caption{
-        Ilustração da ligação dos vértices da primeira stack ao pólo norte, formando os triângulos
-        iniciais da esfera e a seguinte iteração.
+        \onehalfspacing
+        Ilustração da ligação dos vértices da primeira \emph{stack} ao pólo norte, formando os
+        triângulos iniciais da esfera. São apresentadas duas iterações deste processo.
     }
 \end{figure}
 
-2. Ligação das stacks intermédias:
-Para cada fatia horizontal da esfera, os vértices são ligados de forma a criar duas faces
-triangulares por quadrilátero:
-\[
+2. Ligação das \emph{stacks} intermédias: para cada fatia horizontal da esfera, os vértices são
+ligados de forma a criar duas faces triangulares por quadrilátero:
+
+$$
 T_1 = (P_1, P_3, P_4)
-\]
-\[
+\hspace{1cm}
 T_2 = (P_1, P_4, P_2)
-\]
+$$
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{res/figures/sphere.pdf}
+    \includegraphics[width=0.6\textwidth]{res/figures/sphere.pdf}
     \caption{
-        Triângulos de uma esfera gerada, e os pontos utilizados numa iteração do ciclo de geração
-        de triângulos e na seguinte.
+        \onehalfspacing
+        Triângulos de uma esfera gerada, e os pontos utilizados em duas iterações do ciclo de
+        geração de triângulos.
     }
 \end{figure}
 
 Este método assegura uma ligação contínua entre os pontos e evita a repetição de vértices
 desnecessários.
 
-3. Ligação ao pólo sul: O mesmo processo utilizado para o pólo norte é aplicado à stack
-mais próxima do pólo sul, assim, garante que todas as fatias inferiores são corretamente ligadas ao
-vértice final.
-No entanto, a ordem dos vértices nos triângulos é invertida em comparação com o pólo norte.
-Esta inversão garante que a normal de cada triângulo aponta para baixo, conforme ilustrado nos
-círculos da primeira figura. No pólo norte, os vértices são ordenados no sentido anti-horário
-(por exemplo, $P_1$, $P_3$, $P_2$), enquanto que no pólo sul, a ordem é invertida
-($P_1$, $P_2$, $P_3$).
+3. Ligação ao pólo sul: o mesmo processo utilizado para o pólo norte é aplicado à \emph{stack} mais
+próxima do pólo sul, assim garantindo que todas as fatias inferiores são corretamente ligadas ao
+vértice final. No entanto, a ordem dos vértices nos triângulos é invertida, em comparação com o pólo
+norte. Esta inversão garante que a normal de cada triângulo aponta para baixo, conforme ilustrado
+nos círculos da figura 6. No pólo norte, os vértices são ordenados no sentido anti-horário (por
+exemplo, $P_1$, $P_3$, $P_2$), enquanto que no pólo sul, a ordem é invertida ($P_1$, $P_2$, $P_3$).
 
-Este método proporciona uma representação eficiente e visualmente precisa, garante uma
-boa distribuição das faces ao longo da sua superfície.
+\subsection{Cone}
 
-\subsection{Cilindro}
+Para gerar a nuvem de pontos do cone, é necessário ter em atenção dois vértices especiais, o centro
+da sua base e o vértice do seu topo, com as coordenadas abaixo:
 
-Para a construção do cilindro, utilizámos um sistema de coordenadas cilíndricas, onde a
-posição de cada ponto é determinada pelo raio, pelo ângulo azimutal \( \phi \) e
-pela altura \( y \).
-
-A parametrização de um vértice sobre um cilindro de raio \( r \) e altura \( h \) pode ser definida
-pelas seguintes equações:
-\[
-x = r \cos(\phi)
-\]
-\[
-y = h
-\]
-\[
-z = r \sin(\phi)
-\]
-onde:
-\begin{itemize}
-\item \( \phi \) é o ângulo azimutal, varia entre \( 0 \) e \( 2\pi \), que determina a
-posição do ponto ao longo da circunferência da base.
-\item \( y \) representa a altura, varia entre \( 0 \) (base inferior) e \( h \)
-(base superior).
-\end{itemize}
-
-Este modelo matemático permite representar um cilindro tridimensionalmente. Para a sua implementação
-computacional, discretizamos estes valores, onde é gerado um conjunto finito de pontos e faces que
-aproximam à sua forma contínua.
-
-\subsubsection{Geração dos Vértices}
-Para discretizar a superfície do cilindro, o intervalo de \( \phi \) é dividido em slices
-(segmentos verticais), enquanto a altura \( y \) é dividida em stacks (fatias horizontais).
-Assim, os incrementos são calculados da seguinte forma:
-\[
-\Delta \phi = \frac{2\pi}{\text{slices}}, \quad \Delta y = \frac{h}{\text{stacks}}
-\]
-
-Os vértices são gerados da seguinte forma:
-
-1. Criação da superfície lateral: Para cada stack ao longo da altura, iterámos
-sobre os valores de \( \phi \), determinando a posição dos pontos na circunferência da secção
-correspondente.
-
-2. Criação dos vértices centrais das bases: Após gerar os pontos da superfície lateral,
-adicionamos dois vértices centrais:
-\begin{itemize}
-\item O centro da base superior, localizado em \( (0, h, 0) \).
-\item O centro da base inferior, localizado em \( (0, 0, 0) \).
-\end{itemize}
-
-\subsubsection{Construção das Faces}
-Após a geração dos vértices, definimos as faces triangulares que compõem o cilindro. Esta etapa
-é realizada em três partes:
-
-1. Construção da superfície lateral:
-Cada quadrilátero entre duas stacks sucessivas é dividido em duas faces triangulares:
-\[
-T_1 = (P_4, P_6, P_7)
-\]
-\[
-T_2 = (P_4, P_7, P_5)
-\]
-Isto garante uma cobertura uniforme da superfície do cilindro.
+$$
+P_0 = (0, 0, 0)
+\hspace{1cm}
+P_n = (0, H, 0)
+\hspace{1cm}
+\text{, onde $H$ representa a altura do cone}
+$$
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{res/figures/cylinder.pdf}
+    \includegraphics[width=0.35\textwidth]{res/figures/Cone1.pdf}
+    \caption{Primeiro vértice ($P_0$) e último vértice ($P_n$) de um cone.}
+\end{figure}
+
+Os restantes vértices são todos obtidos do mesmo modo: para cada \emph{stack}, geram-se tantos
+vértices quantos o número de \emph{slices}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/figures/Cone2.pdf}
     \caption{
-        Triângulos de uma esfera gerada, e os pontos utilizados numa iteração do ciclo de geração
-        de triângulos e na seguinte.
+        Duas \emph{stacks} de um cone. Não são apresentados vértices ocultados pelas faces visíveis.
     }
 \end{figure}
 
-2. Construção da base superior:
-Cada ponto da última stack é ligado ao vértice central da base superior, de modo a formar
-triângulos radiais:
-\[
+Para que as \emph{stacks} sejam equidistantes uma da outra, a distância entre \emph{stacks} será
+o quociente entre a altura do cone e o número de \emph{stacks}. Por conseguinte, a coordenada $y$ da
+$i$-ésima \emph{stack} será:
+
+$$
+y_i = \frac{H}{N_{stacks}} \times i
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_{stacks} - 1 \right \rbrace
+$$
+
+Cada \emph{stack} no modelo será uma aproximação da secção transversal do cone por um plano
+horizontal, ou seja a aproximação de uma circunferência. Na base do cone, o raio desta
+circunferência é o dado pelo utilizador, $r$. Este raio tende para 0 à medida que se caminha para
+o vértice do topo do cone. Logo, para a \emph{stack} $i$, o raio da circunferência a aproximar
+pode ser calculado por uma interpolação linear:
+
+$$
+r_i = \frac{H - y_i}{H}\times r
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_{stacks} - 1 \right \rbrace
+$$
+
+Dentro de cada $\emph{stack}$, as coordenadas $x$ e $z$ de cada ponto são determinadas de acordo
+com a equação trigonométrica de uma circunferência:
+
+$$
+x = r_i \cos(\theta)
+\hspace{1cm}
+z = r_i \sin(\theta)
+\hspace{1cm}
+\theta \in \left [ 0, 2 \pi \right [
+$$
+
+Para se obterem tantos pontos quantas \emph{slices}, e para que estes estejam uniformemente
+distribuídos pelo perímetro da circunferência, o ângulo $\theta$ é sempre incrementado em
+$\frac{2 \pi}{N_{slices}}$ até o perímetro da circunferência ter sido coberto, dando origem à
+seguinte equação de geração de pontos:
+
+$$
+x = r_i \cos \left ( \frac{2 \pi}{N_\text{slices}} \times j \right )
+\hspace{1cm}
+z = r_i \sin \left ( \frac{2 \pi}{N_\text{slices}} \times j \right )
+\hspace{1cm}
+j \in \left \lbrace 0, 1, \ldots, N_\text{slices} - 1 \right \rbrace
+$$
+
+Com os pontos das \emph{stacks}, o centro da base, e o vértice do topo do cone, fica definida a
+nuvem de pontos desta superfície.
+
+Depois de estar criada a nuvem de pontos, constroem-se, em primeiro lugar, as faces triangulares da
+base do cone. Para cada \emph{slice}, gera-se uma face, que tem  como vértices a origem ($P_0$), um
+vértice da base ($P_1$), e o vértice da \emph{slice} seguinte ($P_2$), como mostra a figura abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/figures/Cone3.pdf}
+    \caption{
+        \onehalfspacing
+        Primeira iteração da construção das faces da base de um cone (com 8 \emph{slices} e 2
+        \emph{stacks}).
+    }
+\end{figure}
+
+Para que a normal desta face esteja voltada para fora do cone, ou seja, para baixo, os vértices do
+triângulo são ordenados do seguinte modo, lembrando que esta ordem também se aplica aos restantes
+vértices da base:
+
+$$
+T = (P_0, P_1, P_2)
+$$
+
+De seguida, constroem-se as faces laterais do cone, com exceção das da última \emph{stack} (a de
+maior ordenada). É construído um quadrilátero (dois triângulos) por cada \emph{slice} na
+\emph{stack}, utilizando um vértice da \emph{stack} ($P_1$), o seu adjacente seguinte na
+\emph{stack} ($P_2$), e os dois pontos correspondentes a estes vértices na \emph{stack} seguinte
+($P_9$ e $P_{10}$). A figura abaixo mostra os vértices utilizados na primeira iteração deste
+processo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/figures/Cone4.pdf}
+    \caption{
+        \onehalfspacing
+        Primeira iteração da construção das faces laterais de um cone (com 8 \emph{slices} e 2
+        \emph{stacks}).
+    }
+\end{figure}
+
+Para que os vetores normais destas faces apontem para fora do cone, utiliza-se a seguinte ordem para
+os pontos dos triângulos, nesta e noutras iterações:
+
+$$
+T_1 = (P_1, P_9, P_{10})
+\hspace{1cm}
+T_2 = (P_1, P_{10}, P_2)
+$$
+
+Por último, constroem-se as faces da última \emph{stack}. Ao contrário do que acontece com as
+restantes \emph{stacks}, já não se constroem quadriláteros, mas sim triângulos. Para cada
+\emph{slice}, constrói-se um triângulo, formado pelo vértice do cone ($P_{17}$), por um vértice da
+última \emph{stack} ($P_9$) e pelo vértice seguinte nessa \emph{stack} ($P_{10}$), como mostra a
+figura abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/figures/Cone5.pdf}
+    \caption{
+        \onehalfspacing
+        Primeira iteração da construção das faces da última \emph{stack} de um cone (com 8
+        \emph{slices} e 2 \emph{stacks}).
+    }
+\end{figure}
+
+Para que estas faces sejam visíveis do exterior do cone, os seus vértices são ordenados do seguinte
+modo:
+
+$$
+T = (P_9, P_{17}, P_{10})
+$$
+
+\subsection{Cilindro}
+
+Para a construção do cilindro, utilizámos um sistema de coordenadas cilíndricas, onde a posição de
+cada ponto é determinada pelo raio, $r$, pelo ângulo azimutal, $\phi$, e pela altura $y$.
+
+A parametrização de um vértice sobre um cilindro de raio $r$ e altura $h$ pode ser definida pelas
+seguintes equações \cite{cylinder}:
+
+$$x = r \cos(\phi)$$
+$$y \in \left [ 0, h \right ]$$
+$$z = r \sin(\phi)$$
+
+onde $\phi$ é o ângulo azimutal, que varia entre $0$ e $2\pi$, e que determina a posição do ponto ao
+longo da circunferência da base.
+
+Este modelo matemático permite representar um cilindro tridimensionalmente. Para a sua implementação
+computacional, discretizam-se estes valores, e geram-se conjuntos finitos de pontos e faces que
+aproximam a sua forma contínua.
+
+\subsubsection{Geração dos vértices}
+
+Para discretizar a superfície do cilindro, o intervalo de $\phi$ é dividido em \emph{slices}
+(segmentos verticais), enquanto que a altura $y$ é dividida em \emph{stacks} (fatias horizontais).
+Assim, os incrementos são calculados da seguinte forma:
+
+$$
+\Delta \phi = \frac{2\pi}{N_\text{slices}}
+\hspace{1cm}
+\Delta y = \frac{h}{N_\text{stacks}}
+$$
+
+Os vértices são gerados da seguinte forma:
+
+1. Criação da superfície lateral: para cada \emph{stack} ao longo da altura, itera-se sobre os
+valores de $\phi$, determinando-se a posição dos pontos na circunferência da secção correspondente.
+
+2. Criação dos vértices centrais das bases: Após gerar os pontos da superfície lateral, adicionam-se
+dois vértices centrais:
+
+\begin{itemize}
+    \item O centro da base superior, localizado em $(0, h, 0)$.
+    \item O centro da base inferior, localizado em $(0, 0, 0)$.
+\end{itemize}
+
+\subsubsection{Construção das faces}
+
+Após a geração dos vértices, constroem-se as faces triangulares que compõem o cilindro. Esta etapa
+é realizada em três partes:
+
+1. Construção da superfície lateral: cada quadrilátero entre duas \emph{stacks} sucessivas é
+dividido em duas faces triangulares:
+
+$$
+T_1 = (P_4, P_6, P_7)
+\hspace{1cm}
+T_2 = (P_4, P_7, P_5)
+$$
+
+Isto garante uma cobertura uniforme da superfície lateral do cilindro.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{res/figures/cylinder.pdf}
+    \caption{
+        \onehalfspacing
+        Triângulos de um cilindro gerado, e os pontos utilizados em duas iterações do ciclo de
+        geração de triângulos das faces laterais.
+    }
+\end{figure}
+
+2. Construção da base superior: cada ponto da última \emph{stack} é ligado ao vértice central da
+base superior, de modo a formar triângulos radiais:
+
+$$
 T = (P_1, P_2, P_3)
-\]
+$$
 
-3. Construção da base inferior:
-O mesmo processo é repetido para a base inferior, o que garante o desenho correto da estrutura.
+3. Construção da base inferior: o mesmo processo é repetido para a base inferior. No entanto, a
+ordem dos vértices não é a mesma que a utilizada na base superior. Por exemplo, caso os pontos
+$P_1$, $P_2$ e $P_3$, da figura 8, estivessem na base inferior, o triângulo gerado seria
+$(P_1, P_3, P_2)$. Assim, as normais dos triângulos desta base apontem para baixo, o que é
+importante para o funcionamento correto do \emph{back-face culling}.
 
-A ordem dos vértices cumpre a regra da orientação anti-horária, onde a correta
-aplicação da técnica de face culling cumpre-se, que otimiza o processo de renderização
-ao eliminar automaticamente as faces voltadas para trás.
+\subsection{\emph{Torus}}
 
-Este método resulta numa representação eficiente e precisa do cilindro, mantendo uma boa
-distribuição das faces sobre a sua superfície.
+Matematicamente, as coordenadas de um ponto do \emph{torus} são definidas do seguinte modo
+\cite{torus}:
+
+$$
+x = (-R + r \cos \phi) \cos \theta
+\hspace{1cm}
+y = r \sin \phi
+\hspace{1cm}
+z = (-R + r \cos \phi) \sin \theta
+$$
+
+$R$ e $r$ são os parâmetros dados para a geração do \emph{torus}, os raios maior e menor,
+respetivamente. Os ângulos $\theta$ e $\phi$ variam ambos no intervalo $[0, 2\pi]$.
+
+O ângulo $\theta$ define a rotação do ponto em torno do eixo central do \emph{torus}, percorrendo o
+círculo principal de raio $R$. Assim, ao variar $\theta$, o ponto desloca-se ao longo do anel do
+\emph{torus}, mantendo-se sempre na mesma posição relativa dentro do tubo. Já o ângulo $\phi$
+determina a posição do ponto dentro da secção transversal do tubo, que tem raio $r$. Ao variar
+$\phi$, o ponto descreve um movimento circular dentro do tubo, movendo-se ao longo da circunferência
+menor do \emph{torus}.
+
+Para gerar uma nuvem de pontos uniformemente distribuídos, dividem-se os ângulos em fatias
+($slices$) e segmentos ($stacks$) iguais, utilizando:
+
+$$
+\theta_i = i \cdot \frac{2\pi}{N_\text{slices}}
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_\text{slices} \right \rbrace
+$$
+
+$$
+\phi_j = j \cdot \frac{2\pi}{N_\text{stacks}}
+\hspace{1cm}
+j \in \left \lbrace 0, 1, \ldots, N_\text{stacks} \right \rbrace
+$$
+
+Assim, o \emph{torus} é gerado iterando sobre os valores inteiros possíveis de $i$ e $j$,
+incrementando primeiro $j$ e só depois $i$, o que dá origem à nuvem de pontos desejada.
+
+Após a geração dos vértices, estes são agrupados nos triângulos que compõem a superfície do
+\emph{torus}. Para isso, considera-se um vértice de referência, como $P_1$, juntamente com o vértice
+adjacente na mesma fatia ($P_3$) e os dois vértices correspondentes na fatia seguinte
+($P_2$ e $P_4$), e geram-se as duas faces triangulares do quadrilátero formado por estes quatro
+vértices. Este processo repete-se para todos os vértices onde é aplicável, garantindo que cada
+célula quadrangular é subdividida em dois triângulos. A figura seguinte ilustra esse processo,
+mostrando a organização dos triângulos resultantes:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/figures/TorusTriangle.pdf}
+    \caption{Triângulos de um \emph{torus} gerado. As faces ocultas não são apresentadas.}
+\end{figure}
+
+Pretende-se que os triângulos do \emph{torus} estejam voltados para fora, pelo que os seus vértices
+devem estar ordenados na ordem contrária à dos ponteiros do relógio. Para os quatro pontos
+apresentados acima, os triângulos gerados são os seguintes:
+
+$$
+T_1 = (P_1, P_2, P_3)
+\hspace{1cm}
+T_2 = (P_2, P_4, P_3).
+$$
+
+O \emph{torus} é a única superfície côncava gerada, o que trás problemas relativos à orientação das
+suas normais. As normais de todas as faces apontam para "fora"{} do \emph{torus}, ou seja, as das
+faces interiores ("do buraco"{}) apontam para o centro do \emph{torus}, e as das faces exteriores
+apontam no sentido contrário.
+
+Idealmente, a parte interna do \emph{torus} não deveria ser visível quando este é observado de fora,
+pois a própria geometria bloquearia essa visão. No entanto, como apenas os contornos das faces são
+desenhados, e a direção das normais é o único critério utilizado de momento para determinar se uma
+face é ou não desenhada, pode ocorrer um efeito onde a parte interna do \emph{torus} é visível, como
+mostra a figura abaixo. Esse fenómeno acontece porque as normais da parte interna apontam para a
+câmara, tal como as normais das faces que a deveriam cobrir.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.25\textwidth]{res/figures/TorusVisibleFaces.png}
+    \caption{Faces do interior do \emph{torus} visíveis.}
+\end{figure}
+
+Este problema será mitigado na fase 4 do trabalho, onde a superfície dos polígonos será preenchida
+por completo, e as faces internas do \emph{torus} serão cobertas pelas faces externas frontais.
 
 \section{\emph{Engine}}
 
-\textbf{\color{red} TODO - \emph{engine}}
+\subsection{Criação da janela}
+
+Para a criação da janela, a biblioteca GLFW foi utilizada \cite{glfw}, escolhida principalmente pela
+sua API moderna. Ao contrário do GLUT \cite{glut}, utilizado nas aulas práticas da UC, a API do GLFW
+não obriga a guardar o estado da aplicação em variáveis globais para que os métodos associados à
+janela lhe possam aceder. Isto possibilita a criação de abstrações RAII em torno da janela criada, o
+que por sua vez permite a utilização das várias funcionalidades de C++ para gestão automática de
+memória. Ademais, a API do GFLW também permite um maior controlo sobre o ciclo de resposta a eventos
+e renderização.
+
+Já na primeira fase do projeto, optou-se por utilizar uma versão do OpenGL mais atual do que a que é
+utilizada nas aulas práticas, o \emph{core profile} do OpenGL 4.6. Apesar do seu uso exigir um maior
+esforço na primeira fase, com a utilização obrigatória de VBOs e de \emph{shaders}, esta versão
+suporta mais funcionalidades do que as versões anteriores, permite obter um melhor desempenho, e é
+suportada por depuradores como RenderDoc \cite{renderdoc}. Para utilizar esta versão de OpenGL, um
+\emph{loader} é necessário, e o GLAD \cite{glad} foi escolhido devido ao seu elevado grau de
+personalização.
+
+\subsection{Cena (\texttt{Scene})}
+
+A classe \texttt{Scene} assume um papel fulcral na \texttt{engine}, pois é responsável por
+interpretar ficheiros XML com os conteúdos que devem ser renderizados. Para a sua análise sintática
+destes ficheiros, a biblioteca TinyXML-2 \cite{tinyxml2} é utilizada. Segue um exemplo de
+uma cena em formato XML:
+
+\lstset{language=xml}
+\begin{lstlisting}
+
+<world>
+    <window width="512" height="512" />
+    <camera>
+        <position x="3" y="2" z="1" />
+        <lookAt x="0" y="0" z="0" />
+        <up x="0" y="1" z="0" />
+        <projection fov="60" near="1" far="1000" />
+    </camera>
+    <group>
+        <models>
+            <model file="../models/box.3d" />
+        </models>
+    </group>
+</world>
+\end{lstlisting}
+
+O processo de análise inicia-se com a leitura do elemento raiz, \texttt{<world>}, que contém todos
+os elementos de configuração. A \texttt{Scene} começa por extrair as dimensões da janela a partir do
+elemento \texttt{<window>} e as propriedades da câmara a partir do elemento \texttt{<camera>}.
+Depois, prossegue à leitura dos objetos presentes na cena. Os elementos \texttt{<group>} podem
+conter outros elementos \texttt{<group>}, ou então elementos \texttt{<model>}, que especificam os
+modelos 3D a serem carregados e renderizados. Nesta primeira fase, por simplicidade, esta estrutura
+hierárquica é linearizada durante o carregamento de uma cena (a \texttt{engine} armazena um
+\texttt{std::vector} de modelos), mas isto é algo que terá de ser mudado para suportar as
+transformações geométricas da próxima fase.
+
+O leitor de cenas procura evitar o carregamento do mesmo modelo mais do que uma vez. Com recurso a
+um dicionário (\texttt{std::unordered\_map}), são armazenados os modelos já carregados. Quando um
+elemento \texttt{<model>} é encontrado, caso este refira um ficheiro \texttt{.3d} carregado
+anteriormente, ele é reutilizado; caso contrário, o novo modelo é carregado e armazenado no
+dicionário.
+
+\subsection{Entidade (\texttt{Entity})}
+
+A classe \texttt{Entity} representa um objeto 3D individual na cena, combinando um modelo
+(\texttt{Model}, uma abstração para um \emph{buffer} de vértices na GPU) com outra informação
+relevante como, por exemplo, a sua cor. Esta classe é também responsável por renderizar cada objeto
+corretamente, transformando o seu modelo de acordo com os atributos definidos.
+
+Uma otimização feita à \texttt{Entity} é o uso de um \texttt{std::shared\_ptr<Model>} para
+referenciar o modelo associado a cada objeto. Este apontador inteligente permite a partilha do mesmo
+modelo por várias entidades que o usem, reduzindo o consumo de memória da GPU. Ademais, o uso de
+contagem de referências permite a libertação automática de memória, seguindo os princípios RAII de
+C++.
+
+\subsection{Câmara}
+
+A câmara é responsável por definir a perspetiva e o enquadramento da cena 3D. A sua configuração
+segue um modelo de câmara em primeira pessoa, com a posição, orientação e projeção definidas a
+partir do ficheiro XML da cena.
+
+A posição da câmara é representada pelo vetor \texttt{position}, que define a sua localização no
+espaço tridimensional. A direção para onde a câmara está orientada é determinada pelo vetor
+\texttt{lookAt}, um ponto no espaço para onde a lente da câmara aponta. O vetor \texttt{up}
+especifica a orientação vertical da câmara, garantindo a sua correta rotação no espaço. Estes três
+vetores são utilizados para calcular a matriz de visualização.
+
+Uma vez que este projeto usa \emph{shaders}, não é possível utilizar a função \texttt{gluLookAt}
+\cite{gluLookAt}, usada nas aulas práticas para o cálculo da matriz de visualização. No entanto,
+como utilizamos a biblioteca \texttt{glm} \cite{glm}, é usada a função equivalente
+\texttt{glm::lookAt}, que devolve uma matriz que pode ser passada ao \emph{shader} de vértices.
+
+A projeção da câmara é controlada pelo campo de visão (\emph{Field of View} -- FOV) e pelos planos
+de recorte próximo e distante (\texttt{near} e \texttt{far}). O FOV define o ângulo de abertura da
+câmara, influenciando a sensação de profundidade da cena, enquanto os planos de recorte estabelecem
+os limites mínimo e máximo da região visível. A matriz de projeção é calculada com a função
+\texttt{glm::perspective}, que utiliza o $FOV$, o \emph{aspect ratio} da janela, e os planos de
+recorte para definir a forma como os objetos são projetados no espaço 3D.
+
+A matriz final da câmara resulta da multiplicação da matriz de projeção pela matriz de visualização,
+e é atualizada sempre que a janela é redimensionada. É utilizada para transformar todos os objetos
+da cena, garantindo um enquadramento adequado dos mesmos e a renderização correta da cena.
+
+De momento, a \texttt{engine} não suporta que o utilizador controle a posição da câmara
+dinamicamente, movendo-a após a leitura do ficheiro XML. No entanto, pretendemos implementar esta
+funcionalidade na segunda fase do projeto.
+
+\subsection{Comportamento da \texttt{engine}}
+
+O primeiro passo na execução da \texttt{engine} é a criação da janela e do seu contexto OpenGL. Este
+é necessário para os passos seguintes: a leitura da cena, onde é necessário criar VBOs para os
+modelos 3D, a instanciação dos eixos do sistema de coordenadas, também suportados por VBOs, e a
+criação dos \emph{shaders} de vértices e de fragmentos. Uma vez que os VBOs e os \emph{shaders} não
+são um objetivo da primeira fase deste trabalho, o seu funcionamento só será descrito em detalhe num
+relatório futuro.
+
+Estando inicializada a \texttt{engine}, segue-se um ciclo em que a janela reage a eventos e desenha
+os seus conteúdos. Neste ciclo, são suportados os eventos de passagem de tempo, necessidade de
+atualizar os conteúdos da janela, e redimensionamento da janela. Para se subscrever a um evento,
+basta sobrescrever o seu método correspondente na classe \texttt{Window}:
+
+\lstset{language=c++}
+\begin{lstlisting}
+
+virtual void onUpdate(float time, float timeElapsed) = 0;
+virtual void onRender() = 0;
+virtual void onResize(int width, int height) = 0;
+\end{lstlisting}
+
+De momento, apenas os métodos \texttt{onRender} e \texttt{onResize} são utilizados. Nestes,
+desenham-se os conteúdos da janela e atualiza-se a matriz de projeção da câmara, respetivamente. Em
+relação ao processo de renderização, este consiste no envio da matriz da câmara para o \emph{shader}
+de vértices, na renderização dos eixos usando \texttt{glDrawArrays}, e na iteração por todos os
+objetos da cena, usando \texttt{glDrawElements} para desenhar cada um. No futuro, serão adicionados
+métodos de resposta a eventos de \emph{input} do utilizador, que o permitirão executar ações como,
+por exemplo, mover a câmara.
 
 \section{Resultados obtidos}
 
-\textbf{\color{red} TODO - resultados}
+Nesta fase inicial do projeto, o foco principal foi o desenvolvimento da infraestrutura da
+\texttt{engine}, incluindo a implementação da \emph{pipeline} de renderização e o carregamento de
+modelos 3D. Para demonstrar a funcionalidade da \texttt{engine}, foram gerados e carregados diversos
+modelos 3D, tanto simples figuras geométricas como modelos mais complexos obtidos na Internet.
+
+\subsection{Figuras geométricas geradas}
+
+Os seguintes modelos foram criados utilizando o \texttt{generator} implementado:
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Plane.png}
+        \caption{Plano (\texttt{plane})}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Box.png}
+        \caption{Cubo (\texttt{box})}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Sphere.png}
+        \caption{Esfera (\texttt{sphere})}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Cone.png}
+        \caption{Cone (\texttt{cone})}
+    \end{minipage}\hfill
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Cylinder.png}
+        \caption{Cilindro (\texttt{cylinder})}
+    \end{minipage}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Torus.png}
+        \caption{Torus (\texttt{torus})}
+    \end{minipage}
+\end{figure}
+
+\subsection{Cenas fornecidas pela docência da UC}
+
+A docência da UC forneceu, juntamente com o enunciado do trabalho, algumas cenas a serem testadas no
+trabalho. A \texttt{engine} renderizou-as como esperado:
+
+\begin{figure}[H]
+    \begin{adjustwidth}{-2cm}{-2cm} % These values only need to be large enough to center the figure
+        \centering
+        \includegraphics[width=0.20\textwidth]{res/results/Test1.png}
+        \includegraphics[width=0.20\textwidth]{res/results/Test2.png}
+        \includegraphics[width=0.20\textwidth]{res/results/Test3.png}
+        \includegraphics[width=0.20\textwidth]{res/results/Test4.png}
+        \includegraphics[width=0.20\textwidth]{res/results/Test5.png}
+        \caption{Renderização das cenas de teste fornecidas pela docência da UC.}
+    \end{adjustwidth}
+\end{figure}
+
+Em particular, o último caso de teste demostra a capacidade da \texttt{engine} de apresentar
+corretamente cenas com mais de um objeto.
+
+\subsection{Modelos 3D complexos}
+
+Para testar a capacidade da \texttt{engine} de carregar modelos mais complexos, foram obtidos os
+seguintes modelos 3D da Internet \cite{models}:
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Homer.png}
+        \caption{Homer}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Bunny.png}
+        \caption{Coelho de Stanford}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Cow.png}
+        \caption{Vaca}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{res/results/Dragon.png}
+        \caption{Dragão de Stanford}
+    \end{minipage}
+\end{figure}
+
+Em particular, a renderização do modelo do dragão demonstrou a capacidade da \texttt{engine} de
+lidar com modelos de alta complexidade, com um grande número de faces (871 mil).
 
 \section{Conclusão e Trabalho Futuro}
 
-\textbf{\color{red} TODO - conclusão}
+A primeira fase do projeto foi concluída com sucesso, de modo que os objetivos previamente definidos
+foram alcançados. Ademais, também implementámos a geração de mais figuras geométricas (o cilindro e
+o \emph{torus}), e a implementação de Vertex Buffer Objects (VBOs) já nesta fase melhorou o
+desempenho da \texttt{engine} e permitiu o uso de versões mais recentes de OpenGL, com outras
+funcionalidades que podem vir a ser usadas no futuro.
+
+Em relação ao trabalho futuro, pretendemos realizar uma reestruturação da organização interna das
+cenas. A abordagem atual, que armazena os objetos numa estrutura linear, será substituída por um
+sistema de grupos, que permitirá a aplicação de transformações (translações, rotações, e escalas) a
+conjuntos de modelos de forma simultânea.
+
+Adicionalmente, tencionamos expandir as capacidades da câmara, implementando três modos distintos de
+visualização: orbital, livre e em terceira pessoa. Esta diversidade de perspetivas enriquecerá a
+experiência do utilizador, e permitirá a exploração de diferentes estilos de interação com as cenas
+3D.
 
 \begingroup
 \section{Bibliografia}
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{exemplo}
-        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
-    \bibitem{esfera}
+    \bibitem{opengl}
+        "The Industry's Foundation for High Performance Graphics."{}. OpenGL. Accessed:
+        Mar. 2, 2025. [Online.] Available: \url{https://www.opengl.org/}
+    \bibitem{wavefront-obj}
+        "Wavefront OBJ File Format Summary."{} FileFormat.Info. Accessed: Mar. 2, 2025. [Online.]
+        Available: \url{https://www.fileformat.info/format/wavefrontobj/egff.htm}
+    \bibitem{sphere}
         "OpenGL Sphere."{} Songho CA. Accessed: Mar. 1, 2025. [Online.] Available:
         \url{https://www.songho.ca/opengl/gl_sphere.html}
-    \bibitem{cilindro}
+    \bibitem{cylinder}
         "OpenGL Cylinder, Prism \& Pipe."{} Songho CA. Accessed: Mar. 1, 2025. [Online.] Available:
         \url{https://www.songho.ca/opengl/gl_cylinder.html}
+    \bibitem{torus}
+        "Torus."{} Wolfram MathWorld. Accessed: Mar. 1, 2025. [Online.] Available:
+        \url{https://mathworld.wolfram.com/Torus.html}
+    \bibitem{glfw}
+        "An OpenGL library."{} GLFW. Accessed: Feb. 27, 2025. [Online.] Available:
+        \url{https://www.glfw.org}
+    \bibitem{glut}
+        "About."{} The freeglut project. Accessed: Feb. 27, 2025. [Online.] Available:
+        \url{https://freeglut.sourceforge.net/}
+    \bibitem{renderdoc}
+        "RenderDoc."{} RenderDoc Accessed: Feb. 28, 2025. [Online.] Available:
+        \url{https://renderdoc.org/}
+    \bibitem{glad}
+        "Glad - Multi-Language GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs."{}
+        Feb. 28, 2025. [Online.] Available: \url{https://glad.dav1d.de/}
+    \bibitem{tinyxml2}
+        "TinyXML-2."{} GitHub. Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/leethomason/tinyxml2}
+    \bibitem{gluLookAt}
+        "gluLookAt."{} Khronos Registry. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml}
+    \bibitem{glm}
+        "glm."{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/g-truc/glm}
+    \bibitem{models}
+        "common-3d-test-models"{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/alecjacobson/common-3d-test-models}
 \end{thebibliography}
 \endgroup
 
