@@ -8,9 +8,10 @@ Some programs, not listed in [README.md](README.md), are not required to build t
 *per se*, but are very useful for developing it:
 
 - [clang-format](https://clang.llvm.org) (code formatting);
+- [cppcheck](https://cppcheck.sourceforge.io/) (code linting);
 - [TeX Live](https://www.tug.org/texlive/) (`pdflatex` in specific, for report generation);
 - [Valgrind](https://valgrind.org/) (profiling);
-- [Kcachegrind](https://invent.kde.org/sdk/kcachegrind) (seeing profiling results);
+- [Kcachegrind](https://invent.kde.org/sdk/kcachegrind) (seeing profiler results);
 - [ShellCheck](https://www.shellcheck.net/) (static analysis of scripts);
 - [act](https://nektosact.com) (running GitHub actions locally).
 
@@ -24,7 +25,7 @@ $ DEBUG=1 make
 $ PROFILE=1 make
 ```
 
-Don't forget to run `make clean` between different build types.
+Don't forget to run `make clean` after switching between different build types.
 
 ## Report compilation
 
@@ -51,7 +52,7 @@ A `PROFILE` build is recommended.
 
 ### C++ formatting
 
-The `format.sh` script will attempt to format the whole project to a temporary directory (using
+The `format.sh` script will attempt to format the whole project in a temporary directory (using
 `clang-format`), and then compare the results with your original source files. You can choose
 whether or not you want to keep those changes (you may want to manually disable formatting for a
 snippet of code, for example). Keep in mind that there's a CI action that requires formatting to be
@@ -65,10 +66,11 @@ As any other formatter configuration, there are many tunable parameters. For you
 set the column limit to 100, the tab size to 4, with tab expansion on, and let `clang-format`
 handle the rest.
 
-### Naming
+#### Naming
 
 Methods and variables should be named in `camelCase`. Type names (classes and enums) should be named
-in `PascalCase`.
+in `PascalCase`. The name of files containing a class must match the class's name, and directory
+names should be in `snake_case`.
 
 ### LaTeX formatting
 
@@ -82,11 +84,17 @@ Report formatting can be checked with the `formatlatex.sh` script. It isn't as c
 
 ## GitHub Actions
 
-The CI pipeline is very simple: it checks if the code is correctly formatted, and it builds and
-lints the project. `shellcheck` verification of scripts is also present. All of these can be run
-locally, without any containerization.
+The CI pipeline is very simple. C++ code is formatted, linted, and compiled; LaTeX code is formatted
+and compiled; and shell scripts are checked with `shellcheck`. All of these can be run locally:
 
-However, you may want to run the CI actions in a environment similar to the one in a GitHub runner,
-for example, to use the same version of `clang-format`. Our actions are compatible with
-[`act`](https://nektosact.com). However, you are sure to expect a longer running time, as
-`clang-format`, not available on `act`'s default Ubuntu image, needs to be installed.
+ - C++ compilation: `make`
+ - C++ linting: `make cppcheck`
+ - C++ formatting: `./scripts/format.sh`
+ - LaTeX compilation: `make reports`
+ - LaTeX formatting: `./scripts/formatlatex.sh`
+ - Shell linting: `cd scripts && shellcheck **`
+
+However, you may want to run the CI actions in a environment similar to the one of a GitHub runner.
+For that, you can use [`act`](https://nektosact.com). However, you are sure to expect a longer
+running time, as some software is not available on `act`'s default Ubuntu image and needs to be
+installed.

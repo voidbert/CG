@@ -37,7 +37,7 @@ private:
     std::vector<std::unique_ptr<Entity>> entities;
 
 public:
-    Scene(const std::string &file);
+    explicit Scene(const std::string &file);
     Scene(const Scene &scene) = delete;
     Scene(Scene &&scene) = delete;
 

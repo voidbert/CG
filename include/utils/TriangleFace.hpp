@@ -14,12 +14,13 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 namespace utils {
 
 struct TriangleFace {
-    uint32_t positions[3];
+    std::array<uint32_t, 3> positions;
 
     TriangleFace(uint32_t p1, uint32_t p2, uint32_t p3);
 };

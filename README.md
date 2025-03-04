@@ -23,8 +23,14 @@ $ git clone https://github.com/voidbert/CG.git
 First, you'll need to install the following dependencies:
 
 - [GNU Make](https://www.gnu.org/software/make/) (build-time);
-- [GCC](https://www.gnu.org/software/gcc/) (build-time);
-TODO - add glfw, glad, glm
+- [GCC](https://www.gnu.org/software/gcc/) / [Clang](https://clang.llvm.org/) (build-time);
+- [GLFW](https://www.glfw.org/) (build-time);
+- [GLM](https://github.com/g-truc/glm) (build-time);
+- [TinyXML 2](https://github.com/leethomason/tinyxml2) (build-time).
+
+Other libraries are already included in this repository:
+
+ - [GLAD](https://glad.dav1d.de/).
 
 Then, to compile the project, run:
 

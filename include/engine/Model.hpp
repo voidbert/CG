@@ -26,7 +26,7 @@ private:
     unsigned int vertexCount;
 
 public:
-    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> indices);
+    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
     explicit Model(const utils::WavefrontOBJ &objectFile);
 
     Model(const Model &model) = delete;

@@ -29,11 +29,11 @@ private:
     Axis xAxis, yAxis, zAxis;
 
 public:
-    SceneWindow(const std::string &sceneFile);
+    explicit SceneWindow(const std::string &sceneFile);
 
 protected:
-    void onUpdate(float time, float timeElapsed);
-    void onRender();
-    void onResize(int _width, int _height);
+    void onUpdate(float time, float timeElapsed) override;
+    void onRender() override;
+    void onResize(int _width, int _height) override;
 };
 }

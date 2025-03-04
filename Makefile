@@ -129,3 +129,15 @@ install: $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME)
 .PHONY: uninstall
 uninstall:
 	rm $(PREFIX)/bin/cgmain $(PREFIX)/bin/$(ENGINE_EXENAME) $(PREFIX)/bin/$(GENERATOR_EXENAME)
+
+.PHONY: cppcheck
+cppcheck:
+	$(eval CPPCHECK_EXHAUSTIVE_SUPPORT := \
+		$(shell cppcheck --version | grep -qP '2\.(1[1-8]|1\d{2,}|[2-9]\d+)|[3-9]+\.'; echo $$?))
+	cppcheck \
+		--enable=all --suppress=missingIncludeSystem --suppress=unusedFunction \
+		--library=opengl --library=posix --library=tinyxml2 \
+		$$([ $(CPPCHECK_EXHAUSTIVE_SUPPORT) -eq 0 ] && echo "--check-level=exhaustive") \
+		--error-exitcode=1 \
+		-Iinclude \
+		src

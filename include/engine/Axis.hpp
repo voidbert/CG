@@ -25,7 +25,7 @@ private:
     glm::vec4 color;
 
 public:
-    Axis(const glm::vec3 &direction);
+    explicit Axis(const glm::vec3 &direction);
 
     Axis(const Axis &model) = delete;
     Axis(Axis &&) = delete;
