@@ -16,6 +16,7 @@
 
 #include "engine/camera/Camera.hpp"
 #include "engine/camera/OrbitalCamera.hpp"
+#include "engine/camera/ThirdPersonCamera.hpp"
 #include "engine/Entity.hpp"
 #include "engine/RenderPipeline.hpp"
 #include "engine/Scene.hpp"
@@ -107,7 +108,8 @@ void Scene::getCameraFromXML(const tinyxml2::XMLElement *worldElement) {
     } else if (cameraType == "free") {
         // TODO - Sara - FreeCamera
     } else if (cameraType == "thirdperson") {
-        // TODO - Ana - ThirdPersonCamera
+        this->camera =
+            std::make_unique<camera::ThirdPersonCamera>(position, lookAt, up, fov, near, far);
     } else {
         throw std::runtime_error("Invalid camera type in scene XML file");
     }

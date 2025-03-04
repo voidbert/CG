@@ -25,7 +25,11 @@ enum class MovementDirection {
     Left,
     Right,
     Forward,
-    Backward
+    Backward,
+    UpArrow,
+    DownArrow,
+    LeftArrow,
+    RightArrow
 };
 
 class Camera {

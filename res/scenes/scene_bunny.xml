@@ -1,7 +1,7 @@
 <world>
     <window width="512" height="512" />
-    <camera type="orbital">
-        <position x="0.3" y="0.3" z="0.5" />
+    <camera type="thirdperson">
+        <position x="0" y="0.3" z="0.9" />
         <lookAt x="0" y="0.1" z="0" />
         <up x="0" y="0.06" z="0" />
         <projection fov="20" near="0.1" far="1000" />
