@@ -135,7 +135,8 @@ cppcheck:
 	$(eval CPPCHECK_EXHAUSTIVE_SUPPORT := \
 		$(shell cppcheck --version | grep -qP '2\.(1[1-8]|1\d{2,}|[2-9]\d+)|[3-9]+\.'; echo $$?))
 	cppcheck \
-		--enable=all --suppress=missingIncludeSystem --suppress=unusedFunction \
+		--enable=all \
+		--suppress=missingIncludeSystem --suppress=unusedFunction --suppress=unmatchedSuppression \
 		--library=opengl --library=posix --library=tinyxml2 \
 		$$([ $(CPPCHECK_EXHAUSTIVE_SUPPORT) -eq 0 ] && echo "--check-level=exhaustive") \
 		--error-exitcode=1 \
