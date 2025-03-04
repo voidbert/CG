@@ -13,32 +13,27 @@
 /// limitations under the License.
 
 #pragma once
+#include "engine/camera/Camera.hpp"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+namespace engine::camera {
 
-namespace engine {
-
-class Camera {
+class OrbitalCamera : public Camera {
 private:
-    glm::vec3 position;
-    glm::vec3 lookAt;
-    glm::vec3 up;
-    float fov;
-    float nearPlane;
-    float farPlane;
+    float azimuth;
+    float polar;
+    float radius;
+
+    void updatePosition();
 
 public:
-    Camera();
-    Camera(const glm::vec3 &position,
-           const glm::vec3 &lookAt,
-           const glm::vec3 &up,
-           float fov,
-           float nearPlane,
-           float farPlane);
+    OrbitalCamera(const glm::vec3 &_position,
+                  const glm::vec3 &_lookAt,
+                  const glm::vec3 &_up,
+                  float _fov,
+                  float _near,
+                  float _far);
 
-    void move(const glm::vec3 &direction, float deltaTime);
-    glm::mat4 getCameraMatrix(float aspectRatio) const;
+    void move(MovementDirection direction, float deltaTime) override;
 };
 
 }

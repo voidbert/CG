@@ -1,6 +1,6 @@
 <world>
     <window width="512" height="512" />
-    <camera>
+    <camera type="orbital">
         <position x="0.3" y="0.3" z="0.5" />
         <lookAt x="0" y="0.1" z="0" />
         <up x="0" y="0.06" z="0" />

@@ -14,7 +14,8 @@
 
 #include <cmath>
 
-#include "engine/Camera.hpp"
+#include "engine/camera/Camera.hpp"
+#include "engine/camera/OrbitalCamera.hpp"
 #include "engine/Entity.hpp"
 #include "engine/RenderPipeline.hpp"
 #include "engine/Scene.hpp"
@@ -97,7 +98,19 @@ void Scene::getCameraFromXML(const tinyxml2::XMLElement *worldElement) {
         throw std::runtime_error("Invalid <projection> in scene XML file");
     }
 
-    this->camera = Camera(position, lookAt, up, fov, near, far);
+    // Type of camera
+    std::string cameraType = cameraElement->Attribute("type");
+
+    if (cameraType == "orbital") {
+        this->camera =
+            std::make_unique<camera::OrbitalCamera>(position, lookAt, up, fov, near, far);
+    } else if (cameraType == "free") {
+        // TODO - Sara - FreeCamera
+    } else if (cameraType == "thirdperson") {
+        // TODO - Ana - ThirdPersonCamera
+    } else {
+        throw std::runtime_error("Invalid camera type in scene XML file");
+    }
 }
 
 void Scene::getEntitiesFromWorldXML(
@@ -167,8 +180,8 @@ int Scene::getWindowHeight() const {
     return this->windowHeight;
 }
 
-Camera &Scene::getCamera() {
-    return this->camera;
+camera::Camera &Scene::getCamera() {
+    return *camera;
 }
 
 void Scene::setWindowSize(int width, int height) {

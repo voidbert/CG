@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "engine/Camera.hpp"
+#include "engine/camera/Camera.hpp"
 #include "engine/Entity.hpp"
 #include "engine/RenderPipeline.hpp"
 
@@ -31,7 +31,7 @@ class Scene {
 private:
     int windowWidth, windowHeight;
     std::string windowTitle;
-    Camera camera;
+    std::unique_ptr<camera::Camera> camera;
 
     // TODO - Phase 2 - add support for groups (linear scene is going to make it harder for phase 3)
     std::vector<std::unique_ptr<Entity>> entities;
@@ -43,7 +43,7 @@ public:
 
     int getWindowWidth() const;
     int getWindowHeight() const;
-    Camera &getCamera();
+    camera::Camera &getCamera();
 
     void draw(const RenderPipeline &pipeline) const;
     void setWindowSize(int width, int height);
