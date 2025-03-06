@@ -20,7 +20,8 @@
 #include "engine/Model.hpp"
 #include "engine/RenderPipeline.hpp"
 
-namespace engine {
+namespace engine::scene {
+
 class Entity {
 protected:
     std::shared_ptr<Model> model;
@@ -31,4 +32,5 @@ public:
     Entity(std::shared_ptr<Model> _model, const glm::vec4 &color);
     void draw(const RenderPipeline &pipeline) const;
 };
+
 }

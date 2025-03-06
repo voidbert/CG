@@ -16,12 +16,12 @@
 
 #include "engine/camera/Camera.hpp"
 #include "engine/camera/CameraFactory.hpp"
-#include "engine/Entity.hpp"
 #include "engine/RenderPipeline.hpp"
-#include "engine/Scene.hpp"
+#include "engine/scene/Entity.hpp"
+#include "engine/scene/Scene.hpp"
 #include "utils/XMLUtils.hpp"
 
-namespace engine {
+namespace engine::scene {
 
 Scene::Scene(const std::string &file) {
     const std::filesystem::path sceneDirectory = std::filesystem::path(file).parent_path();

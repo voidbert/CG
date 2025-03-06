@@ -12,11 +12,11 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/Entity.hpp"
+#include "engine/scene/Entity.hpp"
 
 #include "engine/Model.hpp"
 
-namespace engine {
+namespace engine::scene {
 
 Entity::Entity(std::shared_ptr<Model> _model, const glm::vec4 &_color) {
     this->model = _model;

@@ -18,14 +18,14 @@
 
 #include "engine/Axis.hpp"
 #include "engine/RenderPipeline.hpp"
-#include "engine/Scene.hpp"
+#include "engine/scene/Scene.hpp"
 #include "engine/Window.hpp"
 
 namespace engine {
 class SceneWindow : public Window {
 private:
     RenderPipeline pipeline;
-    Scene scene;
+    scene::Scene scene;
     Axis xAxis, yAxis, zAxis;
 
 public:

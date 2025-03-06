@@ -22,16 +22,16 @@
 #include <vector>
 
 #include "engine/camera/Camera.hpp"
-#include "engine/Entity.hpp"
 #include "engine/RenderPipeline.hpp"
+#include "engine/scene/Entity.hpp"
 
-namespace engine {
+namespace engine::scene {
 
 class Scene {
 private:
     int windowWidth, windowHeight;
     std::string windowTitle;
-    std::unique_ptr<camera::Camera> camera;
+    std::unique_ptr<engine::camera::Camera> camera;
 
     // TODO - Phase 2 - add support for groups (linear scene is going to make it harder for phase 3)
     std::vector<std::unique_ptr<Entity>> entities;

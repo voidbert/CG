@@ -14,7 +14,7 @@
 
 #include <iostream>
 
-#include "engine/Scene.hpp"
+#include "engine/scene/Scene.hpp"
 #include "engine/SceneWindow.hpp"
 
 namespace engine {
