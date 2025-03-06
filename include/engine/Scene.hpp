@@ -50,7 +50,6 @@ public:
 
 private:
     void getWindowFromXML(const tinyxml2::XMLElement *worldElement);
-    void getCameraFromXML(const tinyxml2::XMLElement *worldElement);
 
     void getEntitiesFromWorldXML(
         const std::filesystem::path &sceneDirectory,

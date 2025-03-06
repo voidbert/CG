@@ -15,7 +15,7 @@
 #include <cmath>
 
 #include "engine/camera/Camera.hpp"
-#include "engine/camera/OrbitalCamera.hpp"
+#include "engine/camera/CameraFactory.hpp"
 #include "engine/Entity.hpp"
 #include "engine/RenderPipeline.hpp"
 #include "engine/Scene.hpp"
@@ -34,7 +34,8 @@ Scene::Scene(const std::string &file) {
 
     const tinyxml2::XMLElement *worldElement = utils::XMLUtils::getSingleChild(&doc, "world");
     this->getWindowFromXML(worldElement);
-    this->getCameraFromXML(worldElement);
+    this->camera = camera::CameraFactory::createFromXML(
+        utils::XMLUtils::getSingleChild(worldElement, "camera"));
     this->getEntitiesFromWorldXML(sceneDirectory, loadedModels, worldElement);
 }
 
@@ -46,45 +47,6 @@ void Scene::getWindowFromXML(const tinyxml2::XMLElement *worldElement) {
 
     if (this->windowWidth < 0 || this->windowHeight < 0) {
         throw std::runtime_error("Invalid / unknown window width / height in scene XML file");
-    }
-}
-
-void Scene::getCameraFromXML(const tinyxml2::XMLElement *worldElement) {
-    const tinyxml2::XMLElement *cameraElement =
-        utils::XMLUtils::getSingleChild(worldElement, "camera");
-
-    // View matrix
-    const glm::vec3 position =
-        utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "position"));
-    const glm::vec3 lookAt =
-        utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "lookAt"));
-    const glm::vec3 up =
-        utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "up"));
-
-    // Projection matrix
-    const tinyxml2::XMLElement *projectionElement =
-        utils::XMLUtils::getSingleChild(cameraElement, "projection");
-
-    const float fov = projectionElement->FloatAttribute("fov", NAN);
-    const float near = projectionElement->FloatAttribute("near", NAN);
-    const float far = projectionElement->FloatAttribute("far", NAN);
-
-    if (std::isnan(fov) || std::isnan(near) || std::isnan(far)) {
-        throw std::runtime_error("Invalid <projection> in scene XML file");
-    }
-
-    // Type of camera
-    std::string cameraType = cameraElement->Attribute("type");
-
-    if (cameraType == "orbital") {
-        this->camera =
-            std::make_unique<camera::OrbitalCamera>(position, lookAt, up, fov, near, far);
-    } else if (cameraType == "free") {
-        // TODO - Sara - FreeCamera
-    } else if (cameraType == "thirdperson") {
-        // TODO - Ana - ThirdPersonCamera
-    } else {
-        throw std::runtime_error("Invalid camera type in scene XML file");
     }
 }
 
