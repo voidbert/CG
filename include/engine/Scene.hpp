@@ -49,10 +49,6 @@ public:
     void setWindowSize(int width, int height);
 
 private:
-    const tinyxml2::XMLElement *getOnlyOneNodeFromXML(const tinyxml2::XMLNode *parent,
-                                                      const std::string &name);
-    glm::vec3 getVectorFromXML(const tinyxml2::XMLElement *element);
-
     void getWindowFromXML(const tinyxml2::XMLElement *worldElement);
     void getCameraFromXML(const tinyxml2::XMLElement *worldElement);
 

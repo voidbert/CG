@@ -19,6 +19,7 @@
 #include "engine/Entity.hpp"
 #include "engine/RenderPipeline.hpp"
 #include "engine/Scene.hpp"
+#include "utils/XMLUtils.hpp"
 
 namespace engine {
 
@@ -31,43 +32,15 @@ Scene::Scene(const std::string &file) {
         throw std::runtime_error("Failed to load scene XML file");
     }
 
-    const tinyxml2::XMLElement *worldElement = this->getOnlyOneNodeFromXML(&doc, "world");
+    const tinyxml2::XMLElement *worldElement = utils::XMLUtils::getSingleChild(&doc, "world");
     this->getWindowFromXML(worldElement);
     this->getCameraFromXML(worldElement);
     this->getEntitiesFromWorldXML(sceneDirectory, loadedModels, worldElement);
 }
 
-const tinyxml2::XMLElement *Scene::getOnlyOneNodeFromXML(const tinyxml2::XMLNode *parent,
-                                                         const std::string &name) {
-
-    const tinyxml2::XMLElement *child = parent->FirstChildElement(name.c_str());
-    if (!child) {
-        throw std::runtime_error("<" + name + "> element not found in scene XML");
-    }
-
-    const tinyxml2::XMLElement *child2 = child->NextSiblingElement(name.c_str());
-    if (child2) {
-        throw std::runtime_error("More than one <" + name + "> element in scene XML");
-    }
-
-    return child;
-}
-
-glm::vec3 Scene::getVectorFromXML(const tinyxml2::XMLElement *element) {
-    float x = element->FloatAttribute("x", NAN);
-    float y = element->FloatAttribute("y", NAN);
-    float z = element->FloatAttribute("z", NAN);
-
-    if (std::isnan(x) || std::isnan(y) || std::isnan(z)) {
-        std::string name = element->Name();
-        throw std::runtime_error("Invalid vector in <" + name + "> in scene XML file");
-    }
-
-    return glm::vec3(x, y, z);
-}
-
 void Scene::getWindowFromXML(const tinyxml2::XMLElement *worldElement) {
-    const tinyxml2::XMLElement *windowElement = this->getOnlyOneNodeFromXML(worldElement, "window");
+    const tinyxml2::XMLElement *windowElement =
+        utils::XMLUtils::getSingleChild(worldElement, "window");
     this->windowWidth = windowElement->IntAttribute("width", -1);
     this->windowHeight = windowElement->IntAttribute("height", -1);
 
@@ -77,18 +50,20 @@ void Scene::getWindowFromXML(const tinyxml2::XMLElement *worldElement) {
 }
 
 void Scene::getCameraFromXML(const tinyxml2::XMLElement *worldElement) {
-    const tinyxml2::XMLElement *cameraElement = this->getOnlyOneNodeFromXML(worldElement, "camera");
+    const tinyxml2::XMLElement *cameraElement =
+        utils::XMLUtils::getSingleChild(worldElement, "camera");
 
     // View matrix
     const glm::vec3 position =
-        this->getVectorFromXML(this->getOnlyOneNodeFromXML(cameraElement, "position"));
+        utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "position"));
     const glm::vec3 lookAt =
-        this->getVectorFromXML(this->getOnlyOneNodeFromXML(cameraElement, "lookAt"));
-    const glm::vec3 up = this->getVectorFromXML(this->getOnlyOneNodeFromXML(cameraElement, "up"));
+        utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "lookAt"));
+    const glm::vec3 up =
+        utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "up"));
 
     // Projection matrix
     const tinyxml2::XMLElement *projectionElement =
-        this->getOnlyOneNodeFromXML(cameraElement, "projection");
+        utils::XMLUtils::getSingleChild(cameraElement, "projection");
 
     const float fov = projectionElement->FloatAttribute("fov", NAN);
     const float near = projectionElement->FloatAttribute("near", NAN);
