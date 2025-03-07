@@ -27,6 +27,8 @@ Rotation::Rotation(const tinyxml2::XMLElement *rotateElement) {
 
     if (std::isnan(this->rotationAngle)) {
         throw std::runtime_error("Invalid rotation angle <rotate> in scene XML file");
+    } else {
+        this->rotationAngle *= (glm::pi<float>() / 180.0f); // Convert to radians
     }
 }
 
