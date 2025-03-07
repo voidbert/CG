@@ -15,6 +15,7 @@
 #include <glm/vec3.hpp>
 
 #include "engine/camera/CameraFactory.hpp"
+#include "engine/camera/FreeCamera.hpp"
 #include "engine/camera/OrbitalCamera.hpp"
 #include "utils/XMLUtils.hpp"
 
@@ -50,8 +51,7 @@ std::unique_ptr<Camera> CameraFactory::createFromXML(const tinyxml2::XMLElement 
     if (cameraType == "orbital") {
         return std::make_unique<camera::OrbitalCamera>(position, lookAt, up, fov, near, far);
     } else if (cameraType == "free") {
-        // TODO - Sara - FreeCamera
-        return std::unique_ptr<camera::Camera>(nullptr);
+        return std::make_unique<camera::FreeCamera>(position, lookAt, up, fov, near, far);
     } else if (cameraType == "thirdperson") {
         // TODO - Ana - ThirdPersonCamera
         return std::unique_ptr<camera::Camera>(nullptr);
