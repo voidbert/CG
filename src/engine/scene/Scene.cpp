@@ -70,6 +70,10 @@ camera::Camera &Scene::getCamera() {
 }
 
 void Scene::draw(const RenderPipeline &pipeline) const {
+    const float aspectRatio = static_cast<float>(this->windowWidth) / this->windowHeight;
+    const glm::mat4 cameraMatrix = this->camera->getCameraMatrix(aspectRatio);
+
+    pipeline.setCameraMatrix(cameraMatrix);
     for (const std::unique_ptr<Group> &group : this->groups) {
         group->draw(pipeline);
     }
