@@ -14,17 +14,30 @@
 
 #include "engine/scene/Entity.hpp"
 
-#include "engine/Model.hpp"
-
 namespace engine::scene {
 
-Entity::Entity(std::shared_ptr<Model> _model, const glm::vec4 &_color) {
-    this->model = _model;
-    this->color = _color;
+Entity::Entity(const tinyxml2::XMLElement *modelElement,
+               const std::filesystem::path &sceneDirectory,
+               std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels) {
+
+    const char *file = modelElement->Attribute("file");
+    if (!file) {
+        throw std::runtime_error("Invalid <model> in scene XML file");
+    }
+
+    const std::string modelPath = std::filesystem::canonical(sceneDirectory / file);
+    auto it = loadedModels.find(modelPath);
+    if (it == loadedModels.end()) {
+        utils::WavefrontOBJ object(modelPath);
+        this->model = std::make_shared<Model>(object);
+        loadedModels[modelPath] = model;
+    } else {
+        this->model = it->second;
+    }
 }
 
 void Entity::draw(const RenderPipeline &pipeline) const {
-    pipeline.setColor(color);
+    pipeline.setColor(glm::vec4(1.0f));
     this->model->draw();
 }
 

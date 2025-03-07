@@ -21,28 +21,22 @@
 #include <unordered_map>
 #include <vector>
 
-#include "engine/camera/Camera.hpp"
 #include "engine/RenderPipeline.hpp"
 #include "engine/scene/Entity.hpp"
-#include "engine/scene/Group.hpp"
 
 namespace engine::scene {
 
-class Scene {
+class Group {
 private:
-    int windowWidth, windowHeight;
-    std::unique_ptr<engine::camera::Camera> camera;
+    std::vector<std::unique_ptr<Entity>> entities;
     std::vector<std::unique_ptr<Group>> groups;
 
 public:
-    explicit Scene(const std::string &file);
-    Scene(const Scene &scene) = delete;
-    Scene(Scene &&scene) = delete;
-
-    int getWindowWidth() const;
-    int getWindowHeight() const;
-    void setWindowSize(int width, int height);
-    camera::Camera &getCamera();
+    Group(const tinyxml2::XMLElement *groupElement,
+          const std::filesystem::path &sceneDirectory,
+          std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels);
+    Group(const Group &entity) = delete;
+    Group(Group &&entity) = delete;
 
     void draw(const RenderPipeline &pipeline) const;
 };

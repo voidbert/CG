@@ -14,8 +14,11 @@
 
 #pragma once
 
-#include <glm/vec4.hpp>
+#include <filesystem>
 #include <memory>
+#include <string>
+#include <tinyxml2.h>
+#include <unordered_map>
 
 #include "engine/Model.hpp"
 #include "engine/RenderPipeline.hpp"
@@ -23,13 +26,16 @@
 namespace engine::scene {
 
 class Entity {
-protected:
+private:
     std::shared_ptr<Model> model;
-    glm::vec4 color;
-    // TODO - Phase 2 – Add Geometric Transforms
 
 public:
-    Entity(std::shared_ptr<Model> _model, const glm::vec4 &color);
+    Entity(const tinyxml2::XMLElement *modelElement,
+           const std::filesystem::path &sceneDirectory,
+           std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels);
+    Entity(const Entity &entity) = delete;
+    Entity(Entity &&entity) = delete;
+
     void draw(const RenderPipeline &pipeline) const;
 };
 
