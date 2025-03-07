@@ -16,9 +16,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "engine/RenderPipeline.hpp"
+#include "engine/render/RenderPipeline.hpp"
 
-namespace engine {
+namespace engine::render {
+
 // Having these strings as const char * instead of std::string simplifies OpenGL interop
 
 const char *vertexShaderSource = R"(
@@ -44,7 +45,6 @@ void main() {
 )";
 
 RenderPipeline::RenderPipeline() : vertexShader(0), fragmentShader(0), program(0) {
-
     // Compile vertex shader
     this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(this->vertexShader, 1, &vertexShaderSource, nullptr);

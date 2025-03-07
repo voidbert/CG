@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "engine/camera/Camera.hpp"
-#include "engine/RenderPipeline.hpp"
+#include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Entity.hpp"
 #include "engine/scene/Group.hpp"
 
@@ -31,7 +31,7 @@ namespace engine::scene {
 class Scene {
 private:
     int windowWidth, windowHeight;
-    std::unique_ptr<engine::camera::Camera> camera;
+    std::unique_ptr<camera::Camera> camera;
     std::vector<std::unique_ptr<Group>> groups;
 
 public:
@@ -44,7 +44,7 @@ public:
     void setWindowSize(int width, int height);
     camera::Camera &getCamera();
 
-    void draw(const RenderPipeline &pipeline) const;
+    void draw(const render::RenderPipeline &pipeline) const;
 };
 
 }

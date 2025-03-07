@@ -15,25 +15,29 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/mat4x4.hpp>
+#include <vector>
 
-namespace engine {
-class RenderPipeline {
+#include "utils/Vertex.hpp"
+#include "utils/WavefrontOBJ.hpp"
+
+namespace engine::render {
+
+class Model {
 private:
-    GLuint vertexShader, fragmentShader, program;
+    GLuint vao, vbo, ibo;
+    unsigned int vertexCount;
 
 public:
-    RenderPipeline();
-    RenderPipeline(const RenderPipeline &model) = delete;
-    RenderPipeline(RenderPipeline &&) = delete;
-    ~RenderPipeline();
+    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
+    explicit Model(const utils::WavefrontOBJ &objectFile);
+    Model(const Model &model) = delete;
+    Model(Model &&) = delete;
+    ~Model();
 
-    void use() const;
-    void setCameraMatrix(const glm::mat4 &matrix) const;
-    void setColor(const glm::vec4 &color) const;
+    void draw() const;
 
 private:
-    void assertShaderCompilation(GLuint shader) const;
-    void assertProgramLinking() const;
+    explicit Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices);
 };
+
 }

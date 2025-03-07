@@ -21,7 +21,7 @@ namespace engine::scene {
 
 Scene::Scene(const std::string &file) {
     const std::filesystem::path sceneDirectory = std::filesystem::path(file).parent_path();
-    std::unordered_map<std::string, std::shared_ptr<Model>> loadedModels;
+    std::unordered_map<std::string, std::shared_ptr<render::Model>> loadedModels;
 
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS) {
@@ -69,7 +69,7 @@ camera::Camera &Scene::getCamera() {
     return *camera;
 }
 
-void Scene::draw(const RenderPipeline &pipeline) const {
+void Scene::draw(const render::RenderPipeline &pipeline) const {
     const float aspectRatio = static_cast<float>(this->windowWidth) / this->windowHeight;
     const glm::mat4 cameraMatrix = this->camera->getCameraMatrix(aspectRatio);
 

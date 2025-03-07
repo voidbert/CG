@@ -20,7 +20,7 @@ namespace engine::scene {
 
 Group::Group(const tinyxml2::XMLElement *groupElement,
              const std::filesystem::path &sceneDirectory,
-             std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels) {
+             std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels) {
 
     // Parse entities
     const tinyxml2::XMLElement *modelsElement = groupElement->FirstChildElement("models");
@@ -48,7 +48,7 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
     }
 }
 
-void Group::draw(const RenderPipeline &pipeline) const {
+void Group::draw(const render::RenderPipeline &pipeline) const {
     for (const std::unique_ptr<Entity> &entity : this->entities) {
         entity->draw(pipeline);
     }

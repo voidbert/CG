@@ -12,39 +12,48 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <cfloat>
+#include "engine/render/Model.hpp"
 
-#include "engine/Axis.hpp"
+namespace engine::render {
 
-namespace engine {
-
-Axis::Axis(const glm::vec3 &direction) {
-    const glm::vec3 normalized = glm::normalize(direction);
-    glm::vec4 vertices[] = { glm::vec4(normalized * 1000.0f, 1.0f),
-                             glm::vec4(normalized * -1000.0f, 1.0f) };
-
+Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices) {
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
 
     glGenBuffers(1, &this->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-    glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(glm::vec4), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,
+                 vertices.size() * sizeof(utils::Vertex),
+                 vertices.data(),
+                 GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 4, GL_FLOAT, false, 4 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    this->color = glm::vec4(normalized, 1.0f);
+    glGenBuffers(1, &this->ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 indices.size() * sizeof(GLuint),
+                 indices.data(),
+                 GL_STATIC_DRAW);
+
+    this->vertexCount = indices.size();
 }
 
-Axis::~Axis() {
+Model::Model(const utils::WavefrontOBJ &objectFile) : Model(objectFile.getIndexedVertices()) {}
+
+Model::Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices) :
+    Model(vertices.first, vertices.second) {}
+
+Model::~Model() {
     glDeleteBuffers(1, &this->vbo);
+    glDeleteBuffers(1, &this->ibo);
     glDeleteVertexArrays(1, &this->vao);
 }
 
-void Axis::draw(const RenderPipeline &pipeline) const {
-    pipeline.setColor(this->color);
+void Model::draw() const {
     glBindVertexArray(this->vao);
-    glDrawArrays(GL_LINES, 0, 2);
+    glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
 }
 
 }

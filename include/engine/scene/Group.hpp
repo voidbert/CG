@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "engine/RenderPipeline.hpp"
+#include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Entity.hpp"
 
 namespace engine::scene {
@@ -34,11 +34,11 @@ private:
 public:
     Group(const tinyxml2::XMLElement *groupElement,
           const std::filesystem::path &sceneDirectory,
-          std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels);
+          std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
     Group(const Group &entity) = delete;
     Group(Group &&entity) = delete;
 
-    void draw(const RenderPipeline &pipeline) const;
+    void draw(const render::RenderPipeline &pipeline) const;
 };
 
 }

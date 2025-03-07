@@ -18,7 +18,7 @@ namespace engine::scene {
 
 Entity::Entity(const tinyxml2::XMLElement *modelElement,
                const std::filesystem::path &sceneDirectory,
-               std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels) {
+               std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels) {
 
     const char *file = modelElement->Attribute("file");
     if (!file) {
@@ -29,14 +29,14 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
     auto it = loadedModels.find(modelPath);
     if (it == loadedModels.end()) {
         utils::WavefrontOBJ object(modelPath);
-        this->model = std::make_shared<Model>(object);
+        this->model = std::make_shared<render::Model>(object);
         loadedModels[modelPath] = model;
     } else {
         this->model = it->second;
     }
 }
 
-void Entity::draw(const RenderPipeline &pipeline) const {
+void Entity::draw(const render::RenderPipeline &pipeline) const {
     pipeline.setColor(glm::vec4(1.0f));
     this->model->draw();
 }

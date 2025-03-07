@@ -20,23 +20,23 @@
 #include <tinyxml2.h>
 #include <unordered_map>
 
-#include "engine/Model.hpp"
-#include "engine/RenderPipeline.hpp"
+#include "engine/render/Model.hpp"
+#include "engine/render/RenderPipeline.hpp"
 
 namespace engine::scene {
 
 class Entity {
 private:
-    std::shared_ptr<Model> model;
+    std::shared_ptr<render::Model> model;
 
 public:
     Entity(const tinyxml2::XMLElement *modelElement,
            const std::filesystem::path &sceneDirectory,
-           std::unordered_map<std::string, std::shared_ptr<Model>> &loadedModels);
+           std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
     Entity(const Entity &entity) = delete;
     Entity(Entity &&entity) = delete;
 
-    void draw(const RenderPipeline &pipeline) const;
+    void draw(const render::RenderPipeline &pipeline) const;
 };
 
 }

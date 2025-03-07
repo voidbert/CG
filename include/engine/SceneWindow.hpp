@@ -16,17 +16,18 @@
 
 #include <memory>
 
-#include "engine/Axis.hpp"
-#include "engine/RenderPipeline.hpp"
+#include "engine/render/Axis.hpp"
+#include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Scene.hpp"
 #include "engine/Window.hpp"
 
 namespace engine {
+
 class SceneWindow : public Window {
 private:
-    RenderPipeline pipeline;
+    render::RenderPipeline pipeline;
     scene::Scene scene;
-    Axis xAxis, yAxis, zAxis;
+    render::Axis xAxis, yAxis, zAxis;
 
 public:
     explicit SceneWindow(const std::string &sceneFile);
@@ -36,4 +37,5 @@ protected:
     void onRender() override;
     void onResize(int _width, int _height) override;
 };
+
 }
