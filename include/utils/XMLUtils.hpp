@@ -14,21 +14,17 @@
 
 #pragma once
 
-#include <glm/vec4.hpp>
-#include <memory>
+#include <glm/vec3.hpp>
+#include <string>
+#include <tinyxml2.h>
 
-#include "engine/Model.hpp"
-#include "engine/RenderPipeline.hpp"
+namespace utils {
 
-namespace engine {
-class Entity {
-protected:
-    std::shared_ptr<Model> model;
-    glm::vec4 color;
-    // TODO - Phase 2 – Add Geometric Transforms
-
+class XMLUtils {
 public:
-    Entity(std::shared_ptr<Model> _model, const glm::vec4 &color);
-    void draw(const RenderPipeline &pipeline) const;
+    static const tinyxml2::XMLElement *getSingleChild(const tinyxml2::XMLNode *parent,
+                                                      const std::string &name);
+    static glm::vec3 getXYZ(const tinyxml2::XMLElement *element);
 };
+
 }

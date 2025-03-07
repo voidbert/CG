@@ -12,20 +12,30 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/Entity.hpp"
+#pragma once
 
-#include "engine/Model.hpp"
+#include <memory>
 
-namespace engine {
+#include "engine/render/Axis.hpp"
+#include "engine/render/RenderPipeline.hpp"
+#include "engine/scene/Scene.hpp"
+#include "engine/window/Window.hpp"
 
-Entity::Entity(std::shared_ptr<Model> _model, const glm::vec4 &_color) {
-    this->model = _model;
-    this->color = _color;
-}
+namespace engine::window {
 
-void Entity::draw(const RenderPipeline &pipeline) const {
-    pipeline.setColor(color);
-    this->model->draw();
-}
+class SceneWindow : public Window {
+private:
+    render::RenderPipeline pipeline;
+    scene::Scene scene;
+    render::Axis xAxis, yAxis, zAxis;
+
+public:
+    explicit SceneWindow(const std::string &sceneFile);
+
+protected:
+    void onUpdate(float time, float timeElapsed) override;
+    void onRender() override;
+    void onResize(int _width, int _height) override;
+};
 
 }

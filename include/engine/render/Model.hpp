@@ -14,32 +14,30 @@
 
 #pragma once
 
-#include <GLFW/glfw3.h>
-#include <string>
+#include <glad/glad.h>
+#include <vector>
 
-namespace engine {
-class Window {
+#include "utils/Vertex.hpp"
+#include "utils/WavefrontOBJ.hpp"
+
+namespace engine::render {
+
+class Model {
 private:
-    GLFWwindow *handle;
-    int width, height;
+    GLuint vao, vbo, ibo;
+    unsigned int vertexCount;
 
 public:
-    Window(const std::string &title, int _width, int _height);
-    Window(const Window &window) = delete;
-    Window(Window &&window) = delete;
-    ~Window();
+    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
+    explicit Model(const utils::WavefrontOBJ &objectFile);
+    Model(const Model &model) = delete;
+    Model(Model &&) = delete;
+    ~Model();
 
-    void runLoop();
-    void resize(int _width, int _height);
+    void draw() const;
 
-    int getWidth() const;
-    int getHeight() const;
-
-protected:
-    GLFWwindow *getHandle();
-
-    virtual void onUpdate(float time, float timeElapsed) = 0;
-    virtual void onRender() = 0;
-    virtual void onResize(int _width, int _height) = 0;
+private:
+    explicit Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices);
 };
+
 }

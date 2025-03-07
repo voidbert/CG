@@ -14,26 +14,34 @@
 
 #pragma once
 
-#include <glad/glad.h>
-#include <glm/mat4x4.hpp>
+#include <GLFW/glfw3.h>
+#include <string>
 
 namespace engine {
-class RenderPipeline {
+
+class Window {
 private:
-    GLuint vertexShader, fragmentShader, program;
+    GLFWwindow *handle;
+    int width, height;
 
 public:
-    RenderPipeline();
-    RenderPipeline(const RenderPipeline &model) = delete;
-    RenderPipeline(RenderPipeline &&) = delete;
-    ~RenderPipeline();
+    Window(const std::string &title, int _width, int _height);
+    Window(const Window &window) = delete;
+    Window(Window &&window) = delete;
+    ~Window();
 
-    void use() const;
-    void setCameraMatrix(const glm::mat4 &matrix) const;
-    void setColor(const glm::vec4 &color) const;
+    void runLoop();
+    void resize(int _width, int _height);
 
-private:
-    void assertShaderCompilation(GLuint shader) const;
-    void assertProgramLinking() const;
+    int getWidth() const;
+    int getHeight() const;
+
+protected:
+    GLFWwindow *getHandle();
+
+    virtual void onUpdate(float time, float timeElapsed) = 0;
+    virtual void onRender() = 0;
+    virtual void onResize(int _width, int _height) = 0;
 };
+
 }

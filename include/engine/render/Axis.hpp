@@ -14,11 +14,13 @@
 
 #pragma once
 
-#include <glm/vec4.hpp>
+#include <glad/glad.h>
+#include <glm/vec3.hpp>
 
-#include "engine/RenderPipeline.hpp"
+#include "engine/render/RenderPipeline.hpp"
 
-namespace engine {
+namespace engine::render {
+
 class Axis {
 private:
     GLuint vao, vbo;
@@ -26,11 +28,11 @@ private:
 
 public:
     explicit Axis(const glm::vec3 &direction);
-
     Axis(const Axis &model) = delete;
     Axis(Axis &&) = delete;
     ~Axis();
 
     void draw(const RenderPipeline &pipeline) const;
 };
+
 }

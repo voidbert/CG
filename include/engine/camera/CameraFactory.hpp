@@ -15,25 +15,15 @@
 #pragma once
 
 #include <memory>
+#include <tinyxml2.h>
 
-#include "engine/Axis.hpp"
-#include "engine/RenderPipeline.hpp"
-#include "engine/Scene.hpp"
-#include "engine/Window.hpp"
+#include "engine/camera/Camera.hpp"
 
-namespace engine {
-class SceneWindow : public Window {
-private:
-    RenderPipeline pipeline;
-    Scene scene;
-    Axis xAxis, yAxis, zAxis;
+namespace engine::camera {
 
+class CameraFactory {
 public:
-    explicit SceneWindow(const std::string &sceneFile);
-
-protected:
-    void onUpdate(float time, float timeElapsed) override;
-    void onRender() override;
-    void onResize(int _width, int _height) override;
+    static std::unique_ptr<Camera> createFromXML(const tinyxml2::XMLElement *cameraElement);
 };
+
 }

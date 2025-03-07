@@ -12,22 +12,31 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <iostream>
+#pragma once
 
-#include "engine/scene/Scene.hpp"
-#include "engine/window/SceneWindow.hpp"
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <tinyxml2.h>
+#include <unordered_map>
 
-namespace engine {
+#include "engine/render/Model.hpp"
+#include "engine/render/RenderPipeline.hpp"
 
-int main(int argc, char **argv) {
-    if (argc <= 1) {
-        std::cerr << "Usage: " << argv[0] << " <scene.xml>" << std::endl;
-        return 1;
-    }
+namespace engine::scene {
 
-    window::SceneWindow _window(argv[1]);
-    _window.runLoop();
-    return 0;
-}
+class Entity {
+private:
+    std::shared_ptr<render::Model> model;
+
+public:
+    Entity(const tinyxml2::XMLElement *modelElement,
+           const std::filesystem::path &sceneDirectory,
+           std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
+    Entity(const Entity &entity) = delete;
+    Entity(Entity &&entity) = delete;
+
+    void draw(const render::RenderPipeline &pipeline) const;
+};
 
 }

@@ -18,9 +18,9 @@
 #include <map>
 
 #include "engine/camera/Camera.hpp"
-#include "engine/SceneWindow.hpp"
+#include "engine/window/SceneWindow.hpp"
 
-namespace engine {
+namespace engine::window {
 
 SceneWindow::SceneWindow(const std::string &sceneFile) :
     Window(sceneFile, 640, 480),
@@ -67,15 +67,10 @@ void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    glm::mat4 cameraMatrix =
-        scene.getCamera().getCameraMatrix(static_cast<float>(this->getWidth()) / this->getHeight());
-
-    this->pipeline.setCameraMatrix(cameraMatrix);
+    this->scene.draw(this->pipeline);
     this->xAxis.draw(this->pipeline);
     this->yAxis.draw(this->pipeline);
     this->zAxis.draw(this->pipeline);
-
-    this->scene.draw(this->pipeline);
 }
 
 void SceneWindow::onResize(int _width, int _height) {
