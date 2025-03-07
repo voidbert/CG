@@ -36,13 +36,16 @@ std::unique_ptr<Camera> CameraFactory::createFromXML(const tinyxml2::XMLElement 
     const float fov = projectionElement->FloatAttribute("fov", NAN);
     const float near = projectionElement->FloatAttribute("near", NAN);
     const float far = projectionElement->FloatAttribute("far", NAN);
-
     if (std::isnan(fov) || std::isnan(near) || std::isnan(far)) {
         throw std::runtime_error("Invalid <projection> in scene XML file");
     }
 
     // Type of camera
-    std::string cameraType = cameraElement->Attribute("type");
+    std::string cameraType = "orbital";
+    const char *cameraTypePtr = cameraElement->Attribute("type");
+    if (cameraTypePtr) {
+        cameraType = cameraTypePtr;
+    }
 
     if (cameraType == "orbital") {
         return std::make_unique<camera::OrbitalCamera>(position, lookAt, up, fov, near, far);
