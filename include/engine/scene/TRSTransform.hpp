@@ -28,6 +28,7 @@ private:
     std::array<std::unique_ptr<ITransform>, 3> transformations;
 
 public:
+    TRSTransform();
     TRSTransform(const tinyxml2::XMLElement *transformElement);
     glm::mat4 getMatrix() const override;
 };

@@ -15,6 +15,8 @@
 #include <glm/gtx/transform.hpp>
 #include <stdexcept>
 
+#include "engine/scene/Rotation.hpp"
+#include "engine/scene/Scale.hpp"
 #include "engine/scene/Translation.hpp"
 #include "engine/scene/TRSTransform.hpp"
 #include "utils/XMLUtils.hpp"
@@ -27,12 +29,13 @@ class IdentityTransform : public ITransform {
     }
 };
 
-TRSTransform::TRSTransform(const tinyxml2::XMLElement *transformElement) :
+TRSTransform::TRSTransform() :
     transformations { std::make_unique<IdentityTransform>(),
                       std::make_unique<IdentityTransform>(),
-                      std::make_unique<IdentityTransform>() } {
+                      std::make_unique<IdentityTransform>() } {}
 
-    bool hasTranslation, hasRotation, hasScale;
+TRSTransform::TRSTransform(const tinyxml2::XMLElement *transformElement) : TRSTransform() {
+    bool hasTranslation = false, hasRotation = false, hasScale = false;
     int i;
     const tinyxml2::XMLElement *child = transformElement->FirstChildElement();
 
@@ -42,10 +45,10 @@ TRSTransform::TRSTransform(const tinyxml2::XMLElement *transformElement) :
             this->transformations[i] = std::make_unique<Translation>(child);
             hasTranslation = true;
         } else if (name == "rotate" && !hasRotation) {
-
+            this->transformations[i] = std::make_unique<Rotation>(child);
             hasRotation = true;
         } else if (name == "scale" && !hasScale) {
-
+            this->transformations[i] = std::make_unique<Scale>(child);
             hasScale = true;
         } else {
             throw std::runtime_error("Invalid / multiple occurences of <" + name +
