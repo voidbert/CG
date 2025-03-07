@@ -57,10 +57,10 @@ void OrbitalCamera::move(MovementDirection dir, float delta) {
             polar += angularSensitivity * delta;
             break;
         case MovementDirection::Left:
-            azimuth -= angularSensitivity * delta;
+            azimuth += angularSensitivity * delta;
             break;
         case MovementDirection::Right:
-            azimuth += angularSensitivity * delta;
+            azimuth -= angularSensitivity * delta;
             break;
         case MovementDirection::Forward:
             radius -= zoomSpeed * delta;
