@@ -15,7 +15,7 @@
 #include <glad/glad.h>
 #include <stdexcept>
 
-#include "engine/Window.hpp"
+#include "engine/window/Window.hpp"
 
 namespace engine {
 

@@ -18,9 +18,9 @@
 #include <map>
 
 #include "engine/camera/Camera.hpp"
-#include "engine/SceneWindow.hpp"
+#include "engine/window/SceneWindow.hpp"
 
-namespace engine {
+namespace engine::window {
 
 SceneWindow::SceneWindow(const std::string &sceneFile) :
     Window(sceneFile, 640, 480),

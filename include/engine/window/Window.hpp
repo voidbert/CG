@@ -18,6 +18,7 @@
 #include <string>
 
 namespace engine {
+
 class Window {
 private:
     GLFWwindow *handle;
@@ -42,4 +43,5 @@ protected:
     virtual void onRender() = 0;
     virtual void onResize(int _width, int _height) = 0;
 };
+
 }

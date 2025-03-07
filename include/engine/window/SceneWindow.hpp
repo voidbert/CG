@@ -19,9 +19,9 @@
 #include "engine/render/Axis.hpp"
 #include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Scene.hpp"
-#include "engine/Window.hpp"
+#include "engine/window/Window.hpp"
 
-namespace engine {
+namespace engine::window {
 
 class SceneWindow : public Window {
 private:

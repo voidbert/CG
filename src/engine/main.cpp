@@ -15,7 +15,7 @@
 #include <iostream>
 
 #include "engine/scene/Scene.hpp"
-#include "engine/SceneWindow.hpp"
+#include "engine/window/SceneWindow.hpp"
 
 namespace engine {
 
@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    SceneWindow window(argv[1]);
-    window.runLoop();
+    window::SceneWindow _window(argv[1]);
+    _window.runLoop();
     return 0;
 }
 
