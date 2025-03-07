@@ -15,6 +15,7 @@
 #pragma once
 
 #include <filesystem>
+#include <glm/mat4x4.hpp>
 #include <memory>
 #include <string>
 #include <tinyxml2.h>
@@ -36,7 +37,7 @@ public:
     Entity(const Entity &entity) = delete;
     Entity(Entity &&entity) = delete;
 
-    void draw(const render::RenderPipeline &pipeline) const;
+    void draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const;
 };
 
 }

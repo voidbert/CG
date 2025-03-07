@@ -15,6 +15,7 @@
 #pragma once
 
 #include <filesystem>
+#include <glm/mat4x4.hpp>
 #include <memory>
 #include <string>
 #include <tinyxml2.h>
@@ -23,6 +24,7 @@
 
 #include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Entity.hpp"
+#include "engine/scene/TRSTransform.hpp"
 
 namespace engine::scene {
 
@@ -30,6 +32,7 @@ class Group {
 private:
     std::vector<std::unique_ptr<Entity>> entities;
     std::vector<std::unique_ptr<Group>> groups;
+    TRSTransform transform;
 
 public:
     Group(const tinyxml2::XMLElement *groupElement,
@@ -38,7 +41,7 @@ public:
     Group(const Group &entity) = delete;
     Group(Group &&entity) = delete;
 
-    void draw(const render::RenderPipeline &pipeline) const;
+    void draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) const;
 };
 
 }
