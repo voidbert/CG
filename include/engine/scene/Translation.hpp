@@ -27,8 +27,8 @@ private:
     glm::vec3 translateVector;
 
 public:
-    Translation(const tinyxml2::XMLElement *translateElement);
-    glm::mat4 getMatrix() const;
+    explicit Translation(const tinyxml2::XMLElement *translateElement);
+    glm::mat4 getMatrix() const override;
 };
 
 }

@@ -29,7 +29,7 @@ private:
 
 public:
     TRSTransform();
-    TRSTransform(const tinyxml2::XMLElement *transformElement);
+    explicit TRSTransform(const tinyxml2::XMLElement *transformElement);
     glm::mat4 getMatrix() const override;
 };
 

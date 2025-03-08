@@ -28,8 +28,8 @@ private:
     glm::vec3 rotationAxis;
 
 public:
-    Rotation(const tinyxml2::XMLElement *rotateElement);
-    glm::mat4 getMatrix() const;
+    explicit Rotation(const tinyxml2::XMLElement *rotateElement);
+    glm::mat4 getMatrix() const override;
 };
 
 }

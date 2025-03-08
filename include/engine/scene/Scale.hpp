@@ -27,8 +27,8 @@ private:
     glm::vec3 scaleVector;
 
 public:
-    Scale(const tinyxml2::XMLElement *scaleElement);
-    glm::mat4 getMatrix() const;
+    explicit Scale(const tinyxml2::XMLElement *scaleElement);
+    glm::mat4 getMatrix() const override;
 };
 
 }
