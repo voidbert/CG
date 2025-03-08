@@ -38,7 +38,7 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
 
 void Entity::draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const {
     pipeline.setColor(glm::vec4(1.0f));
-    pipeline.setCameraMatrix(transform);
+    pipeline.setMatrix(transform);
     this->model->draw();
 }
 

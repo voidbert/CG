@@ -78,7 +78,7 @@ void Scene::draw(const render::RenderPipeline &pipeline) const {
     }
 
     // Reset camera after transforms
-    pipeline.setCameraMatrix(cameraMatrix);
+    pipeline.setMatrix(cameraMatrix);
 }
 
 }
