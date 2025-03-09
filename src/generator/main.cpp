@@ -19,6 +19,7 @@
 #include "generator/figures/Box.hpp"
 #include "generator/figures/Cone.hpp"
 #include "generator/figures/Cylinder.hpp"
+#include "generator/figures/KleinBottle.hpp"
 #include "generator/figures/Plane.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
@@ -28,17 +29,19 @@ namespace generator {
 void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
     std::cerr << "  " << programName
-              << " plane    <length>      <divisions>                     <file>" << std::endl;
+              << " plane       <length>      <divisions>                     <file>" << std::endl;
     std::cerr << "  " << programName
-              << " box      <length>      <grid>                          <file>" << std::endl;
+              << " box         <length>      <grid>                          <file>" << std::endl;
     std::cerr << "  " << programName
-              << " sphere   <radius>      <slices>      <stacks>          <file>" << std::endl;
+              << " sphere      <radius>      <slices>      <stacks>          <file>" << std::endl;
     std::cerr << "  " << programName
-              << " cone     <radius>      <height>      <slices> <stacks> <file>" << std::endl;
+              << " cone        <radius>      <height>      <slices> <stacks> <file>" << std::endl;
     std::cerr << "  " << programName
-              << " cylinder <radius>      <height>      <slices> <stacks> <file>" << std::endl;
+              << " cylinder    <radius>      <height>      <slices> <stacks> <file>" << std::endl;
     std::cerr << "  " << programName
-              << " torus    <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
+              << " torus       <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
+    std::cerr << "  " << programName
+              << " kleinBottle <radius>      <slices>      <stacks>          <file>" << std::endl;
 }
 
 double stringToDouble(const std::string &str) {
@@ -125,6 +128,15 @@ int main(int argc, char **argv) {
 
             figures::Torus torus(majorRadius, minorRadius, slices, stacks);
             torus.writeToFile(file);
+        } else if (args.at(1) == "kleinBottle") {
+            validateArgumentCount(argc, 6);
+            float radius = stringToDouble(args.at(2));
+            int slices = stringToInt(args.at(3));
+            int stacks = stringToInt(args.at(4));
+            const std::string &file = args.at(5);
+
+            figures::KleinBottle kleinbottle(radius, slices, stacks);
+            kleinbottle.writeToFile(file);
         } else {
             printUsage(args[0]);
         }
