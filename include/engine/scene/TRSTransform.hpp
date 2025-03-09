@@ -14,30 +14,23 @@
 
 #pragma once
 
-#include <filesystem>
+#include <array>
 #include <glm/mat4x4.hpp>
 #include <memory>
-#include <string>
 #include <tinyxml2.h>
-#include <unordered_map>
 
-#include "engine/render/Model.hpp"
-#include "engine/render/RenderPipeline.hpp"
+#include "engine/scene/ITransform.hpp"
 
 namespace engine::scene {
 
-class Entity {
+class TRSTransform : public ITransform {
 private:
-    std::shared_ptr<render::Model> model;
+    std::array<std::unique_ptr<ITransform>, 3> transformations;
 
 public:
-    Entity(const tinyxml2::XMLElement *modelElement,
-           const std::filesystem::path &sceneDirectory,
-           std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
-    Entity(const Entity &entity) = delete;
-    Entity(Entity &&entity) = delete;
-
-    void draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const;
+    TRSTransform();
+    explicit TRSTransform(const tinyxml2::XMLElement *transformElement);
+    glm::mat4 getMatrix() const override;
 };
 
 }

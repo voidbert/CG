@@ -14,30 +14,22 @@
 
 #pragma once
 
-#include <filesystem>
 #include <glm/mat4x4.hpp>
-#include <memory>
-#include <string>
+#include <glm/vec3.hpp>
 #include <tinyxml2.h>
-#include <unordered_map>
 
-#include "engine/render/Model.hpp"
-#include "engine/render/RenderPipeline.hpp"
+#include "engine/scene/ITransform.hpp"
 
 namespace engine::scene {
 
-class Entity {
+class Rotation : public ITransform {
 private:
-    std::shared_ptr<render::Model> model;
+    float rotationAngle;
+    glm::vec3 rotationAxis;
 
 public:
-    Entity(const tinyxml2::XMLElement *modelElement,
-           const std::filesystem::path &sceneDirectory,
-           std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
-    Entity(const Entity &entity) = delete;
-    Entity(Entity &&entity) = delete;
-
-    void draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const;
+    explicit Rotation(const tinyxml2::XMLElement *rotateElement);
+    glm::mat4 getMatrix() const override;
 };
 
 }
