@@ -24,19 +24,17 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
 
     // Parse entities
     const tinyxml2::XMLElement *modelsElement = groupElement->FirstChildElement("models");
-    if (!modelsElement) {
-        return; // <models> is optional
-    }
+    if (modelsElement) {
+        if (modelsElement->NextSiblingElement("models")) {
+            throw std::runtime_error("More than one <models> element in scene XML");
+        }
 
-    if (modelsElement->NextSiblingElement("models")) {
-        throw std::runtime_error("More than one <models> element in scene XML");
-    }
-
-    const tinyxml2::XMLElement *modelElement = modelsElement->FirstChildElement("model");
-    while (modelElement) {
-        this->entities.push_back(
-            std::make_unique<Entity>(modelElement, sceneDirectory, loadedModels));
-        modelElement = modelElement->NextSiblingElement("model");
+        const tinyxml2::XMLElement *modelElement = modelsElement->FirstChildElement("model");
+        while (modelElement) {
+            this->entities.push_back(
+                std::make_unique<Entity>(modelElement, sceneDirectory, loadedModels));
+            modelElement = modelElement->NextSiblingElement("model");
+        }
     }
 
     // Parse subgroups
@@ -46,15 +44,23 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
             std::make_unique<Group>(innerGroupElement, sceneDirectory, loadedModels));
         innerGroupElement = innerGroupElement->NextSiblingElement("group");
     }
+
+    // Parse transform
+    const tinyxml2::XMLElement *transformElement = groupElement->FirstChildElement("transform");
+    if (transformElement) {
+        transform = TRSTransform(transformElement);
+    }
 }
 
-void Group::draw(const render::RenderPipeline &pipeline) const {
+void Group::draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) const {
+    const glm::mat4 subTransform = _transform * this->transform.getMatrix();
+
     for (const std::unique_ptr<Entity> &entity : this->entities) {
-        entity->draw(pipeline);
+        entity->draw(pipeline, subTransform);
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
-        group->draw(pipeline);
+        group->draw(pipeline, subTransform);
     }
 }
 

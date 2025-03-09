@@ -26,10 +26,10 @@ const char *vertexShaderSource = R"(
 #version 460 core
 layout (location = 0) in vec4 inPosition;
 
-layout (location = 1) uniform mat4 uniCameraMatrix;
+layout (location = 1) uniform mat4 uniMatrix;
 
 void main() {
-    gl_Position = uniCameraMatrix * inPosition;
+    gl_Position = uniMatrix * inPosition;
 }
 )";
 
@@ -73,11 +73,11 @@ RenderPipeline::~RenderPipeline() {
 
 void RenderPipeline::use() const {
     glUseProgram(this->program);
-    this->setCameraMatrix(glm::mat4(1.0f));
+    this->setMatrix(glm::mat4(1.0f));
     this->setColor(glm::vec4(1.0f));
 }
 
-void RenderPipeline::setCameraMatrix(const glm::mat4 &matrix) const {
+void RenderPipeline::setMatrix(const glm::mat4 &matrix) const {
     glUniformMatrix4fv(1, 1, false, glm::value_ptr(matrix));
 }
 
