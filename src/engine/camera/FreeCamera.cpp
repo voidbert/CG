@@ -47,7 +47,7 @@ void FreeCamera::move(MovementDirection direction, float deltaTime) {
     const float translationSpeed = 5.0f * deltaTime;
     const float rotationSpeed = 1.5f * deltaTime;
 
-    glm::vec3 horizontalFront = glm::normalize(glm::vec3(front.x, 0.0f, front.z));
+    glm::vec3 horizontalFront = glm::normalize(glm::vec3(front.x, front.y, front.z));
     glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), horizontalFront));
 
     switch (direction) {
