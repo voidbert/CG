@@ -14,16 +14,16 @@
 
 #pragma once
 
-#include <tinyxml2.h>
 #include <string>
+#include <tinyxml2.h>
 
 namespace generator::figures {
 
 class SolarSystem {
 private:
-    tinyxml2::XMLDocument doc; 
-    tinyxml2::XMLElement* addPlanet(tinyxml2::XMLElement *parent, 
-                                    float x, float y, float z, float size);
+    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLElement *
+        addPlanet(tinyxml2::XMLElement *parent, float x, float y, float z, float size);
 
     void addSaturnRings(tinyxml2::XMLElement *parent);
 

@@ -58,20 +58,20 @@ SolarSystem::SolarSystem(float scale) {
 
     addPlanet(solarSystem, 0, 0, 0, 5 * scale);
 
-    addPlanet(solarSystem, 8 * scale, 0, 0, 0.5 * scale);  // Mercúrio
+    addPlanet(solarSystem, 8 * scale, 0, 0, 0.5 * scale); // Mercúrio
     addPlanet(solarSystem, 12 * scale, 0, 0, 0.9 * scale); // Vénus
-    
+
     tinyxml2::XMLElement *earth = addPlanet(solarSystem, 16 * scale, 0, 0, 1 * scale);
     addPlanet(earth, 1.5 * scale, 0, 0, 0.3 * scale); // Lua
 
-    addPlanet(solarSystem, 20 * scale, 0, 0, 0.8 * scale);  // Marte
-    addPlanet(solarSystem, 30 * scale, 0, 0, 3 * scale);    // Júpiter
-    
+    addPlanet(solarSystem, 20 * scale, 0, 0, 0.8 * scale); // Marte
+    addPlanet(solarSystem, 30 * scale, 0, 0, 3 * scale); // Júpiter
+
     // Criar Saturno e adicionar anéis
     tinyxml2::XMLElement *saturn = addPlanet(solarSystem, 40 * scale, 0, 0, 2.7 * scale);
-    addSaturnRings(saturn); 
+    addSaturnRings(saturn);
 
-    addPlanet(solarSystem, 50 * scale, 0, 0, 2 * scale);   // Úrano
+    addPlanet(solarSystem, 50 * scale, 0, 0, 2 * scale); // Úrano
     addPlanet(solarSystem, 60 * scale, 0, 0, 1.9 * scale); // Neptuno
 
     writeToFile("scene_solarSystem.xml");
@@ -82,8 +82,8 @@ void SolarSystem::writeToFile(const std::string &filename) {
     doc.SaveFile(filePath.c_str());
 }
 
-tinyxml2::XMLElement* SolarSystem::addPlanet(tinyxml2::XMLElement *parent,
-                                             float x, float y, float z, float size) {
+tinyxml2::XMLElement *
+    SolarSystem::addPlanet(tinyxml2::XMLElement *parent, float x, float y, float z, float size) {
     tinyxml2::XMLElement *group = doc.NewElement("group");
     parent->InsertEndChild(group);
 
@@ -120,8 +120,8 @@ void SolarSystem::addSaturnRings(tinyxml2::XMLElement *parent) {
     group->InsertEndChild(transform);
 
     tinyxml2::XMLElement *scale = doc.NewElement("scale");
-    scale->SetAttribute("x", 0.15); 
-    scale->SetAttribute("y", 0.1); 
+    scale->SetAttribute("x", 0.15);
+    scale->SetAttribute("y", 0.1);
     scale->SetAttribute("z", 0.15);
     transform->InsertEndChild(scale);
 
@@ -132,6 +132,5 @@ void SolarSystem::addSaturnRings(tinyxml2::XMLElement *parent) {
     model->SetAttribute("file", "../models/torus.3d");
     models->InsertEndChild(model);
 }
-
 
 }

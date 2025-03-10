@@ -21,9 +21,9 @@
 #include "generator/figures/Cylinder.hpp"
 #include "generator/figures/KleinBottle.hpp"
 #include "generator/figures/Plane.hpp"
+#include "generator/figures/SolarSystem.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
-#include "generator/figures/SolarSystem.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
@@ -48,7 +48,7 @@ void printUsage(const std::string &programName) {
 }
 
 double stringToDouble(const std::string &str) {
-    size_t charactersParsed;    
+    size_t charactersParsed;
     double ret = std::stod(str, &charactersParsed);
     if (charactersParsed != str.length())
         throw std::invalid_argument("str is not a double");
