@@ -1,0 +1,109 @@
+<world>
+    <window width="512" height="512"/>
+    <camera type="orbital">
+        <position x="20" y="20" z="20"/>
+        <lookAt x="0" y="0" z="0"/>
+        <up x="0" y="1" z="0"/>
+        <projection fov="60" near="1" far="1000"/>
+    </camera>
+    <group>
+        <group>
+            <transform>
+                <translate x="0" y="0" z="0"/>
+                <scale x="5" y="5" z="5"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+        </group>
+        <group>
+            <transform>
+                <translate x="8" y="0" z="0"/>
+                <scale x="0.5" y="0.5" z="0.5"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+        </group>
+        <group>
+            <transform>
+                <translate x="12" y="0" z="0"/>
+                <scale x="0.89999998" y="0.89999998" z="0.89999998"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+        </group>
+        <group>
+            <transform>
+                <translate x="16" y="0" z="0"/>
+                <scale x="1" y="1" z="1"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+            <group>
+                <transform>
+                    <translate x="1.5" y="0" z="0"/>
+                    <scale x="0.30000001" y="0.30000001" z="0.30000001"/>
+                </transform>
+                <models>
+                    <model file="../models/sphere.3d"/>
+                </models>
+            </group>
+        </group>
+        <group>
+            <transform>
+                <translate x="20" y="0" z="0"/>
+                <scale x="0.80000001" y="0.80000001" z="0.80000001"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+        </group>
+        <group>
+            <transform>
+                <translate x="30" y="0" z="0"/>
+                <scale x="3" y="3" z="3"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+        </group>
+        <group>
+            <transform>
+                <translate x="40" y="0" z="0"/>
+                <scale x="2.7" y="2.7" z="2.7"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+            <group>
+                <transform>
+                    <scale x="0.14999999999999999" y="0.10000000000000001" z="0.14999999999999999"/>
+                </transform>
+                <models>
+                    <model file="../models/torus.3d"/>
+                </models>
+            </group>
+        </group>
+        <group>
+            <transform>
+                <translate x="50" y="0" z="0"/>
+                <scale x="2" y="2" z="2"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+        </group>
+        <group>
+            <transform>
+                <translate x="60" y="0" z="0"/>
+                <scale x="1.9" y="1.9" z="1.9"/>
+            </transform>
+            <models>
+                <model file="../models/sphere.3d"/>
+            </models>
+        </group>
+    </group>
+</world>

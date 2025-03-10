@@ -23,6 +23,7 @@
 #include "generator/figures/Plane.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
+#include "generator/figures/SolarSystem.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
@@ -42,10 +43,12 @@ void printUsage(const std::string &programName) {
               << " torus       <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
     std::cerr << "  " << programName
               << " kleinBottle <radius>      <slices>      <stacks>          <file>" << std::endl;
+    std::cerr << "  " << programName
+              << " solarSystem <scale>                                       <file>" << std::endl;
 }
 
 double stringToDouble(const std::string &str) {
-    size_t charactersParsed;
+    size_t charactersParsed;    
     double ret = std::stod(str, &charactersParsed);
     if (charactersParsed != str.length())
         throw std::invalid_argument("str is not a double");
@@ -137,6 +140,13 @@ int main(int argc, char **argv) {
 
             figures::KleinBottle kleinbottle(radius, slices, stacks);
             kleinbottle.writeToFile(file);
+        } else if (args.at(1) == "solarSystem") {
+            validateArgumentCount(argc, 4);
+            double scale = stringToDouble(args.at(2));
+            const std::string &file = args.at(3);
+
+            figures::SolarSystem solarSystem(scale);
+            solarSystem.writeToFile(file);
         } else {
             printUsage(args[0]);
         }
