@@ -68,6 +68,8 @@ void OrbitalCamera::move(MovementDirection dir, float delta) {
         case MovementDirection::Backward:
             radius += zoomSpeed * delta;
             break;
+        default:
+            break;
     }
 
     azimuth = glm::mod(azimuth, glm::two_pi<float>());

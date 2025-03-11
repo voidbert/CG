@@ -14,30 +14,27 @@
 
 #pragma once
 
-#include <filesystem>
-#include <glm/mat4x4.hpp>
-#include <memory>
-#include <string>
-#include <tinyxml2.h>
-#include <unordered_map>
+#include "engine/camera/Camera.hpp"
 
-#include "engine/render/Model.hpp"
-#include "engine/render/RenderPipeline.hpp"
+namespace engine::camera {
 
-namespace engine::scene {
-
-class Entity {
+class FreeCamera : public Camera {
 private:
-    std::shared_ptr<render::Model> model;
+    glm::vec3 front;
+    float yaw;
+    float pitch;
+
+    void updateCameraVectors();
 
 public:
-    Entity(const tinyxml2::XMLElement *modelElement,
-           const std::filesystem::path &sceneDirectory,
-           std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
-    Entity(const Entity &entity) = delete;
-    Entity(Entity &&entity) = delete;
+    FreeCamera(const glm::vec3 &_position,
+               const glm::vec3 &_lookAt,
+               const glm::vec3 &_up,
+               float _fov,
+               float _near,
+               float _far);
 
-    void draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const;
+    void move(MovementDirection direction, float deltaTime) override;
 };
 
 }

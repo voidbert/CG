@@ -14,29 +14,12 @@
 
 #pragma once
 
-#include <glad/glad.h>
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
+#include "utils/WavefrontOBJ.hpp"
 
-namespace engine::render {
+namespace generator::figures {
 
-class RenderPipeline {
-private:
-    GLuint vertexShader, fragmentShader, program;
-
+class KleinBottle : public utils::WavefrontOBJ {
 public:
-    RenderPipeline();
-    RenderPipeline(const RenderPipeline &model) = delete;
-    RenderPipeline(RenderPipeline &&) = delete;
-    ~RenderPipeline();
-
-    void use() const;
-    void setMatrix(const glm::mat4 &matrix) const;
-    void setColor(const glm::vec4 &color) const;
-
-private:
-    void assertShaderCompilation(GLuint shader) const;
-    void assertProgramLinking() const;
+    KleinBottle(float radius, int slices, int stacks);
 };
-
 }
