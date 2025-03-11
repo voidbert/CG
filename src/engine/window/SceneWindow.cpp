@@ -18,9 +18,9 @@
 #include <map>
 
 #include "engine/camera/Camera.hpp"
-#include "engine/ui/UI.hpp"
 #include "engine/camera/FreeCamera.hpp"
 #include "engine/camera/OrbitalCamera.hpp"
+#include "engine/ui/UI.hpp"
 #include "engine/window/SceneWindow.hpp"
 
 namespace engine::window {
