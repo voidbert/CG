@@ -26,7 +26,6 @@ private:
     bool firstCameraSync = true;
     glm::vec3 currentCamPos;
     std::function<void(const glm::vec3 &)> updateCameraPosition;
-    std::function<void(const std::string &)> updateCameraType;
 
 public:
     void setup(Window *window);
@@ -34,8 +33,7 @@ public:
     void shutdown();
 
     void setCamera(camera::Camera *cam);
-    void setCameraUpdateCallbacks(std::function<void(const glm::vec3 &)> positionCallback,
-                                  std::function<void(const std::string &)> typeCallback);
+    void setCameraUpdateCallbacks(std::function<void(const glm::vec3 &)> positionCallback);
     void setCameraPosition(const glm::vec3 &newPos);
     void setShowAxes(bool value);
 

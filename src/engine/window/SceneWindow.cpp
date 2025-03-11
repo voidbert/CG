@@ -48,10 +48,7 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
     this->UI.setCamera(&this->scene.getCamera());
 
     this->UI.setCameraUpdateCallbacks(
-        [this](const glm::vec3 &newPos) { this->scene.setCameraPosition(newPos); },
-        [this](const std::string &newType) {
-
-        });
+        [this](const glm::vec3 &newPos) { this->scene.setCameraPosition(newPos); });
 }
 
 void SceneWindow::onUpdate(float time, float timeElapsed) {

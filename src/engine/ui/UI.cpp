@@ -114,10 +114,8 @@ void UI::setShowAxes(bool value) {
     this->showAxes = value;
 }
 
-void UI::setCameraUpdateCallbacks(std::function<void(const glm::vec3 &)> positionCallback,
-                                  std::function<void(const std::string &)> typeCallback) {
+void UI::setCameraUpdateCallbacks(std::function<void(const glm::vec3 &)> positionCallback) {
     this->updateCameraPosition = positionCallback;
-    this->updateCameraType = typeCallback;
 }
 
 bool UI::isShowAxesEnabled() const {
