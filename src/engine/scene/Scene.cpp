@@ -69,6 +69,10 @@ camera::Camera &Scene::getCamera() {
     return *camera;
 }
 
+void Scene::setCameraPosition(const glm::vec3 &newPos) {
+    this->camera->setPosition(newPos);
+}
+
 void Scene::draw(const render::RenderPipeline &pipeline) const {
     const float aspectRatio = static_cast<float>(this->windowWidth) / this->windowHeight;
     const glm::mat4 cameraMatrix = this->camera->getCameraMatrix(aspectRatio);

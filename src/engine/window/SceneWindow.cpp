@@ -19,10 +19,11 @@
 
 #include "engine/camera/Camera.hpp"
 #include "engine/window/SceneWindow.hpp"
+#include "engine/ui/UI.hpp"
 
 namespace engine::window {
 
-SceneWindow::SceneWindow(const std::string &sceneFile) :
+    SceneWindow::SceneWindow(const std::string &sceneFile) :
     Window(sceneFile, 640, 480),
     pipeline(),
     scene(sceneFile),
@@ -40,6 +41,18 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
     glCullFace(GL_BACK);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    this->UI.setup(this);
+    this->UI.setCamera(&this->scene.getCamera());
+
+    this->UI.setCameraUpdateCallbacks(
+        [this](const glm::vec3 &newPos) {
+            this->scene.setCameraPosition(newPos);
+        },
+        [this](const std::string &newType) {
+
+        }
+    );
 }
 
 void SceneWindow::onUpdate(float time, float timeElapsed) {
@@ -67,10 +80,14 @@ void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
+    this->UI.render();
     this->scene.draw(this->pipeline);
-    this->xAxis.draw(this->pipeline);
-    this->yAxis.draw(this->pipeline);
-    this->zAxis.draw(this->pipeline);
+
+    if (this->UI.isShowAxesEnabled()) {
+        this->xAxis.draw(this->pipeline);
+        this->yAxis.draw(this->pipeline);
+        this->zAxis.draw(this->pipeline);
+    }
 }
 
 void SceneWindow::onResize(int _width, int _height) {

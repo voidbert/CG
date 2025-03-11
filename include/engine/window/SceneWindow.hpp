@@ -20,6 +20,7 @@
 #include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Scene.hpp"
 #include "engine/window/Window.hpp"
+#include "engine/ui/UI.hpp"
 
 namespace engine::window {
 
@@ -28,6 +29,7 @@ private:
     render::RenderPipeline pipeline;
     scene::Scene scene;
     render::Axis xAxis, yAxis, zAxis;
+    ui::UI UI;
 
 public:
     explicit SceneWindow(const std::string &sceneFile);

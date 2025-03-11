@@ -31,4 +31,8 @@ glm::mat4 Camera::getCameraMatrix(float aspectRatio) const {
     return projection * view;
 }
 
+glm::vec3 Camera::getPosition() const {
+    return this->position;
+}
+
 }

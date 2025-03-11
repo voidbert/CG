@@ -35,9 +35,9 @@ public:
 
     int getWidth() const;
     int getHeight() const;
+    GLFWwindow *getHandle();
 
 protected:
-    GLFWwindow *getHandle();
 
     virtual void onUpdate(float time, float timeElapsed) = 0;
     virtual void onRender() = 0;

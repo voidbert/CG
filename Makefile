@@ -22,12 +22,14 @@ CPPFLAGS := -Iinclude -std=c++20 -Wall -Wextra -pedantic -Wshadow \
 				$(shell pkg-config --cflags glm) \
 				$(shell pkg-config --cflags gl) \
 				$(shell pkg-config --cflags tinyxml2) \
+				$(shell pkg-config --cflags imgui) \
 				-Ilib/include
 LIBS := -lm \
 	$(shell pkg-config --libs glfw3) \
 	$(shell pkg-config --libs glm) \
 	$(shell pkg-config --libs gl) \
-	$(shell pkg-config --libs tinyxml2)
+	$(shell pkg-config --libs tinyxml2) \
+	$(shell pkg-config --libs imgui)
 
 DEBUG_CPPFLAGS   := -O0 -ggdb3
 RELEASE_CPPFLAGS := -O2
