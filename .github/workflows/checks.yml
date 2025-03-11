@@ -41,7 +41,7 @@ jobs:
 
             # clang-format doesn't come with act's local images. This is just for testing, as
             # scripts contain
-            - run: sudo apt update && sudo apt -y install cppcheck libimgui-dev
+            - run: sudo apt update && sudo apt -y install cppcheck
 
             # Don't fail on empty include (not tracked by git)
             - run: if ! [ -d include ]; then mkdir include; fi
