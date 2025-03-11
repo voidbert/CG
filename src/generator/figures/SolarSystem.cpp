@@ -26,7 +26,7 @@ SolarSystem::SolarSystem(float scale) {
 void SolarSystem::createWorld() {
     tinyxml2::XMLElement *world = doc.NewElement("world");
     doc.InsertFirstChild(world);
-    
+
     tinyxml2::XMLElement *window = doc.NewElement("window");
     window->SetAttribute("width", 1024);
     window->SetAttribute("height", 768);
@@ -39,15 +39,15 @@ void SolarSystem::configureCamera() {
     doc.FirstChildElement("world")->InsertEndChild(camera);
 
     struct {
-        const char* name;
+        const char *name;
         float x, y, z;
     } cameraSettings[] = {
-        {"position", 120, 90, 150},
-        {"lookAt", 0, 0, 0},
-        {"up", 0, 1, 0}
+        { "position", 120, 90, 150 },
+        { "lookAt",   0,   0,  0   },
+        { "up",       0,   1,  0   }
     };
 
-    for (const auto& setting : cameraSettings) {
+    for (const auto &setting : cameraSettings) {
         tinyxml2::XMLElement *element = doc.NewElement(setting.name);
         element->SetAttribute("x", setting.x);
         element->SetAttribute("y", setting.y);
@@ -77,23 +77,27 @@ void SolarSystem::generateSolarSystem(float scale) {
     addSatellite(mars, 1.5 * scale, 0.6 * scale, 0.8, 0.1 * scale); // Phobos
     addSatellite(mars, -1.2 * scale, -0.5 * scale, 0.5, 0.08 * scale); // Deimos
 
-    tinyxml2::XMLElement *jupiter = addPlanet(solarSystem, 1200 * scale, -6, -36, 5 * scale); // Jupiter
+    tinyxml2::XMLElement *jupiter =
+        addPlanet(solarSystem, 1200 * scale, -6, -36, 5 * scale); // Jupiter
     addSatellite(jupiter, 20 * scale, 8 * scale, 10, 0.6 * scale); // Ganymede
     addSatellite(jupiter, -18 * scale, 6 * scale, -12, 0.5 * scale); // Callisto
     addSatellite(jupiter, 16 * scale, -4 * scale, 8, 0.4 * scale); // Io
     addSatellite(jupiter, -14 * scale, 3 * scale, -6, 0.3 * scale); // Europa
 
-    tinyxml2::XMLElement *saturn = addPlanet(solarSystem, 1800 * scale, 6, 30, 4.5 * scale); // Saturn
+    tinyxml2::XMLElement *saturn =
+        addPlanet(solarSystem, 1800 * scale, 6, 30, 4.5 * scale); // Saturn
     addRing(saturn, 1.2, 0.1, 1.2, 15); // Saturn’s ring inclination
     addSatellite(saturn, 30 * scale, 12 * scale, 15, 0.4 * scale); // Titan
     addSatellite(saturn, -24 * scale, 9 * scale, -18, 0.3 * scale); // Enceladus
 
-    tinyxml2::XMLElement *uranus = addPlanet(solarSystem, 2300 * scale, -9, -45, 2 * scale); // Uranus
+    tinyxml2::XMLElement *uranus =
+        addPlanet(solarSystem, 2300 * scale, -9, -45, 2 * scale); // Uranus
     addRing(uranus, 1.1, 0.1, 1.1, 90); // Uranus’ vertical ring
     addSatellite(uranus, 14 * scale, 5 * scale, 10, 0.2 * scale); // Miranda
     addSatellite(uranus, -12 * scale, 4 * scale, -8, 0.15 * scale); // Ariel
 
-    tinyxml2::XMLElement *neptune = addPlanet(solarSystem, 2800 * scale, 12, 60, 2 * scale); // Neptune
+    tinyxml2::XMLElement *neptune =
+        addPlanet(solarSystem, 2800 * scale, 12, 60, 2 * scale); // Neptune
     addRing(neptune, 1.05, 0.06, 1.05, 30); // Neptune’s ring inclination
     addSatellite(neptune, 16 * scale, 6 * scale, 12, 0.3 * scale); // Triton
 
@@ -101,7 +105,8 @@ void SolarSystem::generateSolarSystem(float scale) {
     addAsteroidBelt(solarSystem, 3100 * scale, 4000 * scale, 1200); // Kuiper Belt
 }
 
-tinyxml2::XMLElement* SolarSystem::addPlanet(tinyxml2::XMLElement *parent, float x, float y, float z, float size) {
+tinyxml2::XMLElement *
+    SolarSystem::addPlanet(tinyxml2::XMLElement *parent, float x, float y, float z, float size) {
     tinyxml2::XMLElement *group = doc.NewElement("group");
     parent->InsertEndChild(group);
 
@@ -130,11 +135,16 @@ tinyxml2::XMLElement* SolarSystem::addPlanet(tinyxml2::XMLElement *parent, float
     return group;
 }
 
-void SolarSystem::addSatellite(tinyxml2::XMLElement *parent, float x, float y, float z, float size) {
+void
+    SolarSystem::addSatellite(tinyxml2::XMLElement *parent, float x, float y, float z, float size) {
     addPlanet(parent, x, y, z, size);
 }
 
-void SolarSystem::addRing(tinyxml2::XMLElement *parent, float scaleX, float scaleY, float scaleZ, float angle) {
+void SolarSystem::addRing(tinyxml2::XMLElement *parent,
+                          float scaleX,
+                          float scaleY,
+                          float scaleZ,
+                          float angle) {
     tinyxml2::XMLElement *group = doc.NewElement("group");
     parent->InsertEndChild(group);
 
@@ -156,13 +166,16 @@ void SolarSystem::addRing(tinyxml2::XMLElement *parent, float scaleX, float scal
 
     tinyxml2::XMLElement *models = doc.NewElement("models");
     group->InsertEndChild(models);
-    
+
     tinyxml2::XMLElement *model = doc.NewElement("model");
     model->SetAttribute("file", "../models/torus.3d");
     models->InsertEndChild(model);
 }
 
-void SolarSystem::addAsteroidBelt(tinyxml2::XMLElement *parent, float minDist, float maxDist, int numAsteroids) {
+void SolarSystem::addAsteroidBelt(tinyxml2::XMLElement *parent,
+                                  float minDist,
+                                  float maxDist,
+                                  int numAsteroids) {
     tinyxml2::XMLElement *asteroidBelt = doc.NewElement("group");
     parent->InsertEndChild(asteroidBelt);
 

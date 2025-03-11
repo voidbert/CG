@@ -14,9 +14,9 @@
 
 #pragma once
 
+#include <math.h>
 #include <string>
 #include <tinyxml2.h>
-#include <math.h>
 
 namespace generator::figures {
 
@@ -28,10 +28,18 @@ private:
     void configureCamera();
     void generateSolarSystem(float scale);
 
-    tinyxml2::XMLElement* addPlanet(tinyxml2::XMLElement *parent, float x, float y, float z, float size);
+    tinyxml2::XMLElement *
+        addPlanet(tinyxml2::XMLElement *parent, float x, float y, float z, float size);
     void addSatellite(tinyxml2::XMLElement *parent, float x, float y, float z, float size);
-    void addRing(tinyxml2::XMLElement *parent, float scaleX, float scaleY, float scaleZ, float angle);
-    void addAsteroidBelt(tinyxml2::XMLElement *parent, float minDist, float maxDist, int numAsteroids);
+    void addRing(tinyxml2::XMLElement *parent,
+                 float scaleX,
+                 float scaleY,
+                 float scaleZ,
+                 float angle);
+    void addAsteroidBelt(tinyxml2::XMLElement *parent,
+                         float minDist,
+                         float maxDist,
+                         int numAsteroids);
 
 public:
     SolarSystem(float scale);
