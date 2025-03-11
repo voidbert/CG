@@ -18,12 +18,12 @@
 #include <map>
 
 #include "engine/camera/Camera.hpp"
-#include "engine/window/SceneWindow.hpp"
 #include "engine/ui/UI.hpp"
+#include "engine/window/SceneWindow.hpp"
 
 namespace engine::window {
 
-    SceneWindow::SceneWindow(const std::string &sceneFile) :
+SceneWindow::SceneWindow(const std::string &sceneFile) :
     Window(sceneFile, 640, 480),
     pipeline(),
     scene(sceneFile),
@@ -46,13 +46,10 @@ namespace engine::window {
     this->UI.setCamera(&this->scene.getCamera());
 
     this->UI.setCameraUpdateCallbacks(
-        [this](const glm::vec3 &newPos) {
-            this->scene.setCameraPosition(newPos);
-        },
+        [this](const glm::vec3 &newPos) { this->scene.setCameraPosition(newPos); },
         [this](const std::string &newType) {
 
-        }
-    );
+        });
 }
 
 void SceneWindow::onUpdate(float time, float timeElapsed) {

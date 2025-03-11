@@ -19,8 +19,8 @@
 #include "engine/render/Axis.hpp"
 #include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Scene.hpp"
-#include "engine/window/Window.hpp"
 #include "engine/ui/UI.hpp"
+#include "engine/window/Window.hpp"
 
 namespace engine::window {
 

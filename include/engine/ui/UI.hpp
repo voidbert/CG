@@ -19,28 +19,27 @@
 #include <functional>
 
 namespace engine::ui {
-    class UI {
-        private:
-            camera::Camera* camera = nullptr;
-            bool showAxes = true;
-            bool firstCameraSync = true;
-            glm::vec3 currentCamPos;
-            std::function<void(const glm::vec3&)> updateCameraPosition;
-            std::function<void(const std::string&)> updateCameraType;
-        public:
-            void setup(Window *window);
-            void render();
-            void shutdown();
+class UI {
+private:
+    camera::Camera *camera = nullptr;
+    bool showAxes = true;
+    bool firstCameraSync = true;
+    glm::vec3 currentCamPos;
+    std::function<void(const glm::vec3 &)> updateCameraPosition;
+    std::function<void(const std::string &)> updateCameraType;
 
-            void setCamera(camera::Camera* cam);
-            void setCameraUpdateCallbacks(
-                std::function<void(const glm::vec3&)> positionCallback,
-                std::function<void(const std::string&)> typeCallback
-            );
-            void setCameraPosition(const glm::vec3 &newPos);
-            void setShowAxes(bool value);
+public:
+    void setup(Window *window);
+    void render();
+    void shutdown();
 
-            bool isShowAxesEnabled() const;
-        };
+    void setCamera(camera::Camera *cam);
+    void setCameraUpdateCallbacks(std::function<void(const glm::vec3 &)> positionCallback,
+                                  std::function<void(const std::string &)> typeCallback);
+    void setCameraPosition(const glm::vec3 &newPos);
+    void setShowAxes(bool value);
 
-        }
+    bool isShowAxesEnabled() const;
+};
+
+}

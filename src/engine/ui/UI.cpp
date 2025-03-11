@@ -13,14 +13,15 @@
 /// limitations under the License.
 
 #include "engine/ui/UI.hpp"
+#include <GLFW/glfw3.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
-#include "engine/window/Window.hpp"
-#include "engine/render/RenderPipeline.hpp"
+
 #include "engine/camera/Camera.hpp"
-#include <GLFW/glfw3.h>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "engine/render/RenderPipeline.hpp"
+#include "engine/window/Window.hpp"
 
 namespace engine::ui {
 
@@ -77,15 +78,15 @@ void UI::render() {
             firstCameraSync = false;
         }
 
-        if (ImGui::InputFloat3("Position", glm::value_ptr(currentCamPos), "%.2f",
-                             ImGuiInputTextFlags_EnterReturnsTrue))
-        {
+        if (ImGui::InputFloat3("Position",
+                               glm::value_ptr(currentCamPos),
+                               "%.2f",
+                               ImGuiInputTextFlags_EnterReturnsTrue)) {
             if (updateCameraPosition) {
                 updateCameraPosition(currentCamPos);
             }
         }
-    }
-    else {
+    } else {
         ImGui::Text("No Camera Detected");
     }
 
@@ -101,7 +102,7 @@ void UI::shutdown() {
     ImGui::DestroyContext();
 }
 
-void UI::setCamera(camera::Camera* cam) {
+void UI::setCamera(camera::Camera *cam) {
     this->camera = cam;
 }
 
@@ -113,10 +114,8 @@ void UI::setShowAxes(bool value) {
     this->showAxes = value;
 }
 
-void UI::setCameraUpdateCallbacks(
-    std::function<void(const glm::vec3&)> positionCallback,
-    std::function<void(const std::string&)> typeCallback
-) {
+void UI::setCameraUpdateCallbacks(std::function<void(const glm::vec3 &)> positionCallback,
+                                  std::function<void(const std::string &)> typeCallback) {
     this->updateCameraPosition = positionCallback;
     this->updateCameraType = typeCallback;
 }
@@ -126,4 +125,3 @@ bool UI::isShowAxesEnabled() const {
 }
 
 }
-
