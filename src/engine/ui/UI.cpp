@@ -70,7 +70,7 @@ void UI::render() {
     if (ImGui::Checkbox("Axes", &showAxes)) {}
 
     ImGui::Separator();
-    ImGui::Text("Camera Controls:");
+    ImGui::Text("Camera Options");
 
     if (this->camera) {
         if (firstCameraSync) {
