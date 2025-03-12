@@ -28,18 +28,30 @@ private:
     void configureCamera();
     void generateSolarSystem(float scale);
 
-    tinyxml2::XMLElement *
-        addPlanet(tinyxml2::XMLElement *parent, float x, float y, float z, float size);
+    tinyxml2::XMLElement *addCelestialBody(tinyxml2::XMLElement *parent,
+                                           float x,
+                                           float y,
+                                           float z,
+                                           float size,
+                                           const std::string &modelFile,
+                                           float angle,
+                                           float rotX,
+                                           float rotY,
+                                           float rotZ);
     void addSatellite(tinyxml2::XMLElement *parent, float x, float y, float z, float size);
     void addRing(tinyxml2::XMLElement *parent,
                  float scaleX,
                  float scaleY,
                  float scaleZ,
-                 float angle);
+                 float angle,
+                 float rotX,
+                 float rotY,
+                 float rotZ);
     void addAsteroidBelt(tinyxml2::XMLElement *parent,
                          float minDist,
                          float maxDist,
-                         int numAsteroids);
+                         int numAsteroids,
+                         float scale);
 
 public:
     SolarSystem(float scale);
