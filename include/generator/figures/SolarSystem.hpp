@@ -26,12 +26,12 @@ private:
 
     void createWorld();
     void configureCamera();
-    void generateSolarSystem(float sunSizeFactor,
+    void generateSolarSystem(float sceneScale,
+                             float sunSizeFactor,
                              float planetSizeFactor,
                              float moonSizeFactor,
                              float distanceFactor,
                              float asteroidBeltDensity,
-                             float sceneScale,
                              float ringSizeFactor);
 
     tinyxml2::XMLElement *addCelestialBody(tinyxml2::XMLElement *parent,
