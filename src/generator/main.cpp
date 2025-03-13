@@ -29,22 +29,38 @@
 namespace generator {
 void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
-    std::cerr << "  " << programName
-              << " plane       <length>      <divisions>                     <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " box         <length>      <grid>                          <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " sphere      <radius>      <slices>      <stacks>          <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " cone        <radius>      <height>      <slices> <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " cylinder    <radius>      <height>      <slices> <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " torus       <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " kleinBottle <radius>      <slices>      <stacks>          <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " solarSystem <scale>                                       <file>" << std::endl;
+    std::cerr
+        << "  " << programName
+        << " plane        <length>         <divisions>                                                                                                  <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " box          <length>         <grid>                                                                                                       <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " sphere       <radius>         <slices>         <stacks>                                                                                    <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " cone         <radius>         <height>         <slices>           <stacks>                                                                 <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " cylinder     <radius>         <height>         <slices>           <stacks>                                                                 <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " torus        <majorRadius>    <minorRadius>    <slices>           <stacks>                                                                 <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " kleinBottle  <radius>         <slices>         <stacks>                                                                                    <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " solarSystem  <sceneScale>     <sunSizeFactor>  <planetSizeFactor> <moonSizeFactor> <distanceFactor> <asteroidBeltDensity> <ringSizeFactor> <file>"
+        << std::endl;
 }
 
 double stringToDouble(const std::string &str) {
@@ -141,12 +157,34 @@ int main(int argc, char **argv) {
             figures::KleinBottle kleinbottle(radius, slices, stacks);
             kleinbottle.writeToFile(file);
         } else if (args.at(1) == "solarSystem") {
-            validateArgumentCount(argc, 4);
-            double scale = stringToDouble(args.at(2));
-            const std::string &file = args.at(3);
+            if (argc == 4) {
+                validateArgumentCount(argc, 4);
+                double sceneScale = stringToDouble(args.at(2));
+                const std::string &file = args.at(3);
 
-            figures::SolarSystem solarSystem(scale);
-            solarSystem.writeToFile(file);
+                figures::SolarSystem solarSystem(sceneScale, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+                solarSystem.writeToFile(file);
+            } else if (argc == 10) {
+                validateArgumentCount(argc, 10);
+                double sceneScale = stringToDouble(args.at(2));
+                double sunSizeFactor = stringToDouble(args.at(3));
+                double planetSizeFactor = stringToDouble(args.at(4));
+                double moonSizeFactor = stringToDouble(args.at(5));
+                double distanceFactor = stringToDouble(args.at(6));
+                double asteroidBeltDensity = stringToDouble(args.at(7));
+                double ringSizeFactor = stringToDouble(args.at(8));
+                const std::string &file = args.at(9);
+
+                figures::SolarSystem solarSystem(sceneScale,
+                                                 sunSizeFactor,
+                                                 planetSizeFactor,
+                                                 moonSizeFactor,
+                                                 distanceFactor,
+                                                 asteroidBeltDensity,
+                                                 ringSizeFactor);
+
+                solarSystem.writeToFile(file);
+            }
         } else {
             printUsage(args[0]);
         }

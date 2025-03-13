@@ -18,10 +18,22 @@
 
 namespace generator::figures {
 
-SolarSystem::SolarSystem(float scale) {
+SolarSystem::SolarSystem(float sceneScale,
+                         float sunSizeFactor,
+                         float planetSizeFactor,
+                         float moonSizeFactor,
+                         float distanceFactor,
+                         float asteroidBeltDensity,
+                         float ringSizeFactor) {
     createWorld();
     configureCamera();
-    generateSolarSystem(scale);
+    generateSolarSystem(sceneScale,
+                        sunSizeFactor,
+                        planetSizeFactor,
+                        moonSizeFactor,
+                        distanceFactor,
+                        asteroidBeltDensity,
+                        ringSizeFactor);
     writeToFile("scene_solarSystem.xml");
 }
 
@@ -64,135 +76,276 @@ void SolarSystem::configureCamera() {
     camera->InsertEndChild(projection);
 }
 
-void SolarSystem::generateSolarSystem(float scale) {
+void SolarSystem::generateSolarSystem(float sceneScale,
+                                      float sunSizeFactor,
+                                      float planetSizeFactor,
+                                      float moonSizeFactor,
+                                      float distanceFactor,
+                                      float asteroidBeltDensity,
+                                      float ringSizeFactor) {
     tinyxml2::XMLElement *world = doc.FirstChildElement("world");
     tinyxml2::XMLElement *solarSystem = doc.NewElement("group");
     world->InsertEndChild(solarSystem);
 
-    tinyxml2::XMLElement *sun =
-        addCelestialBody(solarSystem, 0, 0, 0, 30 * scale, "../models/sphere.3d", 0, 0, 0, 0);
+    tinyxml2::XMLElement *sun = addCelestialBody(solarSystem,
+                                                 0,
+                                                 0,
+                                                 0,
+                                                 30 * sceneScale * sunSizeFactor,
+                                                 "../models/sphere.3d",
+                                                 0,
+                                                 0,
+                                                 0,
+                                                 0);
 
-    tinyxml2::XMLElement *mercury =
-        addCelestialBody(sun, 12 * scale, 2, -3, 0.15 * scale, "../models/sphere.3d", 0, 0, 0, 0);
-    tinyxml2::XMLElement *venus =
-        addCelestialBody(sun, 20 * scale, -1.5, 2, 0.18 * scale, "../models/sphere.3d", 0, 0, 0, 0);
+    addCelestialBody(sun,
+                     12 * sceneScale * distanceFactor,
+                     2 * distanceFactor,
+                     -3 * distanceFactor,
+                     0.15 * sceneScale * planetSizeFactor,
+                     "../models/sphere.3d",
+                     0,
+                     0,
+                     0,
+                     0);
 
-    tinyxml2::XMLElement *earth =
-        addCelestialBody(sun, 28 * scale, 0, -3, 0.2 * scale, "../models/sphere.3d", 0, 0, 0, 0);
-    addCelestialBody(earth, 3 * scale, 0, 0, 0.05 * scale, "../models/sphere.3d", 0, 0, 0, 0);
+    addCelestialBody(sun,
+                     20 * sceneScale * distanceFactor,
+                     -1.5 * distanceFactor,
+                     2 * distanceFactor,
+                     0.18 * sceneScale * planetSizeFactor,
+                     "../models/sphere.3d",
+                     0,
+                     0,
+                     0,
+                     0);
 
-    tinyxml2::XMLElement *mars =
-        addCelestialBody(sun, 36 * scale, 1.5, 5, 0.15 * scale, "../models/sphere.3d", 0, 0, 0, 0);
-    addCelestialBody(mars, 2 * scale, 0.5, 0, 0.04 * scale, "../models/sphere.3d", 0, 0, 0, 0);
-    addCelestialBody(mars, -1.5 * scale, -0.3, 1, 0.03 * scale, "../models/sphere.3d", 0, 0, 0, 0);
+    tinyxml2::XMLElement *earth = addCelestialBody(sun,
+                                                   28 * sceneScale * distanceFactor,
+                                                   0 * distanceFactor,
+                                                   -3 * distanceFactor,
+                                                   0.2 * sceneScale * planetSizeFactor,
+                                                   "../models/sphere.3d",
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   0);
+    addCelestialBody(earth,
+                     3 * sceneScale,
+                     0,
+                     0,
+                     0.05 * sceneScale * moonSizeFactor,
+                     "../models/sphere.3d",
+                     0,
+                     0,
+                     0,
+                     0);
 
-    tinyxml2::XMLElement *jupiter =
-        addCelestialBody(sun, 56 * scale, -2, -6, 0.5 * scale, "../models/sphere.3d", 0, 0, 0, 0);
+    tinyxml2::XMLElement *mars = addCelestialBody(sun,
+                                                  36 * sceneScale * distanceFactor,
+                                                  1.5 * distanceFactor,
+                                                  5 * distanceFactor,
+                                                  0.15 * sceneScale * planetSizeFactor,
+                                                  "../models/sphere.3d",
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0);
+    addCelestialBody(mars,
+                     2 * sceneScale,
+                     0.5,
+                     0,
+                     0.04 * sceneScale * moonSizeFactor,
+                     "../models/sphere.3d",
+                     0,
+                     0,
+                     0,
+                     0);
+    addCelestialBody(mars,
+                     -1.5 * sceneScale,
+                     -0.3,
+                     1,
+                     0.03 * sceneScale * moonSizeFactor,
+                     "../models/sphere.3d",
+                     0,
+                     0,
+                     0,
+                     0);
+
+    tinyxml2::XMLElement *jupiter = addCelestialBody(sun,
+                                                     56 * sceneScale * distanceFactor,
+                                                     -2 * distanceFactor,
+                                                     -6 * distanceFactor,
+                                                     0.5 * sceneScale * planetSizeFactor,
+                                                     "../models/sphere.3d",
+                                                     0,
+                                                     0,
+                                                     0,
+                                                     0);
     addCelestialBody(jupiter,
-                     5 * scale,
-                     3 * scale,
+                     5 * sceneScale,
+                     3 * sceneScale,
                      4,
-                     0.1 * scale,
+                     0.1 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
     addCelestialBody(jupiter,
-                     -4 * scale,
-                     2.5 * scale,
+                     -4 * sceneScale,
+                     2.5 * sceneScale,
                      -5,
-                     0.7 * scale,
+                     0.7 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
     addCelestialBody(jupiter,
-                     3 * scale,
-                     -2 * scale,
+                     3 * sceneScale,
+                     -2 * sceneScale,
                      3,
-                     0.6 * scale,
+                     0.6 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
     addCelestialBody(jupiter,
-                     -3 * scale,
-                     1 * scale,
+                     -3 * sceneScale,
+                     1 * sceneScale,
                      -2,
-                     0.05 * scale,
+                     0.05 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
 
-    tinyxml2::XMLElement *saturn =
-        addCelestialBody(sun, 79 * scale, 2, -10, 0.4 * scale, "../models/sphere.3d", 0, 0, 0, 0);
-    addCelestialBody(saturn, 0, 0, 0, 0.4, "../models/torus.3d", 26.7, 0, 0, 1);
+    tinyxml2::XMLElement *saturn = addCelestialBody(sun,
+                                                    79 * sceneScale * distanceFactor,
+                                                    2 * distanceFactor,
+                                                    -10 * distanceFactor,
+                                                    0.4 * sceneScale * planetSizeFactor,
+                                                    "../models/sphere.3d",
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0);
     addCelestialBody(saturn,
-                     10 * scale,
-                     5 * scale,
+                     0,
+                     0,
+                     0,
+                     0.6 * sceneScale * ringSizeFactor,
+                     "../models/torus.3d",
+                     26.7,
+                     0,
+                     0,
+                     1);
+    addCelestialBody(saturn,
+                     10 * sceneScale,
+                     5 * sceneScale,
                      7,
-                     0.15 * scale,
+                     0.15 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
     addCelestialBody(saturn,
-                     -8 * scale,
-                     4 * scale,
+                     -8 * sceneScale,
+                     4 * sceneScale,
                      -8,
-                     0.12 * scale,
+                     0.12 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
 
-    tinyxml2::XMLElement *uranus =
-        addCelestialBody(sun, 92 * scale, -4, -12, 0.3 * scale, "../models/sphere.3d", 0, 0, 0, 0);
-    addCelestialBody(uranus, 0, 0, 0, 0.3, "../models/torus.3d", 90, 1, 0, 0);
+    tinyxml2::XMLElement *uranus = addCelestialBody(sun,
+                                                    92 * sceneScale * distanceFactor,
+                                                    -4 * distanceFactor,
+                                                    -12 * distanceFactor,
+                                                    0.3 * sceneScale * planetSizeFactor,
+                                                    "../models/sphere.3d",
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0);
     addCelestialBody(uranus,
-                     4 * scale,
-                     2 * scale,
+                     0,
+                     0,
+                     0,
+                     0.5 * sceneScale * ringSizeFactor,
+                     "../models/torus.3d",
+                     90,
+                     1,
+                     0,
+                     0);
+    addCelestialBody(uranus,
+                     4 * sceneScale,
+                     2 * sceneScale,
                      3,
-                     0.05 * scale,
+                     0.05 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
     addCelestialBody(uranus,
-                     -3.5 * scale,
-                     1.5 * scale,
+                     -3.5 * sceneScale,
+                     1.5 * sceneScale,
                      -3,
-                     0.04 * scale,
+                     0.04 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
 
-    tinyxml2::XMLElement *neptune =
-        addCelestialBody(sun, 105 * scale, 5, -15, 0.3 * scale, "../models/sphere.3d", 0, 0, 0, 0);
-    addCelestialBody(neptune, 0, 0, 0, 0.25, "../models/torus.3d", 28.3, 0, 0, 1);
+    tinyxml2::XMLElement *neptune = addCelestialBody(sun,
+                                                     105 * sceneScale * distanceFactor,
+                                                     5 * distanceFactor,
+                                                     -15 * distanceFactor,
+                                                     0.3 * sceneScale * planetSizeFactor,
+                                                     "../models/sphere.3d",
+                                                     0,
+                                                     0,
+                                                     0,
+                                                     0);
     addCelestialBody(neptune,
-                     5 * scale,
-                     2.5 * scale,
+                     0,
+                     0,
+                     0,
+                     0.45 * sceneScale * ringSizeFactor,
+                     "../models/torus.3d",
+                     28.3,
+                     0,
+                     0,
+                     1);
+    addCelestialBody(neptune,
+                     5 * sceneScale,
+                     2.5 * sceneScale,
                      4,
-                     0.05 * scale,
+                     0.05 * sceneScale * moonSizeFactor,
                      "../models/sphere.3d",
                      0,
                      0,
                      0,
                      0);
 
-    addAsteroidBelt(sun, 40 * scale, 49 * scale, 600, scale);
-    addAsteroidBelt(sun, 120 * scale, 150 * scale, 1400, scale);
+    addAsteroidBelt(sun,
+                    40 * sceneScale * distanceFactor,
+                    49 * sceneScale * distanceFactor,
+                    600 * asteroidBeltDensity,
+                    sceneScale);
+    addAsteroidBelt(sun,
+                    120 * sceneScale * distanceFactor,
+                    150 * sceneScale * distanceFactor,
+                    1400 * asteroidBeltDensity,
+                    sceneScale);
 }
 
 tinyxml2::XMLElement *SolarSystem::addCelestialBody(tinyxml2::XMLElement *parent,
@@ -247,7 +400,7 @@ void SolarSystem::addAsteroidBelt(tinyxml2::XMLElement *parent,
                                   float minDist,
                                   float maxDist,
                                   int numAsteroids,
-                                  float scale) {
+                                  float sceneScale) {
     tinyxml2::XMLElement *asteroidBelt = doc.NewElement("group");
     parent->InsertEndChild(asteroidBelt);
 
@@ -262,8 +415,7 @@ void SolarSystem::addAsteroidBelt(tinyxml2::XMLElement *parent,
         float z = distance * sin(angle);
         float y = static_cast<float>(rand()) / (RAND_MAX / 10.0f) - 5.0f;
 
-        float size =
-            0.01 * scale + static_cast<float>(rand()) / RAND_MAX * (0.06 * scale - 0.01 * scale);
+        float size = (0.01 + (static_cast<float>(rand()) / RAND_MAX) * (0.06 - 0.01)) * sceneScale;
 
         std::string modelFile = models[rand() % models.size()];
 

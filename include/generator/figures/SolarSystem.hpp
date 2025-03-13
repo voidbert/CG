@@ -2,7 +2,7 @@
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
-/// You may obtain a copy of the License at
+/// You may obtain a copy of the License at:
 ///
 ///     http://www.apache.org/licenses/LICENSE-2.0
 ///
@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <math.h>
+#include <cmath>
 #include <string>
 #include <tinyxml2.h>
 
@@ -26,7 +26,13 @@ private:
 
     void createWorld();
     void configureCamera();
-    void generateSolarSystem(float scale);
+    void generateSolarSystem(float sunSizeFactor,
+                             float planetSizeFactor,
+                             float moonSizeFactor,
+                             float distanceFactor,
+                             float asteroidBeltDensity,
+                             float sceneScale,
+                             float ringSizeFactor);
 
     tinyxml2::XMLElement *addCelestialBody(tinyxml2::XMLElement *parent,
                                            float x,
@@ -34,11 +40,13 @@ private:
                                            float z,
                                            float size,
                                            const std::string &modelFile,
-                                           float angle,
-                                           float rotX,
-                                           float rotY,
-                                           float rotZ);
+                                           float angle = 0.0f,
+                                           float rotX = 0.0f,
+                                           float rotY = 0.0f,
+                                           float rotZ = 0.0f);
+
     void addSatellite(tinyxml2::XMLElement *parent, float x, float y, float z, float size);
+
     void addRing(tinyxml2::XMLElement *parent,
                  float scaleX,
                  float scaleY,
@@ -47,14 +55,22 @@ private:
                  float rotX,
                  float rotY,
                  float rotZ);
+
     void addAsteroidBelt(tinyxml2::XMLElement *parent,
                          float minDist,
                          float maxDist,
                          int numAsteroids,
-                         float scale);
+                         float sceneScale);
 
 public:
-    SolarSystem(float scale);
+    SolarSystem(float sceneScale,
+                float sunSizeFactor,
+                float planetSizeFactor,
+                float moonSizeFactor,
+                float distanceFactor,
+                float asteroidBeltDensity,
+                float ringSizeFactor);
+
     void writeToFile(const std::string &filename);
 };
 
