@@ -52,7 +52,7 @@ void SolarSystem::configureCamera() {
     camera->SetAttribute("type", "free");
     doc.FirstChildElement("world")->InsertEndChild(camera);
 
-    struct {
+    const struct {
         const char *name;
         float x, y, z;
     } cameraSettings[] = {
