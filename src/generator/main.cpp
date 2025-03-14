@@ -158,14 +158,12 @@ int main(int argc, char **argv) {
             kleinbottle.writeToFile(file);
         } else if (args.at(1) == "solarSystem") {
             if (argc == 4) {
-                validateArgumentCount(argc, 4);
                 double sceneScale = stringToDouble(args.at(2));
                 const std::string &file = args.at(3);
 
                 figures::SolarSystem solarSystem(sceneScale, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
                 solarSystem.writeToFile(file);
             } else if (argc == 10) {
-                validateArgumentCount(argc, 10);
                 double sceneScale = stringToDouble(args.at(2));
                 double sunSizeFactor = stringToDouble(args.at(3));
                 double planetSizeFactor = stringToDouble(args.at(4));
@@ -184,6 +182,9 @@ int main(int argc, char **argv) {
                                                  ringSizeFactor);
 
                 solarSystem.writeToFile(file);
+            } else {
+                printUsage(args[0]);
+                return 1;
             }
         } else {
             printUsage(args[0]);

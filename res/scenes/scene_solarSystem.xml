@@ -98,7 +98,7 @@
                 <group>
                     <transform>
                         <translate x="-4" y="2.5" z="-5"/>
-                        <scale x="0.69999999" y="0.69999999" z="0.69999999"/>
+                        <scale x="0.30000001" y="0.30000001" z="0.30000001"/>
                     </transform>
                     <models>
                         <model file="../models/sphere.3d"/>
@@ -107,7 +107,7 @@
                 <group>
                     <transform>
                         <translate x="3" y="-2" z="3"/>
-                        <scale x="0.60000002" y="0.60000002" z="0.60000002"/>
+                        <scale x="0.30000001" y="0.30000001" z="0.30000001"/>
                     </transform>
                     <models>
                         <model file="../models/sphere.3d"/>
@@ -116,7 +116,7 @@
                 <group>
                     <transform>
                         <translate x="-3" y="1" z="-2"/>
-                        <scale x="0.050000001" y="0.050000001" z="0.050000001"/>
+                        <scale x="0.1" y="0.1" z="0.1"/>
                     </transform>
                     <models>
                         <model file="../models/sphere.3d"/>
@@ -125,7 +125,7 @@
             </group>
             <group>
                 <transform>
-                    <translate x="79" y="2" z="-10"/>
+                    <translate x="74" y="2" z="-10"/>
                     <scale x="0.40000001" y="0.40000001" z="0.40000001"/>
                 </transform>
                 <models>
@@ -199,7 +199,7 @@
             </group>
             <group>
                 <transform>
-                    <translate x="105" y="5" z="-15"/>
+                    <translate x="110" y="5" z="-15"/>
                     <scale x="0.30000001" y="0.30000001" z="0.30000001"/>
                 </transform>
                 <models>
