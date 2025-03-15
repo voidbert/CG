@@ -20,17 +20,19 @@ namespace generator::figures {
 
 MobiusStrip::MobiusStrip(float radius, float width, int twist, int slices, int stacks) {
 
+    float halfWidth = width / 2.0f;
+
     for (int i = 0; i <= slices; i++) {
         float t = (float) i / slices * 2.0f * M_PI;
         float cosT = cos(t);
         float sinT = sin(t);
-        float halfWidth = width / 2.0f;
+
+        float twistAngle = twist * t / 2.0f;
+        float cosTwist = cos(twistAngle);
+        float sinTwist = sin(twistAngle);
 
         for (int j = 0; j <= stacks; j++) {
             float v = (float) j / stacks * 2.0f - 1.0f;
-            float twistAngle = twist * t / 2.0f;
-            float cosTwist = cos(twistAngle);
-            float sinTwist = sin(twistAngle);
 
             float x = (radius + v * halfWidth * cosTwist) * cosT;
             float z = (radius + v * halfWidth * cosTwist) * sinT;
@@ -53,18 +55,22 @@ MobiusStrip::MobiusStrip(float radius, float width, int twist, int slices, int s
             this->faces.push_back(utils::TriangleFace(idx2, idx3, idx4));
         }
     }
+
+    int start;
+    int direction;
+    if (twist % 2 == 0) {
+        start = 0;
+        direction = 1;
+    } else {
+        start = stacks;
+        direction = -1;
+    }
+
     for (int j = 0; j < stacks; j++) {
         int idx1 = (slices - 1) * (stacks + 1) + j;
-        int idx2;
+        int idx2 = start + j * direction;
         int idx3 = idx1 + 1;
-        int idx4;
-        if (twist % 2 == 0) {
-            idx2 = j;
-            idx4 = j + 1;
-        } else {
-            idx2 = stacks - j;
-            idx4 = stacks - j - 1;
-        }
+        int idx4 = start + (j + 1) * direction;
 
         this->faces.push_back(utils::TriangleFace(idx1, idx2, idx3));
         this->faces.push_back(utils::TriangleFace(idx2, idx1, idx3));
