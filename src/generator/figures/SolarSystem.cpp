@@ -381,9 +381,15 @@ tinyxml2::XMLElement *SolarSystem::addCelestialBody(tinyxml2::XMLElement *parent
     }
 
     tinyxml2::XMLElement *scaleElem = doc.NewElement("scale");
-    scaleElem->SetAttribute("x", size);
-    scaleElem->SetAttribute("y", size);
-    scaleElem->SetAttribute("z", size);
+    if (modelFile == "../models/torus.3d") {
+        scaleElem->SetAttribute("x", size);
+        scaleElem->SetAttribute("y", size * 0.1);
+        scaleElem->SetAttribute("z", size);
+    } else {
+        scaleElem->SetAttribute("x", size);
+        scaleElem->SetAttribute("y", size);
+        scaleElem->SetAttribute("z", size);
+    }
     transform->InsertEndChild(scaleElem);
 
     tinyxml2::XMLElement *models = doc.NewElement("models");
