@@ -79,20 +79,17 @@
 
 \subsection{Câmara Livre}
 
-EM FALTA INTRODUÇÃO
-
-\subsection{Câmara Livre}
-
 A câmara livre permite que o utilizador se desloque de forma intuitiva, sendo semelhante à de
 jogos de exploração na primeira pessoa, como simuladores de voo, e aplicações interativas 3D,
 como ambientes de realidade virtual. Para isto, são realizadas translações em diferentes eixos
-e a orientação da câmara é alterada através de rotações. De seguida, descrevem-se os diferentes
-tipos de movimento suportados.
+e a orientação da câmara é alterada através de rotações, ou seja, não existem restrições de
+movimento.
+De seguida, descrevem-se os diferentes tipos de movimento suportados.
 
 \subsubsection{Movimentação}
 
 A câmara pode deslocar-se e rodar de forma contínua no espaço tridimensional, sendo os seus
-movimentos definidos pelos seguintes vetores:
+movimentos definidos pelos seguintes vetores diretores:
 
 \begin{itemize}
     \item \textbf{Vetor} $\mathbf{front}$: Direção do olhar da câmara.
@@ -141,6 +138,8 @@ garantir que este mantém um comprimento unitário:
 \mathbf{front} \gets \frac{\mathbf{front}}{||\mathbf{front}||}
 \]
 
+Esta normalização é importante, para, por exemplo, evitar variações de velocidade ao deslocar-se
+em diferentes direções.
 O novo ponto de destino da câmara ($\mathbf{lookAt}$) é atualizado através da soma do vetor
 normalizado e da posição atual:
 
@@ -164,6 +163,20 @@ Por fim, o vetor $\mathbf{up}$ é recalculado para ser ortogonal aos outros dois
 
 Isto assegura que os movimentos laterais, verticais e de rotação permanecem coerentes em
 qualquer orientação da câmara, garantindo um comportamento previsível para o utilizador.
+
+\subsubsection{Controlo por parte do utilizador}
+
+O utilizador pode controlar a câmara de forma intuitiva, utilizando o teclado para movimentação
+e as setas direcionais para rotação:
+
+\begin{itemize}
+    \item \textbf{W/S:} Movem a câmara para a frente/trás.
+    \item \textbf{A/D:} Movem a câmara para os lados.
+    \item \textbf{Espaço (SPACE):} Sobe a câmara.
+    \item \textbf{Shift Esquerdo (LEFT SHIFT):} Desce a câmara.
+    \item \textbf{Seta Esquerda/Direita:} Roda a câmara para a esquerda/direita.
+    \item \textbf{Seta Cima/Baixo:} Inclina a câmara para cima/baixo.
+\end{itemize}
 
 \section{Transformações}
 
