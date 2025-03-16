@@ -81,35 +81,89 @@
 
 EM FALTA INTRODUÇÃO
 
+\subsection{Câmara Livre}
+
+A câmara livre permite que o utilizador se desloque de forma intuitiva, sendo semelhante à de
+jogos de exploração na primeira pessoa, como simuladores de voo, e aplicações interativas 3D,
+como ambientes de realidade virtual. Para isto, são realizadas translações em diferentes eixos
+e a orientação da câmara é alterada através de rotações. De seguida, descrevem-se os diferentes
+tipos de movimento suportados.
+
 \subsubsection{Movimentação}
 
-A câmara livre permite que o utilizador se desloque de forma intuitiva, sendo esta semelhante à
-de jogos de exploração na primeira pessoa, como simuladores de voo, e aplicações interativas 3D,
-como ambientes de realidade virtual. Para isto, são realizadas translações em diferentes eixos e
-a orientação da câmara é alterada através de rotações. De seguida, descrevem-se os diferentes tipos
-de movimento suportados:
+A câmara pode deslocar-se e rodar de forma contínua no espaço tridimensional, sendo os seus
+movimentos definidos pelos seguintes vetores:
 
 \begin{itemize}
-    \item \textbf{Translação horizontal:} A câmara pode mover-se para a frente e para trás ao longo
-    do vetor \emph{front}, e para os lados ao longo do vetor \emph{right}.
-    \item \textbf{Translação vertical:} O movimento vertical ocorre ao longo do vetor \emph{up},
-    permitindo ao utilizador subir e descer livremente.
-    \item \textbf{Rotação:} A orientação da câmara muda com base nos valores de \emph{yaw}
-    (rotação horizontal) e \emph{pitch} (inclinação vertical), o que permite alterar a direção do
-    olhar.
+    \item \textbf{Vetor} $\mathbf{front}$: Direção do olhar da câmara.
+    \item \textbf{Vetor} $\mathbf{right}$: Direção perpendicular ao vetor $\mathbf{front}$, ao
+          longo do plano horizontal.
+    \item \textbf{Vetor} $\mathbf{up}$: Direção vertical da câmara.
 \end{itemize}
 
-A posição da câmara é atualizada da seguinte forma:
+A posição da câmara é atualizada de acordo com a seguinte equação:
 
 \[
 \text{posição} \gets \text{posição} + \text{velocidade} \times \text{direção}
 \]
 
-onde o vetor que representa a direção depende do movimento escolhido pelo utilizador. Ou seja, a
-direção correponde ao vetor \emph{front}, \emph{right} ou \emph{up}. A rotação, controlada pelo
-\emph{pitch} e pelo \emph{raw}, afeta o vetor \emph{front} diretamente. Sempre que a orientação da
-câmara muda, os vetores \emph{right} e \emph{up} são recalculados para que os movimentos laterais
-continuem de acordo com a perspetiva atual da câmara.
+onde a direção depende do movimento escolhido pelo utilizador:
+
+\begin{itemize}
+    \item \textbf{Translação horizontal}: O movimento para a frente e para trás ocorre ao longo
+          do vetor $\mathbf{front}$, enquanto o movimento lateral ocorre ao longo do vetor
+          $\mathbf{right}$.
+    \item \textbf{Translação vertical}: O movimento vertical acontece ao longo do vetor
+          $\mathbf{up}$, permitindo ao utilizador subir e descer.
+    \item \textbf{Rotação}: A orientação da câmara é definida pelos ângulos $\mathbf{yaw}$
+          (rotação horizontal) e $\mathbf{pitch}$ (inclinação vertical), que determinam a direção
+          do vetor $\mathbf{front}$.
+\end{itemize}
+
+\subsubsection{Atualização da Direção da Câmara}
+
+A atualização da orientação da câmara obtém-se através da conversão dos ângulos $\mathbf{yaw}$ e
+$\mathbf{pitch}$ para um vetor de direção tridimensional. A relação entre os ângulos e os
+componentes do vetor $\mathbf{front}$ é dada por:
+
+\[
+\begin{aligned}
+    \text{front}_x &= \cos(\text{pitch}) \cdot \cos(\text{yaw}) \\
+    \text{front}_y &= \sin(\text{pitch}) \\
+    \text{front}_z &= \cos(\text{pitch}) \cdot \sin(\text{yaw})
+\end{aligned}
+\]
+
+Após serem calculados os componentes do vetor, este é normalizado, uma vez que é necessário
+garantir que este mantém um comprimento unitário:
+
+\[
+\mathbf{front} \gets \frac{\mathbf{front}}{||\mathbf{front}||}
+\]
+
+O novo ponto de destino da câmara ($\mathbf{lookAt}$) é atualizado através da soma do vetor
+normalizado e da posição atual:
+
+\[
+\mathbf{lookAt} = \text{\textbf{posição}} + \mathbf{front}
+\]
+
+Além disso, os vetores $\mathbf{right}$ e $\mathbf{up}$ são recalculados para garantir que a
+orientação da câmara permanece coerente. O vetor $\mathbf{right}$ é obtido como o produto
+vetorial entre um vetor de referência vertical $(0,1,0)$ e o vetor $\mathbf{front}$:
+
+\[
+\mathbf{right} = \mathbf{front} \times (0,1,0)
+\]
+
+Por fim, o vetor $\mathbf{up}$ é recalculado para ser ortogonal aos outros dois vetores:
+
+\[
+\mathbf{up} = \mathbf{right} \times \mathbf{front}
+\]
+
+Isto assegura que os movimentos laterais, verticais e de rotação permanecem coerentes em
+qualquer orientação da câmara, garantindo um comportamento previsível para o utilizador.
 
 \section{Transformações}
 
