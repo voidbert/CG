@@ -138,8 +138,24 @@ garantir que este mantém um comprimento unitário:
 \mathbf{front} \gets \frac{\mathbf{front}}{||\mathbf{front}||}
 \]
 
-Esta normalização é importante, para, por exemplo, evitar variações de velocidade ao deslocar-se
-em diferentes direções.
+Esta normalização é fundamental para garantir que a câmara mantém uma velocidade constante em
+qualquer direção.
+
+Além disso, foram tomadas medidas para prevenir o $\mathbf{gimbal}$  $\mathbf{lock}$.
+Este é um problema que ocorre quando dois eixos de rotação se alinham, reduzindo
+os graus de liberdade da rotação. No contexto da câmara livre desenvolvida, este problema surge
+quando $\mathbf{pitch}$ antinge um dos seus limites superiror ou inferior, quando o vetor
+$\mathbf{front}$ se alinha com o eixo vertical $\mathbf{up}$, o que impossibilita a rotação
+horizontal ($\mathbf{yaw}$). Para evitar esta situação, é imposto um limite a $\mathbf{pitch}$:
+
+\[
+-89^\circ \leq \mathbf{pitch} \leq 89^\circ
+\]
+
+Isto impede que a câmara olhe completamente para cima ou para baixo, garantindo que o vetor
+$\mathbf{up}$ mantém uma orientação bem definida e evitando a perda de controlo sobre a rotação
+horizontal.
+
 O novo ponto de destino da câmara ($\mathbf{lookAt}$) é atualizado através da soma do vetor
 normalizado e da posição atual:
 
