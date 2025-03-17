@@ -25,12 +25,12 @@
 
 namespace engine::ui {
 
-UI::UI(Window *window, camera::Camera &_camera) : camera(_camera) {
+UI::UI(Window &window, camera::Camera &_camera) : camera(_camera) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
 
-    ImGui_ImplGlfw_InitForOpenGL(window->getHandle(), true);
+    ImGui_ImplGlfw_InitForOpenGL(window.getHandle(), true);
     ImGui_ImplOpenGL3_Init("#version 460 core");
 }
 

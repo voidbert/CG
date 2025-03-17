@@ -19,13 +19,14 @@
 #include <functional>
 
 namespace engine::ui {
+
 class UI {
 private:
     camera::Camera &camera;
     bool showAxes = true;
 
 public:
-    UI(Window *window, camera::Camera &_camera);
+    UI(Window &window, camera::Camera &_camera);
     void render();
     ~UI();
 

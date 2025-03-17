@@ -91,4 +91,5 @@ void OrbitalCamera::setPosition(const glm::vec3 &newPosition) {
         polar = azimuth = 0.0f;
     }
 }
+
 }

@@ -102,4 +102,5 @@ void FreeCamera::setPosition(const glm::vec3 &newPosition) {
     yaw = atan2f(front.z, front.x);
     pitch = asinf(front.y);
 }
+
 }

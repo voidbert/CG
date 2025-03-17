@@ -32,7 +32,7 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
     xAxis(glm::vec3(1.0f, 0.0f, 0.0f)),
     yAxis(glm::vec3(0.0f, 1.0f, 0.0f)),
     zAxis(glm::vec3(0.0f, 0.0f, 1.0f)),
-    UI(this, scene.getCamera()) {
+    UI(*this, scene.getCamera()) {
 
     this->resize(scene.getWindowWidth(), scene.getWindowHeight());
 

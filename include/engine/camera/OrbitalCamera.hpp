@@ -34,7 +34,6 @@ public:
                   float _far);
 
     void move(MovementDirection direction, float deltaTime) override;
-
     void setPosition(const glm::vec3 &newPosition) override;
 };
 

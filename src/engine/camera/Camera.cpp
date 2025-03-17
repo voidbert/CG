@@ -34,6 +34,7 @@ glm::mat4 Camera::getCameraMatrix(float aspectRatio) const {
         glm::perspective(glm::radians(this->fov), aspectRatio, this->nearPlane, this->farPlane);
     return projection * view;
 }
+
 glm::vec3 Camera::getPosition() const {
     return this->position;
 }
