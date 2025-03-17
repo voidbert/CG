@@ -25,13 +25,13 @@
 
 namespace engine::ui {
 
-void UI::setup(Window *window) {
+UI::UI(Window *window, camera::Camera &_camera) : camera(_camera) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
 
     ImGui_ImplGlfw_InitForOpenGL(window->getHandle(), true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    ImGui_ImplOpenGL3_Init("#version 460 core");
 }
 
 void UI::render() {
@@ -54,12 +54,12 @@ void UI::render() {
     ImGui::Text("Render Options");
 
     static bool wireframe = true;
-    if (ImGui::Checkbox("Wireframe", &wireframe)) {
+    if (ImGui::Checkbox("Fill Polygons", &wireframe)) {
         glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
     }
 
     static bool culling = true;
-    if (ImGui::Checkbox("Culling", &culling)) {
+    if (ImGui::Checkbox("Back-face Culling", &culling)) {
         if (culling) {
             glEnable(GL_CULL_FACE);
         } else {
@@ -67,27 +67,14 @@ void UI::render() {
         }
     }
 
-    if (ImGui::Checkbox("Axes", &showAxes)) {}
+    if (ImGui::Checkbox("Show Axes", &showAxes)) {}
 
     ImGui::Separator();
     ImGui::Text("Camera Options");
 
-    if (this->camera) {
-        if (firstCameraSync) {
-            currentCamPos = this->camera->getPosition();
-            firstCameraSync = false;
-        }
-
-        if (ImGui::InputFloat3("Position",
-                               glm::value_ptr(currentCamPos),
-                               "%.2f",
-                               ImGuiInputTextFlags_EnterReturnsTrue)) {
-            if (updateCameraPosition) {
-                updateCameraPosition(currentCamPos);
-            }
-        }
-    } else {
-        ImGui::Text("No Camera Detected");
+    glm::vec3 currentPos = camera.getPosition();
+    if (ImGui::InputFloat3("Position", glm::value_ptr(currentPos), "%.2f")) {
+        camera.setPosition(currentPos);
     }
 
     ImGui::End();
@@ -96,26 +83,14 @@ void UI::render() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void UI::shutdown() {
+UI::~UI() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
-void UI::setCamera(camera::Camera *cam) {
-    this->camera = cam;
-}
-
-void UI::setCameraPosition(const glm::vec3 &newPos) {
-    this->currentCamPos = newPos;
-}
-
 void UI::setShowAxes(bool value) {
     this->showAxes = value;
-}
-
-void UI::setCameraUpdateCallbacks(std::function<void(const glm::vec3 &)> positionCallback) {
-    this->updateCameraPosition = positionCallback;
 }
 
 bool UI::isShowAxesEnabled() const {

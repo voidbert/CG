@@ -21,20 +21,14 @@
 namespace engine::ui {
 class UI {
 private:
-    camera::Camera *camera = nullptr;
+    camera::Camera &camera;
     bool showAxes = true;
-    bool firstCameraSync = true;
-    glm::vec3 currentCamPos;
-    std::function<void(const glm::vec3 &)> updateCameraPosition;
 
 public:
-    void setup(Window *window);
+    UI(Window *window, camera::Camera &_camera);
     void render();
-    void shutdown();
+    ~UI();
 
-    void setCamera(camera::Camera *cam);
-    void setCameraUpdateCallbacks(std::function<void(const glm::vec3 &)> positionCallback);
-    void setCameraPosition(const glm::vec3 &newPos);
     void setShowAxes(bool value);
 
     bool isShowAxesEnabled() const;

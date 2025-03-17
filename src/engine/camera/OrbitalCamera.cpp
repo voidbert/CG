@@ -79,7 +79,7 @@ void OrbitalCamera::move(MovementDirection dir, float delta) {
 }
 
 void OrbitalCamera::setPosition(const glm::vec3 &newPosition) {
-    this->position = newPosition;
+    Camera::setPosition(newPosition);
     const glm::vec3 delta = this->position - this->lookAt;
 
     radius = glm::length(delta);

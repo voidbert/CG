@@ -52,7 +52,7 @@ public:
     virtual ~Camera() = default;
 
     virtual void move(MovementDirection direction, float deltaTime) = 0;
-    virtual void setPosition(const glm::vec3 &pos) = 0;
+    virtual void setPosition(const glm::vec3 &pos);
     glm::vec3 getPosition() const;
     glm::mat4 getCameraMatrix(float aspectRatio) const;
 };

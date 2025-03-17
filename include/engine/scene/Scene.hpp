@@ -43,7 +43,6 @@ public:
     int getWindowHeight() const;
     void setWindowSize(int width, int height);
     camera::Camera &getCamera();
-    void setCameraPosition(const glm::vec3 &newPos);
 
     void draw(const render::RenderPipeline &pipeline) const;
 };

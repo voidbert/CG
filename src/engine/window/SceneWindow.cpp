@@ -31,7 +31,8 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
     scene(sceneFile),
     xAxis(glm::vec3(1.0f, 0.0f, 0.0f)),
     yAxis(glm::vec3(0.0f, 1.0f, 0.0f)),
-    zAxis(glm::vec3(0.0f, 0.0f, 1.0f)) {
+    zAxis(glm::vec3(0.0f, 0.0f, 1.0f)),
+    UI(this, scene.getCamera()) {
 
     this->resize(scene.getWindowWidth(), scene.getWindowHeight());
 
@@ -43,12 +44,6 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
     glCullFace(GL_BACK);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    this->UI.setup(this);
-    this->UI.setCamera(&this->scene.getCamera());
-
-    this->UI.setCameraUpdateCallbacks(
-        [this](const glm::vec3 &newPos) { this->scene.setCameraPosition(newPos); });
 }
 
 void SceneWindow::onUpdate(float time, float timeElapsed) {

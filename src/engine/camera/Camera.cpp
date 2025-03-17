@@ -24,13 +24,16 @@ Camera::Camera(const glm::vec3 &pos,
                float far) :
     position(pos), lookAt(target), up(upDir), fov(fovAngle), nearPlane(near), farPlane(far) {}
 
+void Camera::setPosition(const glm::vec3 &pos) {
+    this->position = pos;
+}
+
 glm::mat4 Camera::getCameraMatrix(float aspectRatio) const {
     glm::mat4 view = glm::lookAt(this->position, this->lookAt, this->up);
     glm::mat4 projection =
         glm::perspective(glm::radians(this->fov), aspectRatio, this->nearPlane, this->farPlane);
     return projection * view;
 }
-
 glm::vec3 Camera::getPosition() const {
     return this->position;
 }
