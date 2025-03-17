@@ -53,9 +53,9 @@ void UI::render() {
     ImGui::Separator();
     ImGui::Text("Render Options");
 
-    static bool wireframe = true;
+    static bool wireframe = false;
     if (ImGui::Checkbox("Fill Polygons", &wireframe)) {
-        glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
+        glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_FILL : GL_LINE);
     }
 
     static bool culling = true;
