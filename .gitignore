@@ -9,6 +9,7 @@
 /deps
 /obj
 
+# ImGUI
 imgui.ini
 
 # LaTeX compilation
