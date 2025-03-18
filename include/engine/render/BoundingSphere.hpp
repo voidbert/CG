@@ -14,35 +14,25 @@
 
 #pragma once
 
-#include <glad/glad.h>
+#include <glm/vec4.hpp>
+#include <memory>
 #include <vector>
 
-#include "engine/render/BoundingSphere.hpp"
 #include "utils/Vertex.hpp"
-#include "utils/WavefrontOBJ.hpp"
 
 namespace engine::render {
 
-class Model {
+class BoundingSphere {
 private:
-    GLuint vao, vbo, ibo;
-    unsigned int vertexCount;
-    BoundingSphere boundingSphere;
+    glm::vec4 center;
+    float radius;
 
 public:
-    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
-    explicit Model(const utils::WavefrontOBJ &objectFile);
-    Model(const Model &model) = delete;
-    Model(Model &&) = delete;
-    ~Model();
+    BoundingSphere(glm::vec4 _center, float _radius);
+    BoundingSphere(const std::vector<utils::Vertex> &vertices);
 
-    const BoundingSphere &getBoundingSphere() const;
-
-    void draw() const;
-
-private:
-    explicit Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices);
-    void calculateBoundingSphere();
+    glm::vec4 getCenter() const;
+    float getRadius() const;
 };
 
 }
