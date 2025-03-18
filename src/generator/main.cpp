@@ -19,6 +19,7 @@
 #include "generator/figures/Box.hpp"
 #include "generator/figures/Cone.hpp"
 #include "generator/figures/Cylinder.hpp"
+#include "generator/figures/Gear.hpp"
 #include "generator/figures/KleinBottle.hpp"
 #include "generator/figures/Plane.hpp"
 #include "generator/figures/Sphere.hpp"
@@ -137,6 +138,17 @@ int main(int argc, char **argv) {
 
             figures::KleinBottle kleinbottle(radius, slices, stacks);
             kleinbottle.writeToFile(file);
+        } else if (args.at(1) == "gear") {
+            validateArgumentCount(argc, 9);
+            double radius = stringToDouble(args.at(2));
+            double height = stringToDouble(args.at(3));
+            int slices = stringToDouble(args.at(4));
+            int stacks = stringToDouble(args.at(5));
+            int teeth = stringToInt(args.at(6));
+            double toothHeight = stringToDouble(args.at(7));
+            const std::string &file = args.at(8);
+            figures::Gear gear(radius, height, slices, stacks, teeth, toothHeight);
+            gear.writeToFile(file);
         } else {
             printUsage(args[0]);
         }
