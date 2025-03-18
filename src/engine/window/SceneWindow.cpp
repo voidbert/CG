@@ -20,8 +20,8 @@
 #include "engine/camera/Camera.hpp"
 #include "engine/camera/FreeCamera.hpp"
 #include "engine/camera/OrbitalCamera.hpp"
-#include "engine/ui/UI.hpp"
 #include "engine/window/SceneWindow.hpp"
+#include "engine/window/UI.hpp"
 
 namespace engine::window {
 
@@ -32,7 +32,7 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
     xAxis(glm::vec3(1.0f, 0.0f, 0.0f)),
     yAxis(glm::vec3(0.0f, 1.0f, 0.0f)),
     zAxis(glm::vec3(0.0f, 0.0f, 1.0f)),
-    UI(*this, scene.getCamera()) {
+    _UI(*this, scene.getCamera()) {
 
     this->resize(scene.getWindowWidth(), scene.getWindowHeight());
 
@@ -93,10 +93,10 @@ void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    this->UI.render();
+    this->_UI.render();
     this->scene.draw(this->pipeline);
 
-    if (this->UI.isShowAxesEnabled()) {
+    if (this->_UI.isShowAxesEnabled()) {
         this->xAxis.draw(this->pipeline);
         this->yAxis.draw(this->pipeline);
         this->zAxis.draw(this->pipeline);

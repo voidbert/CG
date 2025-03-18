@@ -18,7 +18,7 @@
 #include <engine/window/Window.hpp>
 #include <functional>
 
-namespace engine::ui {
+namespace engine::window {
 
 class UI {
 private:

@@ -12,7 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/ui/UI.hpp"
+#include "engine/window/UI.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -23,7 +23,7 @@
 #include "engine/render/RenderPipeline.hpp"
 #include "engine/window/Window.hpp"
 
-namespace engine::ui {
+namespace engine::window {
 
 UI::UI(Window &window, camera::Camera &_camera) : camera(_camera) {
     IMGUI_CHECKVERSION();
