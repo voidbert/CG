@@ -18,14 +18,22 @@
 #include <memory>
 #include <vector>
 
+#include "engine/render/RenderPipeline.hpp"
 #include "utils/Vertex.hpp"
 
 namespace engine::render {
+
+class Model; // Importing model would lead to a recursive inclusion
 
 class BoundingSphere {
 private:
     glm::vec4 center;
     float radius;
+
+    static std::shared_ptr<Model> sphereModel;
+    static bool initializingSphereModel;
+
+    BoundingSphere();
 
 public:
     BoundingSphere(glm::vec4 _center, float _radius);
@@ -33,6 +41,8 @@ public:
 
     glm::vec4 getCenter() const;
     float getRadius() const;
+
+    void draw(const RenderPipeline &pipeline, const glm::mat4 &transform) const;
 };
 
 }

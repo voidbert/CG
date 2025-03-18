@@ -40,6 +40,8 @@ void Entity::draw(const render::RenderPipeline &pipeline, const glm::mat4 &trans
     pipeline.setColor(glm::vec4(1.0f));
     pipeline.setMatrix(transform);
     this->model->draw();
+
+    this->model->getBoundingSphere().draw(pipeline, transform);
 }
 
 }

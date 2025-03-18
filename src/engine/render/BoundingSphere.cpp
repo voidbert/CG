@@ -13,15 +13,29 @@
 /// limitations under the License.
 
 #include <glm/geometric.hpp>
+#include <glm/gtx/transform.hpp>
 
 #include "engine/render/BoundingSphere.hpp"
+#include "engine/render/Model.hpp"
+#include "generator/figures/Sphere.hpp"
 
 namespace engine::render {
 
-BoundingSphere::BoundingSphere(glm::vec4 _center, float _radius) :
-    center(_center), radius(_radius) {}
+BoundingSphere::BoundingSphere() {
+    if (!BoundingSphere::sphereModel && !BoundingSphere::initializingSphereModel) {
+        BoundingSphere::initializingSphereModel = true;
 
-BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) {
+        generator::figures::Sphere sphere(1.0f, 16, 16);
+        BoundingSphere::sphereModel = std::make_shared<Model>(sphere);
+    }
+}
+
+BoundingSphere::BoundingSphere(glm::vec4 _center, float _radius) : BoundingSphere() {
+    this->center = _center;
+    this->radius = _radius;
+}
+
+BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) : BoundingSphere() {
     glm::vec4 sum(0.0f);
     for (const utils::Vertex &vertex : vertices) {
         sum += vertex.position;
@@ -45,5 +59,17 @@ glm::vec4 BoundingSphere::getCenter() const {
 float BoundingSphere::getRadius() const {
     return this->radius;
 }
+
+void BoundingSphere::draw(const RenderPipeline &pipeline, const glm::mat4 &transform) const {
+    const glm::vec3 translationVector = glm::vec3(this->center.x, this->center.y, this->center.z);
+    const glm::vec3 scaleVector = glm::vec3(this->radius);
+    pipeline.setMatrix(transform * glm::translate(translationVector) * glm::scale(scaleVector));
+
+    pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    BoundingSphere::sphereModel->draw();
+}
+
+std::shared_ptr<Model> BoundingSphere::sphereModel = nullptr;
+bool BoundingSphere::initializingSphereModel = false;
 
 }
