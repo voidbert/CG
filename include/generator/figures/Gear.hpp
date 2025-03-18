@@ -20,7 +20,13 @@ namespace generator::figures {
 
 class Gear : public utils::WavefrontOBJ {
 public:
-    Gear(float radius, float height, int slices, int stacks, int teeth, float toothHeight);
+    Gear(float majorRadius,
+         float minorRadius,
+         float height,
+         int slices,
+         int stacks,
+         int teeth,
+         float toothHeight);
 };
 
 }

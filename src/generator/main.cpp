@@ -29,20 +29,38 @@
 namespace generator {
 void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
-    std::cerr << "  " << programName
-              << " plane       <length>      <divisions>                     <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " box         <length>      <grid>                          <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " sphere      <radius>      <slices>      <stacks>          <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " cone        <radius>      <height>      <slices> <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " cylinder    <radius>      <height>      <slices> <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " torus       <majorRadius> <minorRadius> <slices> <stacks> <file>" << std::endl;
-    std::cerr << "  " << programName
-              << " kleinBottle <radius>      <slices>      <stacks>          <file>" << std::endl;
+    std::cerr
+        << "  " << programName
+        << " plane       <length>      <divisions>                                                     <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " box         <length>      <grid>                                                          <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " sphere      <radius>                             <slices> <stacks>                        <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " cone        <radius>                    <height> <slices> <stacks>                        <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " cylinder    <radius>                    <height> <slices> <stacks>                        <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " torus       <majorRadius> <minorRadius>          <slices> <stacks>                        <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " kleinBottle <radius>                             <slices> <stacks>                        <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " gear        <majorRadius> <minorRadius> <height> <slices> <stacks> <teeth> <thoothHeight> <file>"
+        << std::endl;
 }
 
 double stringToDouble(const std::string &str) {
@@ -139,15 +157,17 @@ int main(int argc, char **argv) {
             figures::KleinBottle kleinbottle(radius, slices, stacks);
             kleinbottle.writeToFile(file);
         } else if (args.at(1) == "gear") {
-            validateArgumentCount(argc, 9);
-            double radius = stringToDouble(args.at(2));
-            double height = stringToDouble(args.at(3));
-            int slices = stringToDouble(args.at(4));
-            int stacks = stringToDouble(args.at(5));
-            int teeth = stringToInt(args.at(6));
-            double toothHeight = stringToDouble(args.at(7));
-            const std::string &file = args.at(8);
-            figures::Gear gear(radius, height, slices, stacks, teeth, toothHeight);
+            validateArgumentCount(argc, 10);
+            double majorRadius = stringToDouble(args.at(2));
+            double minorRadius = stringToDouble(args.at(3));
+            double height = stringToDouble(args.at(4));
+            int slices = stringToDouble(args.at(5));
+            int stacks = stringToDouble(args.at(6));
+            int teeth = stringToInt(args.at(7));
+            double toothHeight = stringToDouble(args.at(8));
+            const std::string &file = args.at(9);
+            figures::Gear
+                gear(majorRadius, minorRadius, height, slices, stacks, teeth, toothHeight);
             gear.writeToFile(file);
         } else {
             printUsage(args[0]);

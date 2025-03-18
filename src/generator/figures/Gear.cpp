@@ -17,31 +17,51 @@
 #include "generator/figures/Gear.hpp"
 
 namespace generator::figures {
-Gear::Gear(float radius, float height, int slices, int stacks, int teeth, float toothHeight) {
-    float sliceStep = 2 * M_PI / slices;
-    float stackStep = height / stacks;
+Gear::Gear(float majorRadius,
+           float minorRadius,
+           float height,
+           int slices,
+           int stacks,
+           int teeth,
+           float toothHeight) {
 
-    // Cylindrical base
-    for (int iStack = 0; iStack <= stacks; iStack++) {
+    float sliceStep = 2 * M_PI / slices;
+    float stackStep = height / (stacks - 1);
+
+    // Outer Cylindrical base
+    for (int iStack = 0; iStack < stacks; iStack++) {
         float y = iStack * stackStep;
 
         for (int jSlice = 0; jSlice < slices; jSlice++) {
             float phi = jSlice * sliceStep;
-            float x = radius * cosf(phi);
-            float z = radius * sinf(phi);
+            float x = majorRadius * cosf(phi);
+            float z = majorRadius * sinf(phi);
 
-            // If it is a tooth position, increase the radius
+            // If it is a tooth position, increase the majorRadius
             if (jSlice % (slices / teeth) < (slices / (2 * teeth))) {
-                x *= 1.0f + toothHeight / radius;
-                z *= 1.0f + toothHeight / radius;
+                x *= 1.0f + toothHeight / majorRadius;
+                z *= 1.0f + toothHeight / majorRadius;
             }
 
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
         }
     }
 
-    // Side faces
+    // Inner cylindrical base
     for (int iStack = 0; iStack < stacks; iStack++) {
+        float y = iStack * stackStep;
+
+        for (int jSlice = 0; jSlice < slices; jSlice++) {
+            float phi = jSlice * sliceStep;
+            float x = minorRadius * cosf(phi);
+            float z = minorRadius * sinf(phi);
+
+            this->positions.push_back(glm::vec4(x, y, z, 1.0f));
+        }
+    }
+
+    // Side faces
+    for (int iStack = 0; iStack < stacks - 1; iStack++) {
         int topStart = iStack * slices;
         int bottomStart = (iStack + 1) * slices;
 
@@ -55,22 +75,46 @@ Gear::Gear(float radius, float height, int slices, int stacks, int teeth, float 
         }
     }
 
-    // Top and bottom caps
-    int topCenter = this->positions.size();
-    this->positions.push_back(glm::vec4(0, height, 0, 1.0f));
-    int bottomCenter = this->positions.size();
-    this->positions.push_back(glm::vec4(0, 0, 0, 1.0f));
+    // Inner side faces
+    int minorOffset = stacks * slices;
+    for (int iStack = 0; iStack < stacks - 1; iStack++) {
+        int topStart = minorOffset + iStack * slices;
+        int bottomStart = minorOffset + (iStack + 1) * slices;
 
-    int topBaseIndex = stacks * slices;
+        for (int jSlice = 0; jSlice < slices; jSlice++) {
+            int nextSlice = (jSlice + 1) % slices;
+            int topNext = topStart + jSlice;
+            int bottomNext = bottomStart + nextSlice;
+
+            this->faces.push_back(utils::TriangleFace(topNext, bottomStart + jSlice, bottomNext));
+            this->faces.push_back(utils::TriangleFace(topNext, bottomNext, topStart + nextSlice));
+        }
+    }
+
+    // Top and bottom
+    int topBaseIndex = (stacks - 1) * slices;
+    int minorTopBaseIndex = minorOffset + (stacks - 1) * slices;
     int baseIndex = 0;
+    int minorBaseIndex = minorOffset;
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {
         int nextSlice = (jSlice + 1) % slices;
 
-        this->faces.push_back(
-            utils::TriangleFace(topCenter, topBaseIndex + nextSlice, topBaseIndex + jSlice));
-        this->faces.push_back(
-            utils::TriangleFace(bottomCenter, baseIndex + jSlice, baseIndex + nextSlice));
+        // Top
+        this->faces.push_back(utils::TriangleFace(topBaseIndex + jSlice,
+                                                  minorTopBaseIndex + jSlice,
+                                                  minorTopBaseIndex + nextSlice));
+        this->faces.push_back(utils::TriangleFace(topBaseIndex + jSlice,
+                                                  minorTopBaseIndex + nextSlice,
+                                                  topBaseIndex + nextSlice));
+
+        // Bottom
+        this->faces.push_back(utils::TriangleFace(baseIndex + jSlice,
+                                                  minorBaseIndex + nextSlice,
+                                                  minorBaseIndex + jSlice));
+        this->faces.push_back(utils::TriangleFace(baseIndex + jSlice,
+                                                  baseIndex + nextSlice,
+                                                  minorBaseIndex + nextSlice));
     }
 }
 }
