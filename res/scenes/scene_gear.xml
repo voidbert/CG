@@ -8,7 +8,7 @@
     </camera>
     <group>
         <models>
-            <model file="../../build/gear.3d" />
+            <model file="../models/gear.3d" />
         </models>
     </group>
 </world>
