@@ -91,7 +91,7 @@ void SceneWindow::onRender() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
-    this->scene.draw(this->pipeline);
+    this->scene.draw(this->pipeline, true);
     this->xAxis.draw(this->pipeline);
     this->yAxis.draw(this->pipeline);
     this->zAxis.draw(this->pipeline);

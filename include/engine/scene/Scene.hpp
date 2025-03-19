@@ -44,7 +44,7 @@ public:
     void setWindowSize(int width, int height);
     camera::Camera &getCamera();
 
-    void draw(const render::RenderPipeline &pipeline) const;
+    void draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const;
 };
 
 }

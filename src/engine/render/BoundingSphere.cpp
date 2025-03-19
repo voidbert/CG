@@ -21,7 +21,7 @@
 
 namespace engine::render {
 
-BoundingSphere::BoundingSphere() {
+BoundingSphere::BoundingSphere() : center(0.0f, 0.0f, 0.0f, 1.0f), radius(0.0f) {
     if (!BoundingSphere::sphereModel && !BoundingSphere::initializingSphereModel) {
         BoundingSphere::initializingSphereModel = true;
 
@@ -30,26 +30,40 @@ BoundingSphere::BoundingSphere() {
     }
 }
 
-BoundingSphere::BoundingSphere(glm::vec4 _center, float _radius) : BoundingSphere() {
+BoundingSphere::BoundingSphere(const glm::vec4 &_center, float _radius) : BoundingSphere() {
     this->center = _center;
     this->radius = _radius;
 }
 
 BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) : BoundingSphere() {
+    // Calculate center of mass
     glm::vec4 sum(0.0f);
     for (const utils::Vertex &vertex : vertices) {
         sum += vertex.position;
     }
     this->center = sum / static_cast<float>(vertices.size());
 
+    // Calculate radius
     float maxDistance = -1.0f;
     for (const utils::Vertex &vertex : vertices) {
         float distance = glm::distance(this->center, vertex.position);
+
         if (distance > maxDistance) {
             maxDistance = distance;
         }
     }
+
     this->radius = maxDistance;
+}
+
+BoundingSphere::BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform) {
+    // https://math.stackexchange.com/questions/237369
+    const float scalex = glm::length(transform[0]);
+    const float scaley = glm::length(transform[1]);
+    const float scalez = glm::length(transform[2]);
+
+    this->radius = sphere.radius * std::max(scalex, std::max(scaley, scalez));
+    this->center = transform * sphere.center;
 }
 
 glm::vec4 BoundingSphere::getCenter() const {
@@ -60,10 +74,10 @@ float BoundingSphere::getRadius() const {
     return this->radius;
 }
 
-void BoundingSphere::draw(const RenderPipeline &pipeline, const glm::mat4 &transform) const {
-    const glm::vec3 translationVector = glm::vec3(this->center.x, this->center.y, this->center.z);
+void BoundingSphere::draw(const RenderPipeline &pipeline, const glm::mat4 &cameraMatrix) const {
+    const glm::vec3 translationVector = glm::vec3(this->center);
     const glm::vec3 scaleVector = glm::vec3(this->radius);
-    pipeline.setMatrix(transform * glm::translate(translationVector) * glm::scale(scaleVector));
+    pipeline.setMatrix(cameraMatrix * glm::translate(translationVector) * glm::scale(scaleVector));
 
     pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
     BoundingSphere::sphereModel->draw();

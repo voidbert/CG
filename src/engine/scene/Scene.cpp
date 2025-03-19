@@ -69,12 +69,13 @@ camera::Camera &Scene::getCamera() {
     return *camera;
 }
 
-void Scene::draw(const render::RenderPipeline &pipeline) const {
+void Scene::draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const {
     const float aspectRatio = static_cast<float>(this->windowWidth) / this->windowHeight;
     const glm::mat4 cameraMatrix = this->camera->getCameraMatrix(aspectRatio);
 
     for (const std::unique_ptr<Group> &group : this->groups) {
-        group->draw(pipeline, cameraMatrix);
+        group->updateBoundingSphere(glm::mat4(1.0f));
+        group->draw(pipeline, cameraMatrix, cameraMatrix, drawBoundingSpheres);
     }
 
     // Reset camera after transforms

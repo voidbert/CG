@@ -18,6 +18,7 @@
 #include <memory>
 #include <vector>
 
+#include "engine/render/BoundingSphere.hpp"
 #include "engine/render/RenderPipeline.hpp"
 #include "utils/Vertex.hpp"
 
@@ -33,16 +34,16 @@ private:
     static std::shared_ptr<Model> sphereModel;
     static bool initializingSphereModel;
 
-    BoundingSphere();
-
 public:
-    BoundingSphere(glm::vec4 _center, float _radius);
+    BoundingSphere();
+    BoundingSphere(const glm::vec4 &_center, float _radius);
     BoundingSphere(const std::vector<utils::Vertex> &vertices);
+    BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform);
 
     glm::vec4 getCenter() const;
     float getRadius() const;
 
-    void draw(const RenderPipeline &pipeline, const glm::mat4 &transform) const;
+    void draw(const RenderPipeline &pipeline, const glm::mat4 &cameraMatrix) const;
 };
 
 }

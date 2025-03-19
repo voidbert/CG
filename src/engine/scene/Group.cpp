@@ -52,16 +52,67 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
     }
 }
 
-void Group::draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) const {
+void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
+    const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
+
+    // Calculate center of group (approximation for objects around the same size)
+    glm::vec4 groupCenter(0.0f);
+
+    for (const std::unique_ptr<Entity> &entity : this->entities) {
+        entity->calculateBoundingSphere(subTransform);
+        groupCenter += entity->getBoundingSphere().getCenter();
+    }
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        group->updateBoundingSphere(subTransform);
+        groupCenter += group->boundingSphere.getCenter();
+    }
+
+    groupCenter /= this->entities.size() + this->groups.size();
+
+    // Calculate radius
+    float radius = 0.0f;
+    for (const std::unique_ptr<Entity> &entity : this->entities) {
+        const render::BoundingSphere &entitySphere = entity->getBoundingSphere();
+
+        float maxDistance =
+            glm::distance(entitySphere.getCenter(), groupCenter) + entitySphere.getRadius();
+
+        if (maxDistance >= radius)
+            radius = maxDistance;
+    }
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        float maxDistance = glm::distance(group->boundingSphere.getCenter(), groupCenter) +
+            group->boundingSphere.getRadius();
+
+        if (maxDistance >= radius)
+            radius = maxDistance;
+    }
+
+    this->boundingSphere = render::BoundingSphere(groupCenter, radius);
+}
+
+void Group::draw(const render::RenderPipeline &pipeline,
+                 const glm::mat4 &cameraMatrix,
+                 const glm::mat4 &_transform,
+                 bool drawBoundingSpheres) const {
+
     const glm::mat4 subTransform = _transform * this->transform.getMatrix();
 
     for (const std::unique_ptr<Entity> &entity : this->entities) {
         entity->draw(pipeline, subTransform);
+
+        if (drawBoundingSpheres)
+            entity->getBoundingSphere().draw(pipeline, cameraMatrix);
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
-        group->draw(pipeline, subTransform);
+        group->draw(pipeline, cameraMatrix, subTransform, drawBoundingSpheres);
     }
+
+    if (drawBoundingSpheres)
+        this->boundingSphere.draw(pipeline, cameraMatrix);
 }
 
 }

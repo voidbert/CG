@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "engine/render/BoundingSphere.hpp"
 #include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Entity.hpp"
 #include "engine/scene/TRSTransform.hpp"
@@ -32,6 +33,7 @@ class Group {
 private:
     std::vector<std::unique_ptr<Entity>> entities;
     std::vector<std::unique_ptr<Group>> groups;
+    render::BoundingSphere boundingSphere;
     TRSTransform transform;
 
 public:
@@ -41,7 +43,12 @@ public:
     Group(const Group &entity) = delete;
     Group(Group &&entity) = delete;
 
-    void draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) const;
+    void updateBoundingSphere(const glm::mat4 &worldTransform);
+
+    void draw(const render::RenderPipeline &pipeline,
+              const glm::mat4 &cameraMatrix,
+              const glm::mat4 &_transform,
+              bool drawBoundingSpheres) const;
 };
 
 }
