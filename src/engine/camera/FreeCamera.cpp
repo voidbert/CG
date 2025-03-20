@@ -95,4 +95,12 @@ void FreeCamera::move(MovementDirection direction, float deltaTime) {
 
     lookAt = position + front;
 }
+
+void FreeCamera::setPosition(const glm::vec3 &newPosition) {
+    Camera::setPosition(newPosition);
+    this->front = glm::normalize(this->lookAt - newPosition);
+    yaw = atan2f(front.z, front.x);
+    pitch = asinf(front.y);
+}
+
 }
