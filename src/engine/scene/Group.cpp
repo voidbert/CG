@@ -52,6 +52,15 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
     }
 }
 
+int Group::getEntityCount() const {
+    int ret = this->entities.size();
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        ret += group->getEntityCount();
+    }
+
+    return ret;
+}
+
 void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
     const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
 
@@ -93,26 +102,31 @@ void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
     this->boundingSphere = render::BoundingSphere(groupCenter, radius);
 }
 
-void Group::draw(const render::RenderPipeline &pipeline,
-                 const glm::mat4 &cameraMatrix,
-                 const glm::mat4 &_transform,
-                 bool drawBoundingSpheres) const {
+int Group::draw(const render::RenderPipeline &pipeline,
+                const glm::mat4 &cameraMatrix,
+                const glm::mat4 &_transform,
+                bool drawBoundingSpheres) const {
 
     const glm::mat4 subTransform = _transform * this->transform.getMatrix();
 
+    int renderedEntities = 0;
+
     for (const std::unique_ptr<Entity> &entity : this->entities) {
         entity->draw(pipeline, subTransform);
+        renderedEntities++;
 
         if (drawBoundingSpheres)
             entity->getBoundingSphere().draw(pipeline, cameraMatrix);
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
-        group->draw(pipeline, cameraMatrix, subTransform, drawBoundingSpheres);
+        renderedEntities += group->draw(pipeline, cameraMatrix, subTransform, drawBoundingSpheres);
     }
 
     if (drawBoundingSpheres)
         this->boundingSphere.draw(pipeline, cameraMatrix);
+
+    return renderedEntities;
 }
 
 }

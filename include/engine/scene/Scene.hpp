@@ -41,10 +41,11 @@ public:
 
     int getWindowWidth() const;
     int getWindowHeight() const;
+    int getEntityCount() const;
     void setWindowSize(int width, int height);
     camera::Camera &getCamera();
 
-    void draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const;
+    int draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const;
 };
 
 }

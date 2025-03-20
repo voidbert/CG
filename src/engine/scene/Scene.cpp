@@ -60,6 +60,15 @@ int Scene::getWindowHeight() const {
     return this->windowHeight;
 }
 
+int Scene::getEntityCount() const {
+    int ret = 0;
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        ret += group->getEntityCount();
+    }
+
+    return ret;
+}
+
 void Scene::setWindowSize(int width, int height) {
     this->windowWidth = width;
     this->windowHeight = height;
@@ -69,17 +78,21 @@ camera::Camera &Scene::getCamera() {
     return *camera;
 }
 
-void Scene::draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const {
+int Scene::draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const {
     const float aspectRatio = static_cast<float>(this->windowWidth) / this->windowHeight;
     const glm::mat4 cameraMatrix = this->camera->getCameraMatrix(aspectRatio);
 
+    int entityCount = 0;
+
     for (const std::unique_ptr<Group> &group : this->groups) {
         group->updateBoundingSphere(glm::mat4(1.0f));
-        group->draw(pipeline, cameraMatrix, cameraMatrix, drawBoundingSpheres);
+        entityCount += group->draw(pipeline, cameraMatrix, cameraMatrix, drawBoundingSpheres);
     }
 
     // Reset camera after transforms
     pipeline.setMatrix(cameraMatrix);
+
+    return entityCount;
 }
 
 }

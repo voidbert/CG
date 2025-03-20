@@ -43,12 +43,13 @@ public:
     Group(const Group &entity) = delete;
     Group(Group &&entity) = delete;
 
+    int getEntityCount() const;
     void updateBoundingSphere(const glm::mat4 &worldTransform);
 
-    void draw(const render::RenderPipeline &pipeline,
-              const glm::mat4 &cameraMatrix,
-              const glm::mat4 &_transform,
-              bool drawBoundingSpheres) const;
+    int draw(const render::RenderPipeline &pipeline,
+             const glm::mat4 &cameraMatrix,
+             const glm::mat4 &_transform,
+             bool drawBoundingSpheres) const;
 };
 
 }
