@@ -85,7 +85,49 @@
 
 \section{Extras}
 
-\textbf{\color{red} TODO - extras}
+\subsection{Câmara Orbital}
+
+A câmara orbital é uma câmara virtual usada em aplicações gráficas e de visualização tridimensional.
+Esta permite observar uma scene a partir de um ponto que orbita à volta de um objeto ou de
+um ponto de vista (\texttt{lookAt}). Esta câmara é útil para observar
+um objeto de diversos ângulos possíveis com o foco num ponto em específico.
+
+\subsubsection{Movimentação e Controlo}
+
+A movimentação é definida por 3 parâmetros:
+\begin{itemize}
+    \item Raio (\texttt{radius}): determina a distância do ponto de interesse à câmara;
+    \item Ângulo azimutal (\texttt{azimuth}): define a rotação da câmara em torno do eixo vertical,
+    o que permite uma visualização de 360 graus ao redor do objeto;
+    \item Ângulo polar (\texttt{polar}): controla o ângulo de elevação da câmara.
+\end{itemize}
+
+A posição da câmara é atualizada dinamicamente através da conversão das coordenadas esféricas para
+coordenadas cartesianas, isto é:
+
+$$x = radius \times \sin(polar) \times \cos(azimuth)$$
+$$y = radius \times \sin(polar) \times \sin(azimuth)$$
+$$z = radius \times \cos(polar)$$
+
+De forma a garantir um comportamento estável e consistente, os valores são restringidos em
+intervalos pré-definidos. O raio encontra-se limitado entre $0.5$ e $100$ para evitar que a câmara
+se aproxime demasiado ou se afaste demasiado do ponto de interesse. O ângulo azimutal varia entre
+$0$ e $2\pi$ de modo que a rotação ocorra de forma contínua e sem descontinuidades. Por fim, o
+ângulo polar encontra-se entre $0.01$ e $\pi - 0.01$ para evitar que a câmara atinja os polos e
+cause instabilidade no movimento.
+
+\subsubsection{Controlo pelo Utilizador}
+
+Para controlar a câmara orbital, o utilizador utiliza o teclado, sendo que as teclas associadas a
+cada ação são:
+\begin{itemize}
+    \item \texttt{W}: inclina a câmara para cima;
+    \item \texttt{S}: inclina a câmara para baixo;
+    \item \texttt{A}: roda a câmara para a esquerda;
+    \item \texttt{D}: roda a câmara para a direita;
+    \item \texttt{F}: aproxima a câmara do ponto de interesse;
+    \item \texttt{B}: afasta a câmara do ponto de interesse.
+\end{itemize}
 
 \section{Resultados obtidos}
 
