@@ -101,8 +101,9 @@ A movimentação é definida por 3 parâmetros:
     \item Ângulo polar (\texttt{polar}): controla o ângulo de elevação da câmara.
 \end{itemize}
 
-A posição da câmara é atualizada de forma dinâmica através da conversão das coordenadas esféricas
-para coordenadas cartesianas, isto é:
+A atualização da a posição da câmara é dada pela soma do ponto de interesse (\texttt{lookAt}) com
+as coordenadas cartesianas obtidas a partir das coordenadas esféricas. As fórmulas utilizadas para
+a conversão são as seguintes:
 
 $$x = radius \times \sin(polar) \times \cos(azimuth)$$
 $$y = radius \times \cos(polar)$$
