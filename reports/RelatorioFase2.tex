@@ -85,7 +85,58 @@
 
 \section{Extras}
 
-\textbf{\color{red} TODO - extras}
+\subsection{Garrafa de Klein}
+
+A garrafa de Klein é uma superfície não orientável, ou seja, não possui um lado interno e externo
+distinguíveis. Esta não possui fronteira e trata-se de uma variedade bidimensional onde não se pode
+definir um vetor normal em todos os pontos.
+
+\subsubsection{Geração dos vértices}
+
+Para a geração da garrafa de Klein, a superfície foi discretizada com a utilização de coordenadas
+paramétricas, com o auxílio de duas variáveis ($\theta$ e $\phi$).
+
+A parametrização de um vértice sobre a garrafa de klein de raio $r$ pode ser definida pelas
+seguintes equações \cite{bottleKlein}:
+
+$$
+x = r \left( \frac{-2}{15} \right) \cos(\theta) \left(3 \cos(\phi) - 30 \sin(\theta) +
+90 \cos^4(\theta) \sin(\theta) - 60 \cos^6(\theta) \sin(\theta) +
+5 \cos(\theta) \cos(\phi) \sin(\theta) \right)
+$$
+
+$$
+y = r \left( \frac{-1}{15} \right) \sin(\theta) \left( 3 \cos(\phi) - 3 \cos^2(\theta) \cos(\phi)
+- 48 \cos^4(\theta) \cos(\phi) + 48 \cos^6(\theta) \cos(\phi) - 60 \sin(\theta) \right.
+$$
+$$
+\quad \left. + 5 \cos(\theta) \cos(\phi) \sin(\theta) - 5 \cos^3(\theta) \cos(\phi) \sin(\theta)
+- 80 \cos^5(\theta) \cos(\phi) \sin(\theta) + 80 \cos^7(\theta) \cos(\phi) \sin(\theta) \right)
+$$
+
+$$
+z = r \left( \frac{2}{15} \right) (3 + 5 \cos(\theta) \sin(\theta)) \sin(\phi)
+$$
+
+A variável $\theta$ varia entre $0$ e $\pi$ e $\phi$ varia entre $0$ e $2\pi$. Além disso, o
+intervalo de valores de $\theta$ e $\phi$ varia de acordo com o número de slices e stacks.
+
+\subsubsection{Construção das faces}
+
+Após a geração dos vértices, constroem-se as faces da garrafa de Klein. Cada quadrilátero entre duas
+\emph{stacks} sucessivas é dividido em duas faces triangulares:
+
+$$
+T_1 = (P_1, P_2, P_3)
+\hspace{1cm}
+T_2 = (P_1, P_3, P_4)
+$$
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{res/phase2/figures/kleinBottle.pdf}
+    \caption{Garrafa de Klein}
+\end{figure}
 
 \section{Resultados obtidos}
 
@@ -100,8 +151,9 @@
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{exemplo}
-        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
+    \bibitem{bottleKlein}
+        "Klein bottle"{} Wikipedia: Mar. 21, 2025. [Online.] Available:
+        \url{https://en.wikipedia.org/wiki/Klein_bottle}
 \end{thebibliography}
 \endgroup
 
