@@ -87,10 +87,9 @@
 
 \subsection{Câmara Orbital}
 
-A câmara orbital é uma câmara virtual usada em aplicações gráficas e de visualização tridimensional.
-Esta permite observar uma scene a partir de um ponto que orbita à volta de um objeto ou de
-um ponto de vista (\texttt{lookAt}). Esta câmara é útil para observar
-um objeto de diversos ângulos possíveis com o foco num ponto em específico.
+A câmara orbital é uma câmara virtual que permite observar uma scene a partir de um ponto que
+orbita à volta de um objeto ou de um ponto de vista (\texttt{lookAt}). Esta câmara é útil para
+observar um objeto de diversos ângulos possíveis com o foco num ponto em específico.
 
 \subsubsection{Movimentação e Controlo}
 
@@ -102,19 +101,19 @@ A movimentação é definida por 3 parâmetros:
     \item Ângulo polar (\texttt{polar}): controla o ângulo de elevação da câmara.
 \end{itemize}
 
-A posição da câmara é atualizada dinamicamente através da conversão das coordenadas esféricas para
-coordenadas cartesianas, isto é:
+A posição da câmara é atualizada de forma dinâmica através da conversão das coordenadas esféricas
+para coordenadas cartesianas, isto é:
 
 $$x = radius \times \sin(polar) \times \cos(azimuth)$$
-$$y = radius \times \sin(polar) \times \sin(azimuth)$$
-$$z = radius \times \cos(polar)$$
+$$y = radius \times \cos(polar)$$
+$$z = radius \times \sin(polar) \times \sin(azimuth)$$
 
 De forma a garantir um comportamento estável e consistente, os valores são restringidos em
 intervalos pré-definidos. O raio encontra-se limitado entre $0.5$ e $100$ para evitar que a câmara
 se aproxime demasiado ou se afaste demasiado do ponto de interesse. O ângulo azimutal varia entre
-$0$ e $2\pi$ de modo que a rotação ocorra de forma contínua e sem descontinuidades. Por fim, o
-ângulo polar encontra-se entre $0.01$ e $\pi - 0.01$ para evitar que a câmara atinja os polos e
-cause instabilidade no movimento.
+$0$ e $2\pi$ para que a rotação aconteça de forma contínua. Por fim, o ângulo polar encontra-se
+entre $0.01$ e $\pi - 0.01$ para evitar que a câmara alcance os polos e cause instabilidade no
+movimento.
 
 \subsubsection{Controlo pelo Utilizador}
 
