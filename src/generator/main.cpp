@@ -58,7 +58,8 @@ void printUsage(const std::string &programName) {
         << "  " << programName
         << " kleinBottle  <radius>         <slices>         <stacks>                                                                                    <file>"
         << std::endl;
-    std::cerr << "  " << programName
+    std::cerr
+        << "  " << programName
         << " mobiusStrip  <radius>         <width>          <twist>            <slices>         <stacks>                                                <file>"
         << std::endl;
     std::cerr
@@ -173,19 +174,19 @@ int main(int argc, char **argv) {
             mobius.writeToFile(file);
         } else if (args.at(1) == "solarSystem") {
             if (argc == 4) {
-                double sceneScale = stringToDouble(args.at(2));
+                double sceneScale = stringToFloat(args.at(2));
                 const std::string &file = args.at(3);
 
                 figures::SolarSystem solarSystem(sceneScale, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
                 solarSystem.writeToFile(file);
             } else if (argc == 10) {
-                double sceneScale = stringToDouble(args.at(2));
-                double sunSizeFactor = stringToDouble(args.at(3));
-                double planetSizeFactor = stringToDouble(args.at(4));
-                double moonSizeFactor = stringToDouble(args.at(5));
-                double distanceFactor = stringToDouble(args.at(6));
-                double asteroidBeltDensity = stringToDouble(args.at(7));
-                double ringSizeFactor = stringToDouble(args.at(8));
+                float sceneScale = stringToFloat(args.at(2));
+                float sunSizeFactor = stringToFloat(args.at(3));
+                float planetSizeFactor = stringToFloat(args.at(4));
+                float moonSizeFactor = stringToFloat(args.at(5));
+                float distanceFactor = stringToFloat(args.at(6));
+                float asteroidBeltDensity = stringToFloat(args.at(7));
+                float ringSizeFactor = stringToFloat(args.at(8));
                 const std::string &file = args.at(9);
 
                 figures::SolarSystem solarSystem(sceneScale,
