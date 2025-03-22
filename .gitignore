@@ -9,5 +9,8 @@
 /deps
 /obj
 
+# ImGUI
+imgui.ini
+
 # LaTeX compilation
 *-eps-converted-to.pdf

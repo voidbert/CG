@@ -77,4 +77,19 @@ void OrbitalCamera::move(MovementDirection dir, float delta) {
     radius = glm::clamp(radius, 0.5f, 100.0f);
     updatePosition();
 }
+
+void OrbitalCamera::setPosition(const glm::vec3 &newPosition) {
+    Camera::setPosition(newPosition);
+    const glm::vec3 delta = this->position - this->lookAt;
+
+    radius = glm::length(delta);
+    if (radius > 0.0f) {
+        const glm::vec3 dir = glm::normalize(delta);
+        azimuth = atan2f(dir.z, dir.x);
+        polar = acosf(dir.y);
+    } else {
+        polar = azimuth = 0.0f;
+    }
+}
+
 }
