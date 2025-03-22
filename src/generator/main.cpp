@@ -20,6 +20,7 @@
 #include "generator/figures/Cone.hpp"
 #include "generator/figures/Cylinder.hpp"
 #include "generator/figures/KleinBottle.hpp"
+#include "generator/figures/MobiusStrip.hpp"
 #include "generator/figures/Plane.hpp"
 #include "generator/figures/SolarSystem.hpp"
 #include "generator/figures/Sphere.hpp"
@@ -57,17 +58,20 @@ void printUsage(const std::string &programName) {
         << "  " << programName
         << " kleinBottle  <radius>         <slices>         <stacks>                                                                                    <file>"
         << std::endl;
+    std::cerr << "  " << programName
+        << " mobiusStrip  <radius>         <width>          <twist>            <slices>         <stacks>                                                <file>"
+        << std::endl;
     std::cerr
         << "  " << programName
         << " solarSystem  <sceneScale>     <sunSizeFactor>  <planetSizeFactor> <moonSizeFactor> <distanceFactor> <asteroidBeltDensity> <ringSizeFactor> <file>"
         << std::endl;
 }
 
-double stringToDouble(const std::string &str) {
+float stringToFloat(const std::string &str) {
     size_t charactersParsed;
-    double ret = std::stod(str, &charactersParsed);
+    float ret = std::stof(str, &charactersParsed);
     if (charactersParsed != str.length())
-        throw std::invalid_argument("str is not a double");
+        throw std::invalid_argument("str is not a float");
     if (ret <= 0)
         throw std::invalid_argument("str is not positive");
     return ret;
@@ -94,7 +98,7 @@ int main(int argc, char **argv) {
     try {
         if (args.at(1) == "plane") {
             validateArgumentCount(argc, 5);
-            double length = stringToDouble(args.at(2));
+            float length = stringToFloat(args.at(2));
             int divisions = stringToInt(args.at(3));
             const std::string &file = args.at(4);
 
@@ -102,15 +106,15 @@ int main(int argc, char **argv) {
             plane.writeToFile(file);
         } else if (args.at(1) == "box") {
             validateArgumentCount(argc, 5);
-            double length = stringToDouble(args.at(2));
-            double grid = stringToDouble(args.at(3));
+            float length = stringToFloat(args.at(2));
+            int grid = stringToInt(args.at(3));
             const std::string &file = args.at(4);
 
             figures::Box box(length, grid);
             box.writeToFile(file);
         } else if (args.at(1) == "sphere") {
             validateArgumentCount(argc, 6);
-            double radius = stringToDouble(args.at(2));
+            float radius = stringToFloat(args.at(2));
             int slices = stringToInt(args.at(3));
             int stacks = stringToInt(args.at(4));
             const std::string &file = args.at(5);
@@ -119,8 +123,8 @@ int main(int argc, char **argv) {
             sphere.writeToFile(file);
         } else if (args.at(1) == "cone") {
             validateArgumentCount(argc, 7);
-            double radius = stringToDouble(args.at(2));
-            double height = stringToDouble(args.at(3));
+            float radius = stringToFloat(args.at(2));
+            float height = stringToFloat(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
 
@@ -129,8 +133,8 @@ int main(int argc, char **argv) {
             cone.writeToFile(file);
         } else if (args.at(1) == "cylinder") {
             validateArgumentCount(argc, 7);
-            float radius = stringToDouble(args.at(2));
-            float height = stringToDouble(args.at(3));
+            float radius = stringToFloat(args.at(2));
+            float height = stringToFloat(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
             const std::string &file = args.at(6);
@@ -139,8 +143,8 @@ int main(int argc, char **argv) {
             cylinder.writeToFile(file);
         } else if (args.at(1) == "torus") {
             validateArgumentCount(argc, 7);
-            double majorRadius = stringToDouble(args.at(2));
-            double minorRadius = stringToDouble(args.at(3));
+            float majorRadius = stringToFloat(args.at(2));
+            float minorRadius = stringToFloat(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
             const std::string &file = args.at(6);
@@ -149,13 +153,24 @@ int main(int argc, char **argv) {
             torus.writeToFile(file);
         } else if (args.at(1) == "kleinBottle") {
             validateArgumentCount(argc, 6);
-            float radius = stringToDouble(args.at(2));
+            float radius = stringToFloat(args.at(2));
             int slices = stringToInt(args.at(3));
             int stacks = stringToInt(args.at(4));
             const std::string &file = args.at(5);
 
             figures::KleinBottle kleinbottle(radius, slices, stacks);
             kleinbottle.writeToFile(file);
+        } else if (args.at(1) == "mobiusStrip") {
+            validateArgumentCount(argc, 8);
+            float radius = stringToFloat(args.at(2));
+            float width = stringToFloat(args.at(3));
+            int twist = stringToInt(args.at(4));
+            int slices = stringToInt(args.at(5));
+            int stacks = stringToInt(args.at(6));
+            const std::string &file = args.at(7);
+
+            figures::MobiusStrip mobius(radius, width, twist, slices, stacks);
+            mobius.writeToFile(file);
         } else if (args.at(1) == "solarSystem") {
             if (argc == 4) {
                 double sceneScale = stringToDouble(args.at(2));

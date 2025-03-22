@@ -13,28 +13,14 @@
 /// limitations under the License.
 
 #pragma once
-#include "engine/camera/Camera.hpp"
 
-namespace engine::camera {
+#include "utils/WavefrontOBJ.hpp"
 
-class OrbitalCamera : public Camera {
-private:
-    float azimuth;
-    float polar;
-    float radius;
+namespace generator::figures {
 
-    void updatePosition();
-
+class MobiusStrip : public utils::WavefrontOBJ {
 public:
-    OrbitalCamera(const glm::vec3 &_position,
-                  const glm::vec3 &_lookAt,
-                  const glm::vec3 &_up,
-                  float _fov,
-                  float _near,
-                  float _far);
-
-    void move(MovementDirection direction, float deltaTime) override;
-    void setPosition(const glm::vec3 &newPosition) override;
+    MobiusStrip(float radius, float width, int twist, int slices, int stacks);
 };
 
 }

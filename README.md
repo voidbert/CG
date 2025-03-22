@@ -30,7 +30,8 @@ First, you'll need to install the following dependencies:
 
 Other libraries are already included in this repository:
 
- - [GLAD](https://glad.dav1d.de/).
+ - [GLAD](https://glad.dav1d.de/);
+ - [Dear ImGui](https://github.com/ocornut/imgui).
 
 Then, to compile the project, run:
 
