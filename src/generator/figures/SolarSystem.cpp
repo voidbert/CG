@@ -435,9 +435,4 @@ void SolarSystem::addAsteroidBelt(tinyxml2::XMLElement *parent,
     }
 }
 
-void SolarSystem::writeToFile(const std::string &filename) {
-    std::string filePath = "res/scenes/" + filename;
-    doc.SaveFile(filePath.c_str());
-}
-
 }

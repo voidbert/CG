@@ -72,8 +72,6 @@ public:
                 float distanceFactor,
                 float asteroidBeltDensity,
                 float ringSizeFactor);
-
-    void writeToFile(const std::string &filename);
 };
 
 }
