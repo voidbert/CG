@@ -56,7 +56,7 @@ void SolarSystem::configureCamera() {
         { "position", glm::vec3(200, 150, 300) },
         { "lookAt",   glm::vec3(0,   0,   0)   },
         { "up",       glm::vec3(0,   1,   0)   }
-    }; 
+    };
 
     for (const auto &[name, vec] : cameraSettings) {
         tinyxml2::XMLElement *element = doc.NewElement(name.c_str());
