@@ -33,42 +33,43 @@ void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
     std::cerr
         << "  " << programName
-        << " plane        <length>         <divisions>                                                                                                  <file>"
+        << " plane        <length>       <divisions>                                                                                                  <file>"
         << std::endl;
     std::cerr
         << "  " << programName
-        << " box          <length>         <grid>                                                                                                       <file>"
+        << " box          <length>       <grid>                                                                                                       <file>"
         << std::endl;
     std::cerr
         << "  " << programName
-        << " sphere       <radius>         <slices>         <stacks>                                                                                    <file>"
+        << " sphere       <radius>       <slices>         <stacks>                                                                                    <file>"
         << std::endl;
     std::cerr
         << "  " << programName
-        << " cone         <radius>         <height>         <slices>           <stacks>                                                                 <file>"
+        << " cone         <radius>       <height>         <slices>           <stacks>                                                                 <file>"
         << std::endl;
     std::cerr
         << "  " << programName
-        << " cylinder     <radius>         <height>         <slices>           <stacks>                                                                 <file>"
+        << " cylinder     <radius>       <height>         <slices>           <stacks>                                                                 <file>"
         << std::endl;
     std::cerr
         << "  " << programName
-        << " torus        <majorRadius>    <minorRadius>    <slices>           <stacks>                                                                 <file>"
+        << " torus        <majorRadius>  <minorRadius>    <slices>           <stacks>                                                                 <file>"
         << std::endl;
     std::cerr
         << "  " << programName
-        << " kleinBottle  <radius>         <slices>         <stacks>                                                                                    <file>"
+        << " kleinBottle  <radius>       <slices>         <stacks>                                                                                    <file>"
         << std::endl;
     std::cerr
         << "  " << programName
-        << " mobiusStrip  <radius>         <width>          <twist>            <slices>         <stacks>                                                <file>"
+        << " mobiusStrip  <radius>       <width>          <twist>            <slices>         <stacks>                                                <file>"
         << std::endl;
     std::cerr
         << "  " << programName
-        << " solarSystem  <sceneScale>     <sunSizeFactor>  <planetSizeFactor> <moonSizeFactor> <distanceFactor> <asteroidBeltDensity> <ringSizeFactor> <file>"
+        << " solarSystem  <sceneScale>   <sunSizeFactor>  <planetSizeFactor> <moonSizeFactor> <distanceFactor> <asteroidBeltDensity> <ringSizeFactor> <file>"
+        << std::endl;
     std::cerr
         << "  " << programName
-        << " gear        <majorRadius> <minorRadius> <height> <slices> <stacks> <teeth> <toothHeight> <file>"
+        << " gear         <majorRadius>  <minorRadius>    <height>           <stacks>         <teeth>          <toothHeight>                          <file>"
         << std::endl;
 }
 
@@ -202,23 +203,22 @@ int main(int argc, char **argv) {
                                                  ringSizeFactor);
 
                 solarSystem.writeToFile(file);
-          } else if (args.at(1) == "gear") {
-            validateArgumentCount(argc, 10);
+            }
+        } else if (args.at(1) == "gear") {
+            validateArgumentCount(argc, 9);
             float majorRadius = stringToFloat(args.at(2));
             float minorRadius = stringToFloat(args.at(3));
             float height = stringToFloat(args.at(4));
-            int slices = stringToInt(args.at(5));
-            int stacks = stringToInt(args.at(6));
-            int teeth = stringToInt(args.at(7));
-            float toothHeight = stringToFloat(args.at(8));
-            const std::string &file = args.at(9);
-            figures::Gear
-                gear(majorRadius, minorRadius, height, slices, stacks, teeth, toothHeight);
+            int stacks = stringToInt(args.at(5));
+            int teeth = stringToInt(args.at(6));
+            float toothHeight = stringToFloat(args.at(7));
+            const std::string &file = args.at(8);
+            figures::Gear gear(majorRadius, minorRadius, height, stacks, teeth, toothHeight);
             gear.writeToFile(file);
-          else {
-                printUsage(args[0]);
-                return 1;
-            }
+        } else {
+            printUsage(args[0]);
+            return 1;
+        }
     } catch (std::out_of_range &e) {
         printUsage(args[0]);
         return 1;

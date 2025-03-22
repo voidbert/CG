@@ -20,13 +20,13 @@ namespace generator::figures {
 Gear::Gear(float majorRadius,
            float minorRadius,
            float height,
-           int slices,
            int stacks,
            int teeth,
            float toothHeight) {
 
+    int slices = 4 * teeth;
     float sliceStep = 2 * M_PI / slices;
-    float stackStep = height / (stacks - 1);
+    float stackStep = height / stacks;
 
     // Outer Cylindrical base
     for (int iStack = 0; iStack < stacks; iStack++) {

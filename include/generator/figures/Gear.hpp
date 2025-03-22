@@ -23,7 +23,6 @@ public:
     Gear(float majorRadius,
          float minorRadius,
          float height,
-         int slices,
          int stacks,
          int teeth,
          float toothHeight);
