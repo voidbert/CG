@@ -44,7 +44,7 @@ void FreeCamera::updateCameraVectors() {
 }
 
 void FreeCamera::move(MovementDirection direction, float deltaTime) {
-    const float translationSpeed = 5.0f * deltaTime;
+    const float translationSpeed = 100.0f * deltaTime;
     const float rotationSpeed = 1.5f * deltaTime;
 
     glm::vec3 horizontalFront = glm::normalize(glm::vec3(front.x, front.y, front.z));
@@ -95,4 +95,12 @@ void FreeCamera::move(MovementDirection direction, float deltaTime) {
 
     lookAt = position + front;
 }
+
+void FreeCamera::setPosition(const glm::vec3 &newPosition) {
+    Camera::setPosition(newPosition);
+    this->front = glm::normalize(this->lookAt - newPosition);
+    yaw = atan2f(front.z, front.x);
+    pitch = asinf(front.y);
+}
+
 }

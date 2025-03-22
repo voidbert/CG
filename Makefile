@@ -22,7 +22,7 @@ CPPFLAGS := -Iinclude -std=c++20 -Wall -Wextra -pedantic -Wshadow \
 				$(shell pkg-config --cflags glm) \
 				$(shell pkg-config --cflags gl) \
 				$(shell pkg-config --cflags tinyxml2) \
-				-Ilib/include
+				-Ilib/include -Ilib/include/imgui -Ilib/include/imgui/backends
 LIBS := -lm \
 	$(shell pkg-config --libs glfw3) \
 	$(shell pkg-config --libs glm) \
@@ -46,13 +46,15 @@ PREFIX ?= $(HOME)/.local
 
 # END OF CONFIGURATION
 
-SOURCES     = $(shell find "src" -name '*.cpp' -type f)
-OBJECTS     = $(patsubst src/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
-LIB_SOURCES = $(shell find "lib" -name '*.c' -type f)
-LIB_OBJECTS = $(patsubst lib/%.c, $(OBJDIR)/%.o, $(LIB_SOURCES))
-HEADERS     = $(shell find "include" -name '*.hpp' -type f)
-DEPENDS     = $(patsubst src/%.cpp, $(DEPDIR)/%.d, $(SOURCES))
-REPORTS     = $(patsubst reports/%.tex, $(BUILDDIR)/%.pdf, $(shell find reports -name '*.tex' -type f))
+SOURCES := $(shell find "src" -name '*.cpp' -type f)
+OBJECTS := $(patsubst src/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
+HEADERS := $(shell find "include" -name '*.hpp' -type f)
+DEPENDS := $(patsubst src/%.cpp, $(DEPDIR)/%.d, $(SOURCES))
+REPORTS := $(patsubst reports/%.tex, $(BUILDDIR)/%.pdf, $(shell find reports -name '*.tex' -type f))
+
+LIB_SOURCES := $(shell find "lib" -name '*.c' -or -name '*.cpp' -type f)
+LIB_OBJECTS := $(patsubst lib/src/%.c, $(OBJDIR)/lib/%.o, $(LIB_SOURCES))
+LIB_OBJECTS := $(patsubst lib/src/%.cpp, $(OBJDIR)/lib/%.o, $(LIB_OBJECTS))
 
 ifeq ($(DEBUG), 1)
 	CPPFLAGS += $(DEBUG_CPPFLAGS)
@@ -95,9 +97,13 @@ $(OBJDIR)/%.o: src/%.cpp Makefile
 	@mkdir -p $$(dirname $@)
 	$(CPP) -MMD -MF $(patsubst src/%.cpp, $(DEPDIR)/%.d, $<) -c $< -o $@ $(CPPFLAGS)
 
-$(OBJDIR)/%.o: lib/%.c Makefile
+$(OBJDIR)/lib/%.o: lib/src/%.c Makefile
 	@mkdir -p $$(dirname $@)
 	$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/lib/%.o: lib/src/%.cpp Makefile
+	@mkdir -p $$(dirname $@)
+	$(CPP) -c $< -o $@ $(CPPFLAGS)
 
 $(BUILDDIR)/$(ENGINE_EXENAME) $(BUILDDIR)/$(GENERATOR_EXENAME) $(BUILDDIR)/build_type: \
 	$(OBJECTS) $(LIB_OBJECTS)
