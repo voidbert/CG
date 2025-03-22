@@ -18,9 +18,11 @@
 #include <string>
 #include <tinyxml2.h>
 
+#include "utils/WavefrontOBJ.hpp"
+
 namespace generator::figures {
 
-class SolarSystem {
+class SolarSystem : public utils::WavefrontOBJ {
 private:
     tinyxml2::XMLDocument doc;
 

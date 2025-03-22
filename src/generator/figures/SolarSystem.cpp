@@ -12,7 +12,8 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <vector>
+#include <glm/vec3.hpp>
+#include <unordered_map>
 
 #include "generator/figures/SolarSystem.hpp"
 
@@ -34,7 +35,6 @@ SolarSystem::SolarSystem(float sceneScale,
                         distanceFactor,
                         asteroidBeltDensity,
                         ringSizeFactor);
-    writeToFile("scene_solarSystem.xml");
 }
 
 void SolarSystem::createWorld() {
@@ -52,20 +52,17 @@ void SolarSystem::configureCamera() {
     camera->SetAttribute("type", "free");
     doc.FirstChildElement("world")->InsertEndChild(camera);
 
-    const struct {
-        const char *name;
-        float x, y, z;
-    } cameraSettings[] = {
-        { "position", 200, 150, 300 },
-        { "lookAt",   0,   0,   0   },
-        { "up",       0,   1,   0   }
-    };
+    std::unordered_map<std::string, glm::vec3> cameraSettings = {
+        { "position", glm::vec3(200, 150, 300) },
+        { "lookAt",   glm::vec3(0,   0,   0)   },
+        { "up",       glm::vec3(0,   1,   0)   }
+    }; 
 
-    for (const auto &setting : cameraSettings) {
-        tinyxml2::XMLElement *element = doc.NewElement(setting.name);
-        element->SetAttribute("x", setting.x);
-        element->SetAttribute("y", setting.y);
-        element->SetAttribute("z", setting.z);
+    for (const auto &[name, vec] : cameraSettings) {
+        tinyxml2::XMLElement *element = doc.NewElement(name.c_str());
+        element->SetAttribute("x", vec.x);
+        element->SetAttribute("y", vec.y);
+        element->SetAttribute("z", vec.z);
         camera->InsertEndChild(element);
     }
 
