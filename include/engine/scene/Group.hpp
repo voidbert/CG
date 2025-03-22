@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "engine/camera/Camera.hpp"
 #include "engine/render/BoundingSphere.hpp"
 #include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/Entity.hpp"
@@ -47,7 +48,7 @@ public:
     void updateBoundingSphere(const glm::mat4 &worldTransform);
 
     int draw(const render::RenderPipeline &pipeline,
-             const glm::mat4 &cameraMatrix,
+             const camera::Camera &camera,
              const glm::mat4 &_transform,
              bool drawBoundingSpheres) const;
 };

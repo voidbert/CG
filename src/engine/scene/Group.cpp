@@ -103,24 +103,31 @@ void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
 }
 
 int Group::draw(const render::RenderPipeline &pipeline,
-                const glm::mat4 &cameraMatrix,
+                const camera::Camera &camera,
                 const glm::mat4 &_transform,
                 bool drawBoundingSpheres) const {
 
     const glm::mat4 subTransform = _transform * this->transform.getMatrix();
-
+    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
     int renderedEntities = 0;
 
-    for (const std::unique_ptr<Entity> &entity : this->entities) {
-        entity->draw(pipeline, subTransform);
-        renderedEntities++;
+    if (!camera.isInFrustum(this->boundingSphere))
+        return renderedEntities;
 
-        if (drawBoundingSpheres)
-            entity->getBoundingSphere().draw(pipeline, cameraMatrix);
+    for (const std::unique_ptr<Entity> &entity : this->entities) {
+        const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
+
+        if (camera.isInFrustum(entityBoundingSphere)) {
+            entity->draw(pipeline, subTransform);
+            renderedEntities++;
+
+            if (drawBoundingSpheres)
+                entityBoundingSphere.draw(pipeline, cameraMatrix);
+        }
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
-        renderedEntities += group->draw(pipeline, cameraMatrix, subTransform, drawBoundingSpheres);
+        renderedEntities += group->draw(pipeline, camera, subTransform, drawBoundingSpheres);
     }
 
     if (drawBoundingSpheres)
