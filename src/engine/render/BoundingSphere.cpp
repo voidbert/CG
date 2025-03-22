@@ -12,8 +12,10 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <execution>
 #include <glm/geometric.hpp>
 #include <glm/gtx/transform.hpp>
+#include <numeric>
 
 #include "engine/render/BoundingSphere.hpp"
 #include "engine/render/Model.hpp"
@@ -37,23 +39,25 @@ BoundingSphere::BoundingSphere(const glm::vec4 &_center, float _radius) : Boundi
 
 BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) : BoundingSphere() {
     // Calculate center of mass
-    glm::vec4 sum(0.0f);
-    for (const utils::Vertex &vertex : vertices) {
-        sum += vertex.position;
-    }
-    this->center = sum / static_cast<float>(vertices.size());
+    this->center =
+        std::transform_reduce(std::execution::par,
+                              vertices.cbegin(),
+                              vertices.cend(),
+                              glm::vec4(0.0f),
+                              std::plus<>(),
+                              [](const utils::Vertex &vertex) { return vertex.position; }) /
+        static_cast<float>(vertices.size());
 
     // Calculate radius
-    float maxDistance = -1.0f;
-    for (const utils::Vertex &vertex : vertices) {
-        float distance = glm::distance(this->center, vertex.position);
-
-        if (distance > maxDistance) {
-            maxDistance = distance;
-        }
-    }
-
-    this->radius = maxDistance;
+    this->radius = std::transform_reduce(
+        std::execution::par,
+        vertices.cbegin(),
+        vertices.cend(),
+        -1.0,
+        [](float d1, float d2) { return std::max(d1, d2); },
+        [this](const utils::Vertex &vertex) {
+            return glm::distance(this->center, vertex.position);
+        });
 }
 
 BoundingSphere::BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform) {
@@ -75,8 +79,8 @@ float BoundingSphere::getRadius() const {
 }
 
 void BoundingSphere::draw(const RenderPipeline &pipeline, const glm::mat4 &cameraMatrix) const {
-    const glm::vec3 translationVector = glm::vec3(this->center);
-    const glm::vec3 scaleVector = glm::vec3(this->radius);
+    const glm::vec3 translationVector(this->center);
+    const glm::vec3 scaleVector(this->radius);
     pipeline.setMatrix(cameraMatrix * glm::translate(translationVector) * glm::scale(scaleVector));
 
     pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));

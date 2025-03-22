@@ -37,7 +37,7 @@ private:
 public:
     BoundingSphere();
     BoundingSphere(const glm::vec4 &_center, float _radius);
-    BoundingSphere(const std::vector<utils::Vertex> &vertices);
+    explicit BoundingSphere(const std::vector<utils::Vertex> &vertices);
     BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform);
 
     glm::vec4 getCenter() const;

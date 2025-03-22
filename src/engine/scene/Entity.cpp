@@ -36,7 +36,7 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
     }
 }
 
-void Entity::calculateBoundingSphere(const glm::mat4 &worldTransform) {
+void Entity::updateBoundingSphere(const glm::mat4 &worldTransform) {
     this->boundingSphere = render::BoundingSphere(this->model->getBoundingSphere(), worldTransform);
 }
 

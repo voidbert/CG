@@ -12,6 +12,8 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <algorithm>
+
 #include "engine/camera/Camera.hpp"
 
 namespace engine::camera {
@@ -65,13 +67,13 @@ void Camera::updateCameraMatrix() {
 }
 
 bool Camera::isInFrustum(const render::BoundingSphere &sphere) const {
-    for (const glm::vec4 &plane : this->viewFrustum) {
-        const float distance = glm::dot(glm::vec3(plane), glm::vec3(sphere.getCenter())) + plane.w;
-        if (distance < -sphere.getRadius())
-            return false;
-    }
-
-    return true;
+    return std::none_of(this->viewFrustum.cbegin(),
+                        this->viewFrustum.cend(),
+                        [sphere](const glm::vec4 &plane) {
+                            const float distance =
+                                glm::dot(glm::vec3(plane), glm::vec3(sphere.getCenter())) + plane.w;
+                            return distance < -sphere.getRadius();
+                        });
 }
 
 void Camera::updateViewFrustum() {

@@ -38,7 +38,7 @@ public:
     Entity(const Entity &entity) = delete;
     Entity(Entity &&entity) = delete;
 
-    void calculateBoundingSphere(const glm::mat4 &worldTransform);
+    void updateBoundingSphere(const glm::mat4 &worldTransform);
     const render::BoundingSphere &getBoundingSphere() const;
 
     void draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const;

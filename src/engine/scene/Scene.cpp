@@ -12,9 +12,11 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/scene/Scene.hpp"
+#include <execution>
+#include <numeric>
 
 #include "engine/camera/CameraFactory.hpp"
+#include "engine/scene/Scene.hpp"
 #include "utils/XMLUtils.hpp"
 
 namespace engine::scene {
@@ -61,12 +63,13 @@ int Scene::getWindowHeight() const {
 }
 
 int Scene::getEntityCount() const {
-    int ret = 0;
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        ret += group->getEntityCount();
-    }
-
-    return ret;
+    return std::transform_reduce(
+        std::execution::par,
+        this->groups.cbegin(),
+        this->groups.cend(),
+        0,
+        std::plus<>(),
+        [](const std::unique_ptr<Group> &group) { return group->getEntityCount(); });
 }
 
 void Scene::setWindowSize(int width, int height) {

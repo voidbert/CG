@@ -12,6 +12,8 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <execution>
+#include <numeric>
 #include <stdexcept>
 
 #include "engine/scene/Group.hpp"
@@ -53,12 +55,13 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
 }
 
 int Group::getEntityCount() const {
-    int ret = this->entities.size();
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        ret += group->getEntityCount();
-    }
-
-    return ret;
+    return std::transform_reduce(
+        std::execution::par,
+        this->groups.cbegin(),
+        this->groups.cend(),
+        this->entities.size(),
+        std::plus<>(),
+        [](const std::unique_ptr<Group> &group) { return group->getEntityCount(); });
 }
 
 void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
@@ -67,38 +70,51 @@ void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
     // Calculate center of group (approximation for objects around the same size)
     glm::vec4 groupCenter(0.0f);
 
-    for (const std::unique_ptr<Entity> &entity : this->entities) {
-        entity->calculateBoundingSphere(subTransform);
-        groupCenter += entity->getBoundingSphere().getCenter();
-    }
+    groupCenter += std::transform_reduce(std::execution::par,
+                                         this->entities.cbegin(),
+                                         this->entities.cend(),
+                                         glm::vec4(0.0f),
+                                         std::plus<>(),
+                                         [subTransform](const std::unique_ptr<Entity> &entity) {
+                                             entity->updateBoundingSphere(subTransform);
+                                             return entity->getBoundingSphere().getCenter();
+                                         });
 
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        group->updateBoundingSphere(subTransform);
-        groupCenter += group->boundingSphere.getCenter();
-    }
+    groupCenter += std::transform_reduce(std::execution::par,
+                                         this->groups.cbegin(),
+                                         this->groups.cend(),
+                                         glm::vec4(0.0f),
+                                         std::plus<>(),
+                                         [subTransform](const std::unique_ptr<Group> &group) {
+                                             group->updateBoundingSphere(subTransform);
+                                             return group->boundingSphere.getCenter();
+                                         });
 
     groupCenter /= this->entities.size() + this->groups.size();
 
-    // Calculate radius
-    float radius = 0.0f;
-    for (const std::unique_ptr<Entity> &entity : this->entities) {
-        const render::BoundingSphere &entitySphere = entity->getBoundingSphere();
+    const float entitiesRadius = std::transform_reduce(
+        std::execution::par,
+        this->entities.cbegin(),
+        this->entities.cend(),
+        0.0f,
+        [](float d1, float d2) { return std::max(d1, d2); },
+        [groupCenter](const std::unique_ptr<Entity> &entity) {
+            const render::BoundingSphere &entitySphere = entity->getBoundingSphere();
+            return glm::distance(entitySphere.getCenter(), groupCenter) + entitySphere.getRadius();
+        });
 
-        float maxDistance =
-            glm::distance(entitySphere.getCenter(), groupCenter) + entitySphere.getRadius();
+    const float groupsRadius = std::transform_reduce(
+        std::execution::par,
+        this->groups.cbegin(),
+        this->groups.cend(),
+        0.0f,
+        [](float d1, float d2) { return std::max(d1, d2); },
+        [groupCenter](const std::unique_ptr<Group> &group) {
+            const render::BoundingSphere &groupSphere = group->boundingSphere;
+            return glm::distance(groupSphere.getCenter(), groupCenter) + groupSphere.getRadius();
+        });
 
-        if (maxDistance >= radius)
-            radius = maxDistance;
-    }
-
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        float maxDistance = glm::distance(group->boundingSphere.getCenter(), groupCenter) +
-            group->boundingSphere.getRadius();
-
-        if (maxDistance >= radius)
-            radius = maxDistance;
-    }
-
+    const float radius = std::max(entitiesRadius, groupsRadius);
     this->boundingSphere = render::BoundingSphere(groupCenter, radius);
 }
 
@@ -119,7 +135,7 @@ int Group::draw(const render::RenderPipeline &pipeline,
 
         if (camera.isInFrustum(entityBoundingSphere)) {
             entity->draw(pipeline, subTransform);
-            renderedEntities++;
+            renderedEntities++; // cppcheck-suppress useStlAlgorithm
 
             if (drawBoundingSpheres)
                 entityBoundingSphere.draw(pipeline, cameraMatrix);
@@ -127,6 +143,7 @@ int Group::draw(const render::RenderPipeline &pipeline,
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
+        // cppcheck-suppress useStlAlgorithm
         renderedEntities += group->draw(pipeline, camera, subTransform, drawBoundingSpheres);
     }
 
