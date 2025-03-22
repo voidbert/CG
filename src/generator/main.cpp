@@ -22,6 +22,7 @@
 #include "generator/figures/KleinBottle.hpp"
 #include "generator/figures/MobiusStrip.hpp"
 #include "generator/figures/Plane.hpp"
+#include "generator/figures/SolarSystem.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
 #include "utils/WavefrontOBJ.hpp"
@@ -29,30 +30,42 @@
 namespace generator {
 void printUsage(const std::string &programName) {
     std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
-    std::cerr << "  " << programName
-              << " plane       <length>      <divisions>                              <file>"
-              << std::endl;
-    std::cerr << "  " << programName
-              << " box         <length>      <grid>                                   <file>"
-              << std::endl;
-    std::cerr << "  " << programName
-              << " sphere      <radius>      <slices>      <stacks>                   <file>"
-              << std::endl;
-    std::cerr << "  " << programName
-              << " cone        <radius>      <height>      <slices> <stacks>          <file>"
-              << std::endl;
-    std::cerr << "  " << programName
-              << " cylinder    <radius>      <height>      <slices> <stacks>          <file>"
-              << std::endl;
-    std::cerr << "  " << programName
-              << " torus       <majorRadius> <minorRadius> <slices> <stacks>          <file>"
-              << std::endl;
-    std::cerr << "  " << programName
-              << " kleinBottle <radius>      <slices>      <stacks>                   <file>"
-              << std::endl;
-    std::cerr << "  " << programName
-              << " mobiusStrip <radius>      <width>       <twist>  <slices> <stacks> <file>"
-              << std::endl;
+    std::cerr
+        << "  " << programName
+        << " plane        <length>         <divisions>                                                                                                  <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " box          <length>         <grid>                                                                                                       <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " sphere       <radius>         <slices>         <stacks>                                                                                    <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " cone         <radius>         <height>         <slices>           <stacks>                                                                 <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " cylinder     <radius>         <height>         <slices>           <stacks>                                                                 <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " torus        <majorRadius>    <minorRadius>    <slices>           <stacks>                                                                 <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " kleinBottle  <radius>         <slices>         <stacks>                                                                                    <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " mobiusStrip  <radius>         <width>          <twist>            <slices>         <stacks>                                                <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " solarSystem  <sceneScale>     <sunSizeFactor>  <planetSizeFactor> <moonSizeFactor> <distanceFactor> <asteroidBeltDensity> <ringSizeFactor> <file>"
+        << std::endl;
 }
 
 float stringToFloat(const std::string &str) {
@@ -159,6 +172,36 @@ int main(int argc, char **argv) {
 
             figures::MobiusStrip mobius(radius, width, twist, slices, stacks);
             mobius.writeToFile(file);
+        } else if (args.at(1) == "solarSystem") {
+            if (argc == 4) {
+                double sceneScale = stringToFloat(args.at(2));
+                const std::string &file = args.at(3);
+
+                figures::SolarSystem solarSystem(sceneScale, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+                solarSystem.writeToFile(file);
+            } else if (argc == 10) {
+                float sceneScale = stringToFloat(args.at(2));
+                float sunSizeFactor = stringToFloat(args.at(3));
+                float planetSizeFactor = stringToFloat(args.at(4));
+                float moonSizeFactor = stringToFloat(args.at(5));
+                float distanceFactor = stringToFloat(args.at(6));
+                float asteroidBeltDensity = stringToFloat(args.at(7));
+                float ringSizeFactor = stringToFloat(args.at(8));
+                const std::string &file = args.at(9);
+
+                figures::SolarSystem solarSystem(sceneScale,
+                                                 sunSizeFactor,
+                                                 planetSizeFactor,
+                                                 moonSizeFactor,
+                                                 distanceFactor,
+                                                 asteroidBeltDensity,
+                                                 ringSizeFactor);
+
+                solarSystem.writeToFile(file);
+            } else {
+                printUsage(args[0]);
+                return 1;
+            }
         } else {
             printUsage(args[0]);
         }
