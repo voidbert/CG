@@ -15,7 +15,6 @@
 #pragma once
 
 #include <glm/vec4.hpp>
-#include <memory>
 #include <vector>
 
 #include "engine/render/BoundingSphere.hpp"
@@ -31,7 +30,7 @@ private:
     glm::vec4 center;
     float radius;
 
-    static std::shared_ptr<Model> sphereModel;
+    static Model *sphereModel;
     static bool initializingSphereModel;
 
 public:

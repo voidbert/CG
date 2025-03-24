@@ -28,7 +28,8 @@ BoundingSphere::BoundingSphere() : center(0.0f, 0.0f, 0.0f, 1.0f), radius(0.0f) 
         BoundingSphere::initializingSphereModel = true;
 
         generator::figures::Sphere sphere(1.0f, 16, 16);
-        BoundingSphere::sphereModel = std::make_shared<Model>(sphere);
+        // Free this only with the destruction of the OpenGL context
+        BoundingSphere::sphereModel = new Model(sphere);
     }
 }
 
@@ -87,7 +88,7 @@ void BoundingSphere::draw(const RenderPipeline &pipeline, const glm::mat4 &camer
     BoundingSphere::sphereModel->draw();
 }
 
-std::shared_ptr<Model> BoundingSphere::sphereModel = nullptr;
+Model *BoundingSphere::sphereModel = nullptr;
 bool BoundingSphere::initializingSphereModel = false;
 
 }
