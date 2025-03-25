@@ -94,29 +94,68 @@ Nesta fase, fizemos vários extras:
 \end{itemize}
 \subsection{\emph{Möbius Strip}}
 
-Para gerar um \emph{möbius strip} temos de ter um raio, uma largura, o número
-de voltas, o número de slices, o número de stacks e o ficheiro onde iremos
-colocar os vértices e as faces desta figura:
+Para gerar um \emph{möbius strip} é necessário ter um raio, uma largura, o número de slices,
+o número de stacks e o ficheiro onde se irá colocar os vértices e as faces desta figura.
+Um \emph{möbius strip} clássico possui uma torção (uma meia volta), mas para tornar a geração
+da figura mais interessante, é possível incluir o parâmetro de número de torções (meias voltas
+dadas), permitindo variações no modelo.
 \begin{verbatim}
     ./generator mobiusStrip <radius> <width> <twist> <slices> <stacks> <file>
 \end{verbatim}
 
 Matematicamente, as coordenadas de um ponto do \emph{möbius strip} são definidas do seguinte modo:
 
-$$x = (radius + \theta \times \frac{width}{2} \times \cos (\frac{twist \times \phi}{2})) \times
+$$x = (radius + \theta \times \frac{width}{2} \times \cos (\frac{twist}{2} \times \phi)) \times
 \cos (\phi)$$
-$$y = radius \times \theta \times \frac{width}{2} \times \sin (\frac{twist \times \phi}{2})$$
-$$z = (radius + \theta \times \frac{width}{2} \times \cos (\frac{twist \times \phi}{2})) \times
+$$y = \theta \times \frac{width}{2} \times \sin (\frac{twist}{2} \times \phi)$$
+$$z = (radius + \theta \times \frac{width}{2} \times \cos (\frac{twist}{2} \times \phi)) \times
 \sin (\phi)$$
 
-$$\theta \in \left [ 0, 2 \pi \right [$$
-$$\phi \in \left [ -1, 1 \right ]$$
+$$\phi \in \left [ 0, 2 \pi \right [$$
+$$\theta \in \left [ -1, 1 \right ]$$
+
+radius, width e twist são os parâmetros dados para a geração do \emph{möbius strip}, o raio, a
+largura e o número de torções, respetivamente.
+
+$\phi$ varia entre 0 e $2 \pi$ e $\theta$ varia entre -1 e 1.
+
+Para gerar uma nuvem de pontos uniformemente distribuídos percorremos a faixa pelo seu comprimento
+(pelas fatias ou slices) e pela sua largura (pelos segmentos ou stacks).
+
+$$
+\phi_i = i \cdot \frac{2\pi}{N_\text{slices}}
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_\text{slices} \right \rbrace
+$$
+
+$$
+\theta_j = j \cdot \frac{2}{N_\text{stacks}} -1
+\hspace{1cm}
+j \in \left \lbrace 0, 1, \ldots, N_\text{stacks} \right \rbrace
+$$
+
+Assim, o \emph{möbius strip} é gerado iterando sobre os valores inteiros possíveis de i e j,
+o que dá origem à nuvem de pontos desejada.
+
+Após a geração dos vértices, estes são agrupados nos triângulos que compõem a superfície do
+\emph{möbius strip}.
+Para isso, considera-se um vértice de referência, como P1, juntamente com o vértice
+adjacente na mesma fatia (P3) e os dois vértices correspondentes na fatia seguinte (P2 e P4),
+e geram-se quatro faces triangulares: duas faces de um lado e outras duas faces do outro lado
+do quadrilátero formado por estes quatro vértices. Este processo repete-se para todos os vértices
+onde é aplicável, garantindo que cada célula quadrangular é subdividida em quatro triângulos.
+A figura seguinte ilustra esse processo, mostrando a organização dos triângulos resultantes:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.35\textwidth]{res/phase2/figures/MobiusStrip.pdf}
     \caption{Faces do \emph{möbius strip} geradas numa iteração.}
 \end{figure}
+
+Como \emph{möbius strip} é uma faixa, então desenha-se os dois lados da faixa. É por
+isto que geramos faces com os mesmos pontos mas com ordenações dos pontos diferentes:
+geramos tanto as faces de um lado da faixa como as faces do outro lado.
+Para os quatro pontos apresentados acima, os triângulos gerados são os seguintes:
 
 $$
 T_1 = (P_1, P_2, P_3)
@@ -128,6 +167,14 @@ T_3 = (P_3, P_2, P_4)
 T_4 = (P_2, P_3, P_4)
 $$
 
+Com o \texttt{generator} foi criado um modelo do \emph{möbius strip}. Com esse modelo
+foi criada uma cena que foi renderizada pela \texttt{engine} da seguinte forma:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/phase2/figures/MobiusStrip.png}
+    \caption{\emph{Möbius Strip}}
+\end{figure}
 
 \textbf{\color{red} TODO - extras continuação}
 
@@ -144,8 +191,9 @@ $$
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{exemplo}
-        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
+    \bibitem{möbius strip}
+        "Möbius Strip."{} Wolfram MathWorld. Accessed: Mar. 25, 2025. [Online.] Available:
+        \url{https://mathworld.wolfram.com/MoebiusStrip.html}
 \end{thebibliography}
 \endgroup
 
