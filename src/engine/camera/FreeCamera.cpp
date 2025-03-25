@@ -72,28 +72,30 @@ void FreeCamera::move(MovementDirection direction, float deltaTime) {
         case MovementDirection::LookLeft:
             yaw -= rotationSpeed;
             updateCameraVectors();
-            return;
+            break;
         case MovementDirection::LookRight:
             yaw += rotationSpeed;
             updateCameraVectors();
-            return;
+            break;
         case MovementDirection::LookUp:
             pitch += rotationSpeed;
             if (pitch > glm::radians(89.0f))
                 pitch = glm::radians(89.0f);
             updateCameraVectors();
-            return;
+            break;
         case MovementDirection::LookDown:
             pitch -= rotationSpeed;
             if (pitch < glm::radians(-89.0f))
                 pitch = glm::radians(-89.0f);
             updateCameraVectors();
-            return;
+            break;
         default:
             break;
     }
 
     lookAt = position + front;
+    this->updateCameraMatrix();
+    this->updateViewFrustum();
 }
 
 void FreeCamera::setPosition(const glm::vec3 &newPosition) {
