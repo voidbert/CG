@@ -87,9 +87,9 @@
 
 \subsection{UI (Interface Gráfica)}
 
-A interface do projeto foi desenvolvida com o auxílio da biblioteca \texttt{ImGui}. Esta biblioteca
-simplifica a gestão e atualização dos componentes, pois os elementos gráficos são recriados a cada
-\textit{frame}.
+A interface do projeto foi desenvolvida com o auxílio da biblioteca \texttt{Dear ImGui}. Esta
+biblioteca simplifica a gestão e atualização dos componentes, pois os elementos gráficos são
+recriados a cada \textit{frame}.
 
 A classe responsável pela configuração e renderização da interface é a \texttt{UI}.
 Assim, no processo de inicialização realizado no construtor da classe, a criação do contexto
@@ -99,8 +99,8 @@ melhor visualização dos elementos gráficos) e é efetuada a inicialização d
 \texttt{OpenGL} e \texttt{GLFW} (assegura que há compatibilidade entre o motor de renderização
 utilizado com o sistema de janelas).
 
-A interface é composta por um menu principal, sendo este renderizado na função \texttt{UI::render
-(int renderedEntities)} com as seguintes opções:
+A interface é composta por um menu, sendo este renderizado na função \texttt{UI::render} com os
+seguintes elementos:
 
 \begin{itemize}
     \item Acompanhamento do Desempenho:
@@ -108,7 +108,9 @@ A interface é composta por um menu principal, sendo este renderizado na funçã
         \item FPS (\textit{Frames Per Second}): apresenta o número de \textit{frames}
         renderizados por segundo.
         \item Apresenta o número de entidades renderizadas em relação ao número total de entidades
-        existentes.
+        existentes. Esta métrica é útil para testar a eficiência do \textit{frustum culling},
+        pois permite avaliar se apenas as entidades dentro da visão da câmara estão a ser
+        renderizadas.
     \end{itemize}
     \item Configurações:
     \begin{itemize}
@@ -116,14 +118,14 @@ A interface é composta por um menu principal, sendo este renderizado na funçã
         (\textit{fill polygons}) e o modo \textit{wireframe}.
         \item \textit{Back face culling}: ativa ou desativa o \textit{back-face culling}.
         \item Exibir eixos: ativa ou desativa a visualização dos eixos.
-        \item \textit{Bounding spheres}: ativa ou desativa a visualização das esferas delimitadoras
+        \item \textit{Bounding spheres}: ativa ou desativa a visualização das esferas encapsuladoras
         das entidades.
     \end{itemize}
     \item Câmara: permite modificar as coordenadas da posição da câmara.
 \end{itemize}
 
-Após a definição dos elementos gráficos, a interface é renderizada através da função
-\texttt{ImGui::Render()} e pelo \texttt{ImGui\_ImplOpenGL3\_RenderDrawData(ImGui::GetDrawData())}.
+Após a definição dos elementos gráficos, a interface é renderizada através das funções
+\texttt{ImGui::Render} e \texttt{ImGui\_ImplOpenGL3\_RenderDrawData}.
 
 \begin{figure}[H]
     \centering
@@ -144,8 +146,9 @@ Após a definição dos elementos gráficos, a interface é renderizada através
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{exemplo}
-        \href{https://youtu.be/dQw4w9WgXcQ}{Um item de exemplo na bibliografia}
+    \bibitem{Dear ImGui}
+        "Dear ImGui."{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/ocornut/imgui}
 \end{thebibliography}
 \endgroup
 
