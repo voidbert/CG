@@ -131,23 +131,13 @@ Após a geração dos vértices, é necessário definir as faces triangulares qu
 A triangulação é realizada da seguinte forma:
 
 1. Superfície lateral externa: Os pontos adjacentes de duas \emph{stacks} consecutivas são
-ligados, isto forma quadriláteros que são divididos individualmente em dois triângulos:
-
-$$
-T_1 = (P_1, P_2, P_3)
-\hspace{1cm}
-T_2 = (P_1, P_3, P_4)
-$$
+ligados, isto forma quadriláteros que são divididos individualmente em dois triângulos.
 
 2. Superfície lateral interna: É aplicada a mesma estratégia ao cilindro interno, com a ligação
 dos pontos entre diferentes \emph{stacks}.
 
 3. Bases superior e inferior: Os pontos da última \emph{stack} são ligados ao vértice central
-correspondente, formando triângulos radiais:
-
-$$
-T = (P_1, P_2, P_3)
-$$
+correspondente, de modo a formar triângulos radiais.
 
 \begin{figure}[H]
     \centering
