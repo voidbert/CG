@@ -14,9 +14,12 @@
 
 #pragma once
 
+#include <array>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
+
+#include "engine/render/BoundingSphere.hpp"
 
 namespace engine::camera {
 
@@ -39,20 +42,36 @@ protected:
     glm::vec3 lookAt;
     glm::vec3 up;
     float fov;
-    float nearPlane;
-    float farPlane;
+    float near;
+    float far;
+    float aspectRatio;
+
+    glm::mat4 cameraMatrix;
+    std::array<glm::vec4, 6> viewFrustum;
 
 public:
-    Camera(const glm::vec3 &position,
-           const glm::vec3 &lookAt,
-           const glm::vec3 &up,
-           float fov,
-           float nearPlane,
-           float farPlane);
-    virtual ~Camera() = default;
+    Camera(const glm::vec3 &_position,
+           const glm::vec3 &_lookAt,
+           const glm::vec3 &_up,
+           float _fov,
+           float _near,
+           float _far);
 
+    virtual void setPosition(const glm::vec3 &pos);
+    void setWindowSize(int width, int height);
     virtual void move(MovementDirection direction, float deltaTime) = 0;
-    glm::mat4 getCameraMatrix(float aspectRatio) const;
+
+    const glm::vec3 &getPosition() const;
+    const glm::mat4 &getCameraMatrix() const;
+
+    bool isInFrustum(const render::BoundingSphere &sphere) const;
+
+protected:
+    void updateCameraMatrix();
+    void updateViewFrustum();
+
+private:
+    static glm::vec4 planeEquation(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3);
 };
 
 }

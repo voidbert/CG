@@ -29,6 +29,7 @@ namespace engine::scene {
 class Entity {
 private:
     std::shared_ptr<render::Model> model;
+    render::BoundingSphere boundingSphere;
 
 public:
     Entity(const tinyxml2::XMLElement *modelElement,
@@ -36,6 +37,9 @@ public:
            std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
     Entity(const Entity &entity) = delete;
     Entity(Entity &&entity) = delete;
+
+    void updateBoundingSphere(const glm::mat4 &worldTransform);
+    const render::BoundingSphere &getBoundingSphere() const;
 
     void draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const;
 };

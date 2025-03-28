@@ -36,6 +36,14 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
     }
 }
 
+void Entity::updateBoundingSphere(const glm::mat4 &worldTransform) {
+    this->boundingSphere = render::BoundingSphere(this->model->getBoundingSphere(), worldTransform);
+}
+
+const render::BoundingSphere &Entity::getBoundingSphere() const {
+    return this->boundingSphere;
+}
+
 void Entity::draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const {
     pipeline.setColor(glm::vec4(1.0f));
     pipeline.setMatrix(transform);

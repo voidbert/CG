@@ -12,9 +12,11 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/scene/Scene.hpp"
+#include <execution>
+#include <numeric>
 
 #include "engine/camera/CameraFactory.hpp"
+#include "engine/scene/Scene.hpp"
 #include "utils/XMLUtils.hpp"
 
 namespace engine::scene {
@@ -60,25 +62,40 @@ int Scene::getWindowHeight() const {
     return this->windowHeight;
 }
 
+int Scene::getEntityCount() const {
+    return std::transform_reduce(
+        std::execution::par,
+        this->groups.cbegin(),
+        this->groups.cend(),
+        0,
+        std::plus<>(),
+        [](const std::unique_ptr<Group> &group) { return group->getEntityCount(); });
+}
+
 void Scene::setWindowSize(int width, int height) {
     this->windowWidth = width;
     this->windowHeight = height;
+    this->camera->setWindowSize(width, height);
 }
 
 camera::Camera &Scene::getCamera() {
     return *camera;
 }
 
-void Scene::draw(const render::RenderPipeline &pipeline) const {
-    const float aspectRatio = static_cast<float>(this->windowWidth) / this->windowHeight;
-    const glm::mat4 cameraMatrix = this->camera->getCameraMatrix(aspectRatio);
+int Scene::draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const {
+    const glm::mat4 &cameraMatrix = this->camera->getCameraMatrix();
+
+    int entityCount = 0;
 
     for (const std::unique_ptr<Group> &group : this->groups) {
-        group->draw(pipeline, cameraMatrix);
+        group->updateBoundingSphere(glm::mat4(1.0f));
+        entityCount += group->draw(pipeline, *this->camera, cameraMatrix, drawBoundingSpheres);
     }
 
     // Reset camera after transforms
     pipeline.setMatrix(cameraMatrix);
+
+    return entityCount;
 }
 
 }
