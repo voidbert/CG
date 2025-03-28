@@ -88,33 +88,36 @@
 \subsection{Câmara Orbital}
 
 A câmara orbital é uma câmara virtual que permite observar uma scene a partir de um ponto que
-orbita à volta de um objeto ou de um ponto de vista (\texttt{lookAt}). Esta câmara é útil para
+orbita à volta de um objeto ou de um ponto de vista (\texttt{lookAt}). Na implementação atual, este
+ponto de interesse está fixado na origem do espaço tridimensional. Esta abordagem é útil para
 observar um objeto de diversos ângulos possíveis com o foco num ponto em específico.
 
 \subsubsection{Movimentação e Controlo}
 
-A movimentação é definida por 3 parâmetros:
+A câmara orbital é definida por 3 parâmetros:
 \begin{itemize}
     \item Raio (\texttt{radius}): determina a distância do ponto de interesse à câmara;
-    \item Ângulo azimutal (\texttt{azimuth}): define a rotação da câmara em torno do eixo vertical,
+    \item Ângulo azimutal ($\phi$): define a rotação da câmara em torno do eixo vertical,
     o que permite uma visualização de 360 graus ao redor do objeto;
-    \item Ângulo polar (\texttt{polar}): controla o ângulo de elevação da câmara.
+    \item Ângulo polar ($\theta$): controla o ângulo de elevação da câmara.
 \end{itemize}
 
 A atualização da a posição da câmara é dada pela soma do ponto de interesse (\texttt{lookAt}) com
 as coordenadas cartesianas obtidas a partir das coordenadas esféricas. As fórmulas utilizadas para
 a conversão são as seguintes:
 
-$$x = radius \times \sin(polar) \times \cos(azimuth)$$
-$$y = radius \times \cos(polar)$$
-$$z = radius \times \sin(polar) \times \sin(azimuth)$$
+$$x = radius \times \sin(\theta) \times \cos(\phi)$$
+$$y = radius \times \cos(\theta)$$
+$$z = radius \times \sin(\theta) \times \sin(\phi)$$
 
-De forma a garantir um comportamento estável e consistente, os valores são restringidos em
-intervalos pré-definidos. O raio encontra-se limitado entre $0.5$ e $100$ para evitar que a câmara
+De forma a garantir um comportamento estável e consistente, os valores são restringidos a
+intervalos pré-definidos. O raio encontra-se limitado entre $0.5$ e $100$, para evitar que a câmara
 se aproxime demasiado ou se afaste demasiado do ponto de interesse. O ângulo azimutal varia entre
-$0$ e $2\pi$ para que a rotação aconteça de forma contínua. Por fim, o ângulo polar encontra-se
+$0$ e $2\pi$, para que a rotação aconteça de forma contínua. Por fim, o ângulo polar encontra-se
 entre $0.01$ e $\pi - 0.01$ para evitar que a câmara alcance os polos e cause instabilidade no
-movimento.
+movimento, no sentido em que se $\theta$ atingir o valor $\pi$, o vetor \texttt{up} da câmara
+ficaria invertido, de modo que a câmara viraria completamente ao contrário. Assim, os comandos
+também ficariam invertidos, isso tornaria a navegação confusa e pouco intuitiva.
 
 \subsubsection{Controlo pelo Utilizador}
 
