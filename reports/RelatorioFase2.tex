@@ -93,9 +93,6 @@ definir um vetor normal em todos os pontos.
 
 \subsubsection{Geração dos vértices}
 
-Para a geração da garrafa de Klein, a superfície foi discretizada com a utilização de coordenadas
-paramétricas, com o auxílio de duas variáveis ($\theta$ e $\phi$).
-
 A parametrização de um vértice sobre a garrafa de klein de raio $r$ pode ser definida pelas
 seguintes equações \cite{bottleKlein}:
 
@@ -118,19 +115,16 @@ $$
 z = r \left( \frac{2}{15} \right) (3 + 5 \cos(\theta) \sin(\theta)) \sin(\phi)
 $$
 
+Para a geração da garrafa de Klein, a superfície foi discretizada com a utilização de coordenadas
+paramétricas, com o auxílio de duas variáveis ($\theta$ e $\phi$).
+
 A variável $\theta$ varia entre $0$ e $\pi$ e $\phi$ varia entre $0$ e $2\pi$. Além disso, o
 intervalo de valores de $\theta$ e $\phi$ varia de acordo com o número de slices e stacks.
 
 \subsubsection{Construção das faces}
 
 Após a geração dos vértices, constroem-se as faces da garrafa de Klein. Cada quadrilátero entre duas
-\emph{stacks} sucessivas é dividido em duas faces triangulares:
-
-$$
-T_1 = (P_1, P_2, P_3)
-\hspace{1cm}
-T_2 = (P_1, P_3, P_4)
-$$
+\emph{stacks} sucessivas é dividido em duas faces triangulares.
 
 \begin{figure}[H]
     \centering
@@ -152,8 +146,8 @@ $$
 
 \begin{thebibliography}{9}
     \bibitem{bottleKlein}
-        "Klein bottle"{} Wikipedia: Mar. 21, 2025. [Online.] Available:
-        \url{https://en.wikipedia.org/wiki/Klein_bottle}
+        "Klein bottle"{} Mathematics: Mar. 28, 2025. [Online.] Available:
+     \url{https://math.stackexchange.com/questions/2982429/whats-the-surface-area-of-a-klein-bottle}
 \end{thebibliography}
 \endgroup
 
