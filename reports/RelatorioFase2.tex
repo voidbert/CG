@@ -89,7 +89,79 @@
 
 \section{Resultados obtidos}
 
-\textbf{\color{red} TODO - resultados}
+Nesta fase, implementámos câmaras orbital e livre, transformações hierárquicas, frustum culling e
+novas primitivas geométricas. Os resultados incluem novos modelos de primitivas gerados pelo
+\texttt{generator}, testes de renderização, uma representação funcional do sistema solar e a
+implementação de \textit{frustum culling}.
+
+\subsection{Figuras geométricas geradas}
+
+Os seguintes modelos foram criados utilizando o \texttt{generator} implementado:
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.5\textwidth]{res/phase2/results/KleinBottle.png}
+        \caption{Garrafa de Klein (\texttt{kleinBottle})}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.5\textwidth]{res/phase2/results/MobiusStrip.png}
+        \caption{Fita de Möbius (\texttt{möbius strip})}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.5\textwidth]{res/phase2/results/Gear.png}
+        \caption{Roda dentada (\texttt{gear})}
+    \end{minipage}\hfill
+\end{figure}
+
+\subsection{Cenas fornecidas pela docência da UC}
+
+A docência da UC forneceu, juntamente com o enunciado do trabalho, algumas cenas a serem testadas no
+trabalho. A \texttt{engine} renderizou-as como esperado:
+
+\begin{figure}[H]
+    \begin{adjustwidth}{-2cm}{-2cm}
+        \centering
+        \includegraphics[width=0.26\textwidth]{res/phase2/results/Test1.png}
+        \includegraphics[width=0.26\textwidth]{res/phase2/results/Test2.png}
+        \includegraphics[width=0.26\textwidth]{res/phase2/results/Test3.png}
+        \includegraphics[width=0.26\textwidth]{res/phase2/results/Test4.png}
+        \caption{Renderização das cenas de teste fornecidas pela docência da UC.}
+    \end{adjustwidth}
+\end{figure}
+
+\subsection{Sistema Solar}
+
+A hierarquia implementada produziu com sucesso as órbitas e relações de escala do sistema solar.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{res/phase2/results/SolarSystem.png}
+    \caption{Renderização do sistema solar.}
+\end{figure}
+
+\subsection{Frustum Culling}
+
+O \textit{frustum culling} utiliza as esferas vermelhas para verificar se um objeto
+se encontra dentro do campo de visão da câmara. Se a esfera estiver dentro da área visível, o
+modelo correspondente é renderizado. Os objetos que se encontrem fora do \textit{frustum} têm as
+suas esferas ignoradas, o que evita um processamento desnecessário.
+
+\begin{figure}[H]
+    \begin{adjustwidth}{-2cm}{-2cm}
+        \centering
+        \includegraphics[width=0.4\textwidth]{res/phase2/results/FrustumCulling.png}
+        \includegraphics[width=0.4\textwidth]{res/phase2/results/FrustumCullingpt2.png}
+        \caption{Frustum Culling}
+    \end{adjustwidth}
+\end{figure}
 
 \section{Conclusão e Trabalho Futuro}
 
