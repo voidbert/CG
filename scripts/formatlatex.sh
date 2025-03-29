@@ -24,7 +24,9 @@ grep_error_message() {
 
 # shellcheck disable=SC2266
 find reports -type f -name "*.tex" | while IFS="" read -r file; do
-    grep -PHn '.{101,}$' "$file" | grep_error_message "Column exceeds 100 characters"
+    grep -PHn '.{101,}$' "$file" | \
+        grep -Pv 'http' | \
+        grep_error_message "Column exceeds 100 characters"
     grep -PHn '\t$'      "$file" | grep_error_message "Use of tabs"
     grep -PHn '\s+$'     "$file" | grep_error_message "Trailing whitespace"
 done |
