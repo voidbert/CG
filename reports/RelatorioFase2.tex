@@ -90,89 +90,83 @@ A câmara pode deslocar-se e rodar de forma contínua no espaço tridimensional,
 movimentos definidos pelos seguintes vetores:
 
 \begin{itemize}
-    \item \textbf{Vetor} $\vec d$: Direção do olhar da câmara.
-    \item \textbf{Vetor} $\vec r$: Direção perpendicular ao vetor $\vec d$, ao
+    \item \textbf{Vetor} $\vec{f}$: Direção do olhar da câmara.
+    \item \textbf{Vetor} $\vec{r}$: Direção perpendicular ao vetor $\vec{f}$, ao
           longo do plano horizontal.
-    \item \textbf{Vetor} $\vec {up}$: Aproximação da vertical da câmara.
+    \item \textbf{Vetor} $\vec{up}$: Aproximação da vertical da câmara.
 \end{itemize}
 
-A posição da câmara é atualizada de acordo com a seguinte equação:
+A posição da câmara, $\vec{p}$, é atualizada de acordo com a seguinte equação:
 
 \[
-\text{posição} \gets \text{posição} + \text{velocidade} \times \text{direção}
+\vec{p} \gets \vec{p} + v \cdot \vec{f}'
 \]
 
-onde a direção depende do movimento escolhido pelo utilizador:
+onde $v$ representa a velocidade e $\vec{f}'$ a direção, que depende do movimento escolhido
+pelo utilizador:
 
 \begin{itemize}
     \item \textbf{Translação horizontal}: O movimento para a frente e para trás ocorre ao longo
-          do vetor $\mathbf{front}$, enquanto o movimento lateral ocorre ao longo do vetor
-          $\mathbf{right}$.
+          do vetor $\textbf{front}$, $\vec{f}$, enquanto o movimento lateral ocorre ao longo do
+          vetor $\textbf{right}$, $\vec{r}$.
     \item \textbf{Translação vertical}: O movimento vertical acontece ao longo do vetor
-          $\mathbf{up}$, permitindo ao utilizador subir e descer.
-    \item \textbf{Rotação}: A orientação da câmara é definida pelos ângulos $\mathbf{yaw}$
-          (rotação horizontal) e $\mathbf{pitch}$ (inclinação vertical), que determinam a direção
-          do vetor $\mathbf{front}$.
+          $\textbf{up}$, $\vec{up}$, permitindo ao utilizador subir e descer.
+    \item \textbf{Rotação}: A orientação da câmara é definida pelos ângulos $\textbf{yaw}$,
+          $\theta$, responsável pela rotação horizontal, e $\textbf{pitch}$, $\phi$, responsável
+          pela inclinação vertical, que determinam a direção do vetor $\vec{f}$.
 \end{itemize}
 
 \subsubsection{Atualização da Direção da Câmara}
 
-A atualização da orientação da câmara obtém-se através da conversão dos ângulos $\mathbf{yaw}$ e
-$\mathbf{pitch}$ para um vetor de direção tridimensional. A relação entre os ângulos e os
-componentes do vetor $\mathbf{front}$ é dada por:
+A atualização da orientação da câmara obtém-se através da conversão dos ângulos $\theta$ e
+$\phi$ para um vetor de direção tridimensional. A relação entre os ângulos e os
+componentes do vetor $\vec{f}$ é dada por:
 
 \[
 \begin{aligned}
-    \text{front}_x &= \cos(\text{pitch}) \cdot \cos(\text{yaw}) \\
-    \text{front}_y &= \sin(\text{pitch}) \\
-    \text{front}_z &= \cos(\text{pitch}) \cdot \sin(\text{yaw})
+    \text{f}_x &= \cos(\phi) \cdot \cos(\theta) \\
+    \text{f}_y &= \sin(\phi) \\
+    \text{f}_z &= \cos(\phi) \cdot \sin(\theta)
 \end{aligned}
 \]
 
 Após serem calculados os componentes do vetor, este é normalizado, uma vez que é necessário
-garantir que este mantém um comprimento unitário:
-
-\[
-\mathbf{front} \gets \frac{\mathbf{front}}{||\mathbf{front}||}
-\]
-
-Esta normalização é fundamental para garantir que a câmara mantém uma velocidade constante em
-qualquer direção.
+garantir que este mantém um comprimento unitário. Esta normalização é fundamental para garantir
+que a câmara mantém uma velocidade constante em qualquer direção.
 
 Além disso, foram tomadas medidas para prevenir o $\mathbf{gimbal}$  $\mathbf{lock}$.
-Este é um problema que ocorre quando dois eixos de rotação se alinham, reduzindo
-os graus de liberdade da rotação. No contexto da câmara livre desenvolvida, este problema surge
-quando $\mathbf{pitch}$ antinge um dos seus limites superiror ou inferior, quando o vetor
-$\mathbf{front}$ se alinha com o eixo vertical $\mathbf{up}$, o que impossibilita a rotação
-horizontal ($\mathbf{yaw}$). Para evitar esta situação, é imposto um limite a $\mathbf{pitch}$:
+Este é um problema que ocorre quando dois eixos de rotação se alinham, ou seja, quando $\phi$
+atinge \( 90^\circ \) ou \( -90^\circ \). Além disso, no caso de $\phi$ exceder \( |90^\circ| \),
+o sinal da componente vertical inverte-se, o que provoca uma inversão dos eixos de controlo.
+Para resolver estes 2 problemas, impusemos o seguinte limite:
 
-\[
--89^\circ \leq \mathbf{pitch} \leq 89^\circ
-\]
+$$
+-89^\circ \leq \phi \leq 89^\circ
+$$
 
 Isto impede que a câmara olhe completamente para cima ou para baixo, garantindo que o vetor
-$\mathbf{up}$ mantém uma orientação bem definida e evitando a perda de controlo sobre a rotação
+$\vec{up}$ mantenha uma orientação bem definida e evitando a perda de controlo sobre a rotação
 horizontal.
 
-O novo ponto de destino da câmara ($\mathbf{lookAt}$) é atualizado através da soma do vetor
+O novo ponto de destino da câmara $\mathbf{lookAt}$, $\l$, é atualizado através da soma do vetor
 normalizado e da posição atual:
 
 \[
-\mathbf{lookAt} = \text{\textbf{posição}} + \mathbf{front}
+l = \vec{p} + \vec{f}
 \]
 
-Além disso, os vetores $\mathbf{right}$ e $\mathbf{up}$ são recalculados para garantir que a
-orientação da câmara permanece coerente. O vetor $\mathbf{right}$ é obtido como o produto
-vetorial entre um vetor de referência vertical $(0,1,0)$ e o vetor $\mathbf{front}$:
+Além disso, os vetores $\vec{r}$ e $\vec{up}$ são recalculados para garantir que a
+orientação da câmara permanece coerente. O vetor $\vec{r}$ é obtido como o produto
+vetorial entre um vetor de referência vertical $(0,1,0)$ e o vetor  $\vec{f}$:
 
 \[
-\mathbf{right} = \mathbf{front} \times (0,1,0)
+    \vec{r} = \vec{f} \times (0,1,0)
 \]
 
-Por fim, o vetor $\mathbf{up}$ é recalculado para ser ortogonal aos outros dois vetores:
+Por fim, o vetor $\vec{up}$ é recalculado para ser ortogonal aos outros dois vetores:
 
 \[
-\mathbf{up} = \mathbf{right} \times \mathbf{front}
+    \vec{up} = \vec{r} \times \vec{f}
 \]
 
 Isto assegura que os movimentos laterais, verticais e de rotação permanecem coerentes em
