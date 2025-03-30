@@ -73,121 +73,366 @@
 \pagebreak
 
 \begin{abstract}
-    \textbf{\color{red} TODO - resumo}
+    Para esta fase do trabalho prático, complementámos os programas \texttt{generator} e
+    \texttt{engine} previamente desenvolvidos. Ao \texttt{generator}, adicionámos a possibilidade
+    de gerar uma cena com o Sistema Solar, e modelos com rodas dentadas, fitas de Möbius, e garrafas
+    de Klein. À \texttt{engine}, adicionámos transformações geométricas dos objetos, uma interface
+    com o utilizador, movimentos da câmara (livre e orbital), e \emph{frustum culling} baseado em
+    esferas. Na próxima fase, pretendemos desenvolver sobre os resultados aqui obtidos para
+    adicionar diversas outras funcionalidades, explorando curvas de Bézier e de Catmull-Rom para a
+    geração e animação de modelos, respetivamente.
 \end{abstract}
 
-\section{Engine}
+\section{\emph{Generator}}
 
-\subsection{Câmara Livre}
+\subsection{Geração do Sistema Solar Estático}
 
-A câmara livre permite que o utilizador se desloque de forma intuitiva, sendo semelhante à de
-jogos de exploração na primeira pessoa, como simuladores de voo, e ambientes de realidade
-virtual.
-De seguida, descrevem-se os diferentes tipos de movimento suportados.
+O sistema solar foi representado por um uma estrutura hierárquica, definida de acordo com a atração
+gravítica real dos corpos celestes. No topo da hierarquia, encontra-se o Sol, que serve de ponto
+central e de referência para a órbita dos restantes corpos celestes. Cada planeta foi colocado num
+grupo independente, filho do grupo do Sol. Quando aplicável, os satélites naturais (luas) e os anéis
+dos planetas são inseridos como grupos filhos do planeta correspondente, preservando a hierarquia
+entre os corpos. As cinturas de asteroides, por sua vez, são representadas como grupos filhos do
+Sol, uma vez que orbitam em torno dele.
 
-\subsubsection{Movimentação}
-
-A câmara pode deslocar-se e rodar de forma contínua no espaço tridimensional, sendo os seus
-movimentos definidos pelos seguintes vetores:
-
-\begin{itemize}
-    \item \textbf{Vetor} $\vec{f}$: Direção do olhar da câmara.
-    \item \textbf{Vetor} $\vec{r}$: Direção perpendicular ao vetor $\vec{f}$, ao
-          longo do plano horizontal.
-    \item \textbf{Vetor} $\vec{up}$: Aproximação da vertical da câmara.
-\end{itemize}
-
-A posição da câmara, $\vec{p}$, é atualizada de acordo com a seguinte equação:
-
-\[
-\vec{p} \gets \vec{p} + v \cdot \vec{f}'
-\]
-
-onde $v$ representa a velocidade e $\vec{f}'$ a direção, que depende do movimento escolhido
-pelo utilizador:
+Cada grupo define as transformações aplicadas aos seus elementos, como translações, rotações, e
+escalas, que são acumuladas ao longo da árvore de grupos, ou seja, as transformações são aplicadas
+sequencialmente e as transformações de cada corpo são relativas ao seu elemento pai. Esta
+organização simplifica a expressão das translações e escalas relativas dos corpos celestes. Ademais,
+apesar de não haver movimento do sistema solar neste momento, esta estrutura hierárquica torna mais
+fácil que, no futuro:
 
 \begin{itemize}
-    \item \textbf{Translação horizontal}: O movimento para a frente e para trás ocorre ao longo
-          do vetor $\textbf{front}$, $\vec{f}$, enquanto o movimento lateral ocorre ao longo do
-          vetor $\textbf{right}$, $\vec{r}$.
-    \item \textbf{Translação vertical}: O movimento vertical acontece ao longo do vetor
-          $\textbf{up}$, $\vec{up}$, permitindo ao utilizador subir e descer.
-    \item \textbf{Rotação}: A orientação da câmara é definida pelos ângulos $\textbf{yaw}$,
-          $\theta$, responsável pela rotação horizontal, e $\textbf{pitch}$, $\phi$, responsável
-          pela inclinação vertical, que determinam a direção do vetor $\vec{f}$.
+    \item os planetas orbitem em torno do Sol;
+    \item as luas orbitem em torno do planeta a que pertencem;
+    \item os anéis acompanhem o seu planeta respetivo;
+    \item os asteroides se posicionem nas suas cinturas em órbitas relativas ao Sol.
 \end{itemize}
 
-\subsubsection{Atualização da Direção da Câmara}
+A estrutura XML da cena gerada segue a hierarquia descrita anteriormente. Abaixo, apresenta-se um
+exemplo de cena, apenas com o Sol, a Terra e a Lua:
 
-A atualização da orientação da câmara obtém-se através da conversão dos ângulos $\theta$ e
-$\phi$ para um vetor de direção tridimensional. A relação entre os ângulos e os
-componentes do vetor $\vec{f}$ é dada por:
+\lstset{language=xml}
+\begin{lstlisting}
 
-\[
-\begin{aligned}
-    \text{f}_x &= \cos(\phi) \cdot \cos(\theta) \\
-    \text{f}_y &= \sin(\phi) \\
-    \text{f}_z &= \cos(\phi) \cdot \sin(\theta)
-\end{aligned}
-\]
+<group>
+    <!-- Grupo do sol -->
+    <group>
+        <transform>
+            <translate x="0"  y="0"  z="0" />
+            <scale     x="30" y="30" z="30" />
+        </transform>
+        <models>
+            <model file="../models/sphere.3d" />
+        </models>
+        <!-- Grupo da Terra -->
+        <group>
+            <transform>
+                <translate x="28"  y="0"   z="-3" />
+                <scale     x="0.2" y="0.2" z="0.2" />
+            </transform>
+            <models>
+                <model file="../models/sphere.3d" />
+            </models>
+            <!-- Grupo da Lua -->
+            <group>
+                <transform>
+                    <translate x="3"    y="0"    z="0" />
+                    <scale     x="0.05" y="0.05" z="0.05" />
+                </transform>
+                <models>
+                    <model file="../models/sphere.3d" />
+                </models>
+            </group>
+        </group>
+    </group>
+</group>
+\end{lstlisting}
 
-Após serem calculados os componentes do vetor, este é normalizado, uma vez que é necessário
-garantir que este mantém um comprimento unitário. Esta normalização é fundamental para garantir
-que a câmara mantém uma velocidade constante em qualquer direção.
+Neste exemplo:
+\begin{itemize}
+    \item O grupo no topo da hierarquia contém o Sol, posicionado na origem e aumentado com
+        uma escala (\texttt{scale}).
+    \item Dentro do grupo do Sol, encontra-se a Terra, num grupo posicionado com uma translação
+        (\texttt{translate}). O tamanho da Terra também é ajustado com uma escala.
+    \item Dentro do grupo da Terra está a Lua, com a sua própria transformação relativa.
+\end{itemize}
 
-Além disso, foram tomadas medidas para prevenir o $\mathbf{gimbal}$  $\mathbf{lock}$.
-Este é um problema que ocorre quando dois eixos de rotação se alinham, ou seja, quando $\phi$
-atinge \( 90^\circ \) ou \( -90^\circ \). Além disso, no caso de $\phi$ exceder \( |90^\circ| \),
-o sinal da componente vertical inverte-se, o que provoca uma inversão dos eixos de controlo.
-Para resolver estes 2 problemas, impusemos o seguinte limite:
+Além dos planetas e das luas, existem dois corpos celestes adicionais com formas de representação
+específicas no XML:
+
+\begin{itemize}
+    \item As cinturas de asteroides são compostas por esferas, cubos e cilindros, escolhidos
+        aleatoriamente. Estas figuras são adicionadas um a grupo filho do Sol, e são posicionadas
+        com coordenadas aleatórias em torno de um raio definido. Cada asteroide recebe
+        transformações próprias de translação, rotação e escala, simulando a dispersão e dimensão
+        variável destes corpos celestes.
+
+    \item Os anéis dos planetas utilizam o modelo de um \emph{torus}, gerado na primeira fase deste
+        trabalho prático. Para simular a sua aparência achatada, é aplicada uma escala com fator
+        inferior a $1$ no eixo $y$. Além disso, os anéis são orientados com uma rotação por um
+        diferente eixo consoante o seu planeta.
+\end{itemize}
+
+Parte do sistema solar gerado pode ser observado na figura abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{res/phase2/results/SolarSystemOverview.png}
+    \caption{Sistema solar com anéis e cinturas de asteroides visíveis.}
+\end{figure}
+
+O sistema solar pode ser gerado de forma personalizada, através dos seguintes parâmetros definidos
+pelo utilizador, via linha de comando, especificados ao \texttt{generator} pela ordem apresentada
+abaixo:
+
+\begin{itemize}
+    \item \texttt{sceneScale} -- Escala global, aplicada a toda a cena;
+    \item \texttt{sunSizeFactor} -- Escala aplicada ao Sol;
+    \item \texttt{planetSizeFactor} -- Escala aplicada aos planetas;
+    \item \texttt{moonSizeFactor} -- Escala aplicada aos satélites naturais;
+    \item \texttt{distanceFactor} -- Proporção da distância entre os diferentes corpos celestes;
+    \item \texttt{asteroidBeltDensity} -- Densidade definida para as cinturas de asteroides;
+    \item \texttt{ringSizeFactor} -- Proporção dos anéis em relação ao planeta.
+\end{itemize}
+
+Ainda existem muitas melhorias que podem ser feitas ao sistema solar, como o movimento dos corpos e
+a adição de texturas, que se pretendem implementar ao longo das próximas fases do trabalho prático.
+
+\subsection{Fita de Möbius}
+
+Uma funcionalidade adicional que se implementou no \texttt{generator} foi a geração de fitas de
+Möbius. Para gerar uma fita de Möbius, é necessário ter-se um raio, uma largura, o número de
+\emph{slices}, o número de \emph{stacks}, e o ficheiro para onde será exportado o modelo gerado.
+Ademais, uma fita de Möbius clássica possui uma torção (uma meia volta), mas para tornar a geração
+da figura mais interessante, é possível variar de número de torções do modelo gerado. Abaixo,
+apresenta-se a linha de comandos do \texttt{generator} que deve ser usada para gerar uma fita de
+Möbius:
+
+\texttt{./generator mobiusStrip <radius> <width> <twists> <slices> <stacks> <file>}
+
+Matematicamente, as coordenadas de um ponto da \emph{fita de Möbius} são definidas do seguinte modo,
+onde $R$, $W$ e $T$ são os parâmetros dados para a geração da \emph{fita de Möbius}, o raio, a
+largura e o número de torções, respetivamente \cite{mobius-strip}:
+
+\begin{minipage}{0.5\textwidth}
+    $$
+    x = \left (
+            R + W \cdot \frac{\theta}{2} \cdot \cos \left ( T \cdot \frac{\phi}{2} \right )
+        \right )
+        \cdot \cos \phi
+    $$
+    $$
+    y = W \cdot \frac{\theta}{2} \cdot \sin \left ( T \cdot \frac{\phi}{2} \right )
+    $$
+    $$
+    z = \left (
+            R + W \cdot \frac{\theta}{2} \cdot \cos \left ( T \cdot \frac{\phi}{2} \right )
+        \right ) \cdot
+        \sin \phi
+    $$
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    $$\phi \in \left [ 0, 2 \pi \right [$$
+    $$\theta \in \left [ -1, 1 \right ]$$
+\end{minipage}
+
+Para gerar uma nuvem de pontos uniformemente distribuídos, discretiza-se $\phi$ e $\theta$ em
+\emph{slices} e \emph{stacks}, respetivamente, e percorre-se a faixa pelas suas fatias e camadas:
 
 $$
--89^\circ \leq \phi \leq 89^\circ
+\phi_i = i \cdot \frac{2\pi}{N_\text{slices}}
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_\text{slices} \right \rbrace
 $$
 
-Isto impede que a câmara olhe completamente para cima ou para baixo, garantindo que o vetor
-$\vec{up}$ mantenha uma orientação bem definida e evitando a perda de controlo sobre a rotação
-horizontal.
+$$
+\theta_j = j \cdot \frac{2}{N_\text{stacks}} -1
+\hspace{1cm}
+j \in \left \lbrace 0, 1, \ldots, N_\text{stacks} \right \rbrace
+$$
 
-O novo ponto de destino da câmara $\mathbf{lookAt}$, $\l$, é atualizado através da soma do vetor
-normalizado e da posição atual:
+Após a geração dos vértices, estes são agrupados nos triângulos que compõem a superfície da
+fita de Möbius. Para isso, considera-se um vértice de referência, $P_1$, juntamente com o vértice
+adjacente na mesma fatia, $P_3$, e os dois vértices correspondentes na fatia seguinte, $P_2$ e
+$P_4$, como mostra a figura abaixo. Com estes quatro vértices, geram-se quatro faces triangulares:
+duas faces voltadas para um lado e outras duas faces para o outro. Este processo repete-se para
+todos os vértices onde é aplicável, garantindo que cada célula quadrangular é subdividida em
+quatro triângulos, dois para cada lado.
 
-\[
-l = \vec{p} + \vec{f}
-\]
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{res/phase2/figures/MobiusStrip.pdf}
+    \caption{Pontos utilizados numa iteração da geração de faces da fita de Möbius.}
+\end{figure}
 
-Além disso, os vetores $\vec{r}$ e $\vec{up}$ são recalculados para garantir que a
-orientação da câmara permanece coerente. O vetor $\vec{r}$ é obtido como o produto
-vetorial entre um vetor de referência vertical $(0,1,0)$ e o vetor  $\vec{f}$:
+Como a \emph{fita de Möbius} é uma superfície não orientável, deve ser possível ver os dois lados da
+fita quando esta é desenhada. É por isto que se geram faces dos dois lados da fita: estes são
+necessários para esta ser visualizada mesmo quando o \emph{back-face culling} está ativo. Para gerar
+faces com diferentes orientações, a ordem em que os pontos são especificados é alterada conforme a
+direção desejada. Por exemplo, para os quatro pontos apresentados acima, os triângulos gerados são
+os seguintes:
 
-\[
-    \vec{r} = \vec{f} \times (0,1,0)
-\]
+$$
+T_1 = (P_1, P_2, P_3)
+\hspace{1cm}
+T_2 = (P_2, P_1, P_3)
+\hspace{1cm}
+T_3 = (P_3, P_2, P_4)
+\hspace{1cm}
+T_4 = (P_2, P_3, P_4)
+$$
 
-Por fim, o vetor $\vec{up}$ é recalculado para ser ortogonal aos outros dois vetores:
+\subsection{Garrafa de Klein}
 
-\[
-    \vec{up} = \vec{r} \times \vec{f}
-\]
+Também foi implementada a geração outras superfícies não orientáveis, como a garrafa de Klein, que
+não possui um lado interno e externo distinguíveis. A parametrização de um vértice sobre a garrafa
+de Klein de raio $r$ pode ser definida pelas seguintes equações \cite{klein-bottle}:
 
-Isto assegura que os movimentos laterais, verticais e de rotação permanecem coerentes em
-qualquer orientação da câmara, garantindo um comportamento previsível para o utilizador.
+$$
+x = - \frac{2}{15} \; r \cos(\theta) \left (
+        3  \cos \phi -
+        30 \sin \theta +
+        90 \cos^4 \theta  \sin \theta -
+        60 \cos^6 \theta  \sin \theta +
+        5  \cos \theta  \cos \phi  \sin \theta
+    \right )
+$$
 
-\subsubsection{Controlo por parte do utilizador}
+\begin{align*}
+    y = & - \frac{1}{15} \; r \sin(\theta) \left (
+            3 \cos \phi -
+            3 \cos^2 \theta  \cos \phi -
+            48 \cos^4 \theta  \cos \phi +
+            48 \cos^6 \theta  \cos \phi -
+            60 \sin \theta
+        \right .
+    \\
+    + & \left .
+            5 \cos \theta  \cos \phi  \sin \theta -
+            5 \cos^3 \theta  \cos \phi  \sin \theta -
+            80 \cos^5 \theta  \cos \phi  \sin \theta +
+            80 \cos^7 \theta  \cos \phi  \sin \theta
+    \right)
+\end{align*}
 
-O utilizador pode controlar a câmara de forma intuitiva, utilizando o teclado para movimentação
-e as setas direcionais para rotação:
+$$
+z = \frac{2}{15} \; r (3 + 5 \cos \theta \sin \theta) \sin \phi
+$$
+
+A variável $\theta$ varia entre $0$ e $\pi$, e $\phi$ varia entre $0$ e $2\pi$. Para a geração dos
+pontos da garrafa de Klein, os valores destas duas variáveis foram discretizados:
+
+$$
+\phi_i = i \cdot \frac{2\pi}{N_\text{slices}}
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_\text{slices} \right \rbrace
+$$
+$$
+\theta_j = j \cdot \frac{\pi}{N_\text{stacks}}
+\hspace{1cm}
+j \in \left \lbrace 0, 1, \ldots, N_\text{stacks} \right \rbrace
+$$
+
+Após a geração dos vértices, constroem-se as faces da garrafa de Klein. Cada quadrilátero entre duas
+\emph{stacks} sucessivas é dividido em duas faces triangulares. Ao contrário da fita de Möbius,
+decidiu-se que não era necessário renderizar o interior da garrafa, motivo pelo qual não se geram
+quatro faces triangulares para cada quadrilátero.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/phase2/figures/kleinBottle.pdf}
+    \caption{Garrafa de Klein}
+\end{figure}
+
+Para usar o generator para gerar uma garrafa de Klein, a seguinte linha de comando deve ser
+utilizada:
+
+\begin{center}
+    \texttt{./generator kleinBottle <radius> <slices> <stacks> <file>}
+\end{center}
+
+\subsection{Roda Dentada}
+
+Também foi implementada a geração de rodas dentadas, que apresentam uma natureza muito semelhante à
+de um cilindro: o seu interior é cilíndrico, e o seu exterior também o é, no entanto com variações
+do raio nos dentes da roda dentada. A construção desta primitiva tem por base coordenadas
+cilíndricas, onde a posição de cada ponto é definida em função do raio interno ($r_i$), do raio
+externo ($r_e$), da altura do dente ($h_t$), do ângulo azimutal ($\phi$) e da altura da roda dentada
+($h$).
+
+A parametrização de um ponto sobre uma roda dentada pode ser definida pelas seguintes equações:
+
+$$x = r \cos \phi$$
+$$y \in \left [ 0, h \right ]$$
+$$z =  r \sin \phi$$
+
+No entanto, ao contrário do que acontece num cilindro, $r$ possui três valores distintos: para a
+parte interna da roda, é utilizado $r_i$, para a parte externa, $r_e$, e nos dentes da roda,
+$r_e + h_t$.
+
+Para discretizar a superfície da roda dentada, divide-se o intervalo de $\phi$ em \emph{slices}, e
+o intervalo de $y$ em \emph{stacks}. Assim, os incrementos destas variáveis são calculados da
+seguinte forma:
+
+$$
+\Delta \phi = \frac{2\pi}{N_\text{slices}}
+\hspace{1cm}
+\Delta y = \frac{h}{N_\text{stacks}}
+$$
+
+É de notar que o número de fatias deve ser um múltiplo de 4 do número de dentes da roda dentada.
+Caso contrário, irregularidades no modelo gerado podem ocorrer. Para evitar este problema, o número
+de \emph{slices} é obrigatoriamente o $4 N_\text{dentes}$, que o utilizador especifica ao
+\texttt{generator} juntamente com os outros parâmetros através da seguinte linha de comando:
+
+\begin{adjustwidth}{-2cm}{-2cm} % These values only need to be large enough to center the text
+    \begin{center}
+        \texttt{
+        ./generator gear <majorRadius> <minorRadius> <height> <stacks> <teeth> <toothHeight> <file>
+        }
+    \end{center}
+\end{adjustwidth}
+
+A construção dos vértices segue os seguintes passos:
 
 \begin{itemize}
-    \item \textbf{W/S:} Movem a câmara para a frente/trás.
-    \item \textbf{A/D:} Movem a câmara para os lados.
-    \item \textbf{Espaço (SPACE):} Sobe a câmara.
-    \item \textbf{Shift Esquerdo (LEFT SHIFT):} Desce a câmara.
-    \item \textbf{Seta Esquerda/Direita:} Roda a câmara para a esquerda/direita.
-    \item \textbf{Seta Cima/Baixo:} Inclina a câmara para cima/baixo.
+    \item Superfície lateral externa: Para cada \emph{stack}, os valores de $\phi$ são iterados,
+        determinando a posição dos pontos ao longo da circunferência externa. Nos intervalos
+        correspondentes aos dentes, o raio é aumentado em $h_t$, a altura do dente. passando a ser
+        $r_e + h_t$.
+
+    \item Superfície lateral interna: De forma similar à superfície lateral externa, é gerada a
+        superfície interna do cilindro, mas o raio mantém-se constante em $r_i$.
 \end{itemize}
 
-\section{Transformações}
+Após a geração dos vértices, é necessário definir as faces triangulares que compõem a roda dentada.
+A triangulação é realizada da seguinte forma:
+
+\begin{itemize}
+    \item Superfície lateral externa: Os pontos adjacentes de duas \emph{stacks} consecutivas são
+        ligados, formando quadriláteros que são divididos individualmente em dois triângulos.
+
+    \item Superfície lateral interna: É aplicada a mesma estratégia ao cilindro interno, com a
+        ligação dos pontos entre diferentes \emph{stacks}.
+
+    \item Bases superior e inferior: Os pontos da última \emph{stack} são ligados aos vértices
+        centrais correspondentes, de modo a formar triângulos radiais.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{res/phase2/figures/gear.pdf}
+    \caption{
+        \onehalfspacing
+        Representação da estrutura da roda dentada. Note que a orientação dos eixos foi trocada para
+        ser possível melhor observar os detalhes desta figura.
+    }
+\end{figure}
+
+\section{\emph{Engine}}
+
+\subsection{Transformações}
 
 Um dos objetivos desta fase do trabalho prático é a possibilidade de aplicar transformações de
 translação, rotação e escala às entidades na cena. Estas podem ser especificadas no ficheiro XML
@@ -243,9 +488,9 @@ cena:
         \centering
         \begin{tabular}{|>{\centering\arraybackslash}m{3cm}|}
             \hline \\
-            \hline $C \cdot T_1 \cdot T_3 \cdot T_4$ \\
-            \hline $C \cdot T_1 \cdot T_3$ \\
-            \hline $C \cdot T_1$ \\
+            \hline $C \cdot W_1 \cdot W_3 \cdot W_4$ \\
+            \hline $C \cdot W_1 \cdot W_3$ \\
+            \hline $C \cdot W_1$ \\
             \hline $C$ \\
             \hline
         \end{tabular}
@@ -257,398 +502,18 @@ cena:
     \caption{\emph{Stack} de matrizes associada ao desenho de um grupo numa cena hierárquica.}
 \end{figure}
 
-\section{Sistema Solar Estático}
-
-\subsection{Hierarquia do Sistema Solar}
-
-O sistema solar foi representado através de uma estrutura hierárquica que segue a disposição
-real
-dos corpos celestes. No nível mais elevado encontra-se o Sol, que serve de ponto central e de
-referência para a órbita dos restantes corpos celestes.
-
-Cada planeta foi colocado num grupo independente, associado diretamente ao Sol. Quando aplicável,
-os satélites naturais (luas) e os anéis são inseridos como grupos filhos do planeta
-correspondente, preservando a hierarquia entre os corpos. A cintura de asteróides, por sua vez,
-é representada como um grupo filho do Sol, uma vez que orbita em torno deste.
-
-Desta forma, assegura-se que:
-\begin{itemize}
-    \item os planetas orbitam em torno do Sol;
-    \item as luas orbitam em torno do planeta a que pertencem;
-    \item os anéis acompanham o planeta respetivo;
-    \item os asteróides se posicionam nas suas cinturas, em órbitas relativas ao Sol.
-\end{itemize}
-
-\subsection{Representação em XML}
-
-A estrutura em XML segue a hierarquia descrita anteriormente. Cada grupo define transformações
-aplicadas aos seus elementos, como \texttt{translate}, \texttt{rotate} e \texttt{scale}, que são
-acumuladas ao longo da árvore de grupos. Esta organização permite simular corretamente os
-movimentos
-e proporções relativos entre os corpos celestes, como as órbitas dos planetas em torno do Sol
-ou
-das luas em torno dos seus planetas.
-
-Abaixo apresenta-se um exemplo com o Sol, a Terra e a Lua:
-
-\begin{lstlisting}
-<group>
-    <!-- Grupo do sol -->
-    <group>
-        <transform>
-            <translate x="0" y="0" z="0"/>
-            <scale x="30" y="30" z="30"/>
-        </transform>
-        <models>
-            <model file="../models/sphere.3d"/>
-        </models>
-        <!-- Grupo do planeta Terra -->
-        <group>
-            <transform>
-                <translate x="28" y="0" z="-3"/>
-                <scale x="0.2" y="0.2" z="0.2"/>
-            </transform>
-            <models>
-                <model file="../models/sphere.3d"/>
-            </models>
-            <!-- Grupo da lua -->
-            <group>
-                <transform>
-                    <translate x="3" y="0" z="0"/>
-                    <scale x="0.05" y="0.05" z="0.05"/>
-                </transform>
-                <models>
-                    <model file="../models/sphere.3d"/>
-                </models>
-            </group>
-        </group>
-    </group>
-</group>
-\end{lstlisting}
-
-Neste exemplo:
-\begin{itemize}
-    \item O primeiro \texttt{group} representa o Sol, posicionado na origem e aumentado com
-    \texttt{scale}.
-    \item Dentro do grupo do Sol encontra-se a Terra, posicionada com \texttt{translate} e
-    redimensionada.
-    \item Dentro do grupo da Terra está a Lua, com a sua própria transformação relativa.
-\end{itemize}
-
-As transformações são aplicadas sequencialmente e propagam-se ao longo da hierarquia. Assim, a
-posição e a escala de cada corpo são relativas ao seu elemento pai, respeitando a estrutura do
-sistema solar. Isto permite gerar movimentos orbitais e tamanhos proporcionais com base em
-operações simples.
-
-Além dos planetas e das luas, existem dois tipos de elementos adicionais com representação
-específica no XML:
-
-\begin{itemize}
-    \item As \textbf{cinturas de asteróides} são compostas por figuras \texttt{sphere.3d},
-    \texttt{box.3d} e \texttt{cylinder.3d}, escolhidas aleatoriamente. Estas instâncias são
-    adicionadas como grupo filho do Sol e posicionadas com coordenadas aleatórias em torno de um
-    raio definido. Cada asteróide recebe transformações próprias de \texttt{translate},
-    \texttt{rotate} e \texttt{scale}, simulando a sua dispersão e dimensão variável.
-
-    \item Os \textbf{anéis} reutilizam o modelo \texttt{torus.3d} da Fase I. Para
-    simular a sua aparência achatada, é aplicada uma \texttt{scale} com fator reduzido no eixo
-Y.
-    Além disso, os anéis são orientados através de uma rotação (\texttt{rotate}) com
-ângulo e
-    eixo ajustados consoante o planeta. Cada anel é inserido como grupo filho do planeta
-    correspondente.
-\end{itemize}
-
-O resultado destas pode ser visto na seguinte figura:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\linewidth]{res/phase2/results/SolarSystemOverview.png}
-    \caption{Sistema solar com anéis e cinturas de asteróides visíveis.}
-\end{figure}
-
-Ainda existem muitas melhorias que podem ser feitas ao sistema solar, como movimento dos corpos
-ou texturas.
-Pretendemos implementa-las na próxima fase.
-
-\subsection{Parametrização pelo Utilizador}
-
-O sistema solar pode ser gerado de forma personalizada, atrvés dos seguintes parâmetros
-definidos
-pelo utilizador, via linha de comandos:
-
-\begin{itemize}
-    \item \texttt{sceneScale} — Escala global aplicada a toda a cena.
-    \item \texttt{sunSizeFactor} — Escala atribuída ao Sol.
-    \item \texttt{planetSizeFactor} — Escala definida para os planetas.
-    \item \texttt{moonSizeFactor} — Escala definida para os satélites naturais.
-    \item \texttt{distanceFactor} — Proporção da distância entre os diferentes corpos
-celestes.
-    \item \texttt{asteroidBeltDensity} — Densidade definida para as cinturas de asteróides.
-    \item \texttt{ringSizeFactor} — Proporção dos anéis em relação ao planeta.
-\end{itemize}
-
-O objetivo destes parâmetros é gerar modelos do sistema solar com diferentes escalas e
-proporções, para facilitar a experiência do utilizador.
-
-\section{Extras}
-
-\subsection{\emph{Fita de Möbius}}
-
-Para gerar uma \emph{fita de Möbius} é necessário ter um raio, uma largura, o número de slices,
-o número de stacks e o ficheiro onde se irá colocar os vértices e as faces desta figura.
-Uma \emph{fita de Möbius} clássica possui uma torção (uma meia volta), mas para tornar a geração
-da figura mais interessante, é possível incluir o parâmetro de número de torções, permitindo
-variações no modelo.
-\begin{verbatim}
-    ./generator mobiusStrip <radius> <width> <twist> <slices> <stacks> <file>
-\end{verbatim}
-
-Matematicamente, as coordenadas de um ponto da \emph{fita de Möbius} são definidas do seguinte modo:
-
-$$x = (R + \theta \times \frac{W}{2} \times \cos (\frac{T}{2} \times \phi)) \times
-\cos (\phi)$$
-$$y = \theta \times \frac{W}{2} \times \sin (\frac{T}{2} \times \phi)$$
-$$z = (R + \theta \times \frac{W}{2} \times \cos (\frac{T}{2} \times \phi)) \times
-\sin (\phi)$$
-
-$$\phi \in \left [ 0, 2 \pi \right [$$
-$$\theta \in \left [ -1, 1 \right ]$$
-
-R, W e T são os parâmetros dados para a geração da \emph{fita de Möbius}, o raio, a
-largura e o número de torções, respetivamente.
-
-$\phi$ varia entre 0 e $2 \pi$ e $\theta$ varia entre -1 e 1.
-
-Para gerar uma nuvem de pontos uniformemente distribuídos percorre-se a faixa pelo seu comprimento
-(pelas fatias) e pela sua largura (pelos segmentos).
-
-$$
-\phi_i = i \cdot \frac{2\pi}{N_\text{slices}}
-\hspace{1cm}
-i \in \left \lbrace 0, 1, \ldots, N_\text{slices} \right \rbrace
-$$
-
-$$
-\theta_j = j \cdot \frac{2}{N_\text{stacks}} -1
-\hspace{1cm}
-j \in \left \lbrace 0, 1, \ldots, N_\text{stacks} \right \rbrace
-$$
-
-Assim, a \emph{fita de Möbius} é gerado iterando sobre os valores inteiros possíveis de i e j,
-o que dá origem à nuvem de pontos desejada.
-
-Após a geração dos vértices, estes são agrupados nos triângulos que compõem a superfície da
-\emph{fita de Möbius}.
-Para isso, considera-se um vértice de referência, como $P_1$, juntamente com o vértice
-adjacente na mesma fatia ($P_3$) e os dois vértices correspondentes na fatia seguinte
-($P_2$ e $P_4$), e geram-se quatro faces triangulares: duas faces de um lado e outras duas
-faces do outro lado do quadrilátero formado por estes quatro vértices. Este processo
-repete-se para todos os vértices onde é aplicável, garantindo que cada célula quadrangular
-é subdividida em quatro triângulos. A figura seguinte ilustra esse processo, mostrando
-a organização dos triângulos resultantes:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.35\textwidth]{res/phase2/figures/MobiusStrip.pdf}
-    \caption{Faces da \emph{fita de Möbius} geradas numa iteração.}
-\end{figure}
-
-Como a \emph{fita de Möbius} é uma faixa, então desenha-se os dois lados da faixa. É por
-isto que geramos faces com os mesmos pontos mas com ordenações dos pontos diferentes:
-geramos tanto as faces de um lado da faixa como as faces do outro lado. Essa duplicação é
-necessária porque o backface culling está ativado, garantindo que ambas as faces sejam
-visíveis corretamente. Para os quatro pontos apresentados acima, os triângulos gerados
-são os seguintes:
-
-$$
-T_1 = (P_1, P_2, P_3)
-\hspace{1cm}
-T_2 = (P_2, P_1, P_3)
-\hspace{1cm}
-T_3 = (P_3, P_2, P_4)
-\hspace{1cm}
-T_4 = (P_2, P_3, P_4)
-$$
-
-Com o \texttt{generator} foi criado um modelo da \emph{fita de Möbius}. Com esse modelo
-foi criada uma cena que foi renderizada pela \texttt{engine} da seguinte forma:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.35\textwidth]{res/phase2/figures/MobiusStrip.png}
-    \caption{Uma \emph{fita de Möbius}}
-\end{figure}
-
-\textbf{\color{red} TODO - extras continuação}
-
-\subsection{Câmara Orbital}
-
-A câmara orbital é uma câmara virtual que permite observar uma scene a partir de um ponto que
-orbita à volta de um objeto ou de um ponto de vista (\texttt{lookAt}). Na implementação atual, este
-ponto de interesse está fixado na origem do espaço tridimensional. Esta abordagem é útil para
-observar um objeto de diversos ângulos possíveis com o foco num ponto em específico.
-
-\subsubsection{Movimentação e Controlo}
-
-A câmara orbital é definida por 3 parâmetros:
-\begin{itemize}
-    \item Raio (\texttt{radius}): determina a distância do ponto de interesse à câmara;
-    \item Ângulo azimutal ($\phi$): define a rotação da câmara em torno do eixo vertical,
-    o que permite uma visualização de 360 graus ao redor do objeto;
-    \item Ângulo polar ($\theta$): controla o ângulo de elevação da câmara.
-\end{itemize}
-
-A atualização da a posição da câmara é dada pela soma do ponto de interesse (\texttt{lookAt}) com
-as coordenadas cartesianas obtidas a partir das coordenadas esféricas. As fórmulas utilizadas para
-a conversão são as seguintes:
-
-$$x = radius \times \sin(\theta) \times \cos(\phi)$$
-$$y = radius \times \cos(\theta)$$
-$$z = radius \times \sin(\theta) \times \sin(\phi)$$
-
-De forma a garantir um comportamento estável e consistente, os valores são restringidos a
-intervalos pré-definidos. O raio encontra-se limitado entre $0.5$ e $100$, para evitar que a câmara
-se aproxime demasiado ou se afaste demasiado do ponto de interesse. O ângulo azimutal varia entre
-$0$ e $2\pi$, para que a rotação aconteça de forma contínua. Por fim, o ângulo polar encontra-se
-entre $0.01$ e $\pi - 0.01$ para evitar que a câmara alcance os polos e cause instabilidade no
-movimento, no sentido em que se $\theta$ atingir o valor $\pi$, o vetor \texttt{up} da câmara
-ficaria invertido, de modo que a câmara viraria completamente ao contrário. Assim, os comandos
-também ficariam invertidos, isso tornaria a navegação confusa e pouco intuitiva.
-
-\subsubsection{Controlo pelo Utilizador}
-
-Para controlar a câmara orbital, o utilizador utiliza o teclado, sendo que as teclas associadas a
-cada ação são:
-\begin{itemize}
-    \item \texttt{W}: inclina a câmara para cima;
-    \item \texttt{S}: inclina a câmara para baixo;
-    \item \texttt{A}: roda a câmara para a esquerda;
-    \item \texttt{D}: roda a câmara para a direita;
-    \item \texttt{F}: aproxima a câmara do ponto de interesse;
-    \item \texttt{B}: afasta a câmara do ponto de interesse.
-\end{itemize}
-
-\subsection{Garrafa de Klein}
-
-A garrafa de Klein é uma superfície não orientável, ou seja, não possui um lado interno e externo
-distinguíveis. Esta não possui fronteira e trata-se de uma variedade bidimensional onde não se pode
-definir um vetor normal em todos os pontos.
-
-\subsubsection{Geração dos vértices}
-
-A parametrização de um vértice sobre a garrafa de klein de raio $r$ pode ser definida pelas
-seguintes equações \cite{bottleKlein}:
-
-$$
-x = r \left( \frac{-2}{15} \right) \cos(\theta) \left(3 \cos(\phi) - 30 \sin(\theta) +
-90 \cos^4(\theta) \sin(\theta) - 60 \cos^6(\theta) \sin(\theta) +
-5 \cos(\theta) \cos(\phi) \sin(\theta) \right)
-$$
-
-$$
-y = r \left( \frac{-1}{15} \right) \sin(\theta) \left( 3 \cos(\phi) - 3 \cos^2(\theta) \cos(\phi)
-- 48 \cos^4(\theta) \cos(\phi) + 48 \cos^6(\theta) \cos(\phi) - 60 \sin(\theta) \right.
-$$
-$$
-\quad \left. + 5 \cos(\theta) \cos(\phi) \sin(\theta) - 5 \cos^3(\theta) \cos(\phi) \sin(\theta)
-- 80 \cos^5(\theta) \cos(\phi) \sin(\theta) + 80 \cos^7(\theta) \cos(\phi) \sin(\theta) \right)
-$$
-
-$$
-z = r \left( \frac{2}{15} \right) (3 + 5 \cos(\theta) \sin(\theta)) \sin(\phi)
-$$
-
-Para a geração da garrafa de Klein, a superfície foi discretizada com a utilização de coordenadas
-paramétricas, com o auxílio de duas variáveis ($\theta$ e $\phi$).
-
-A variável $\theta$ varia entre $0$ e $\pi$ e $\phi$ varia entre $0$ e $2\pi$. Além disso, o
-intervalo de valores de $\theta$ e $\phi$ varia de acordo com o número de slices e stacks.
-
-\subsubsection{Construção das faces}
-
-Após a geração dos vértices, constroem-se as faces da garrafa de Klein. Cada quadrilátero entre duas
-\emph{stacks} sucessivas é dividido em duas faces triangulares.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\textwidth]{res/phase2/figures/kleinBottle.pdf}
-    \caption{Garrafa de Klein}
-\end{figure}
-
-\subsection{Roda Dentada}
-
-A roda dentada é uma derivaçaão do cilindro, na medida em que possui uma estrutura básica
-cilíndrica, no entanto tem o complemento dos dentes no exterior e uma coroa no interior. A
-construção desta primitiva tem por base coordenadas cilíndricas, onde a posição de cada ponto é
-dada pelo raio interno ($r_i$), raio externo ($r_e$), ângulo azimutal ($\phi$) e altura ($h$).
-
-A parametrização de um ponto sobre uma roda dentada de raio \( r \) pode ser definida
-pelas seguintes equações:
-
-$$x = r \cos(\phi)$$
-$$y \in \left [ 0, h \right ]$$
-$$z =  r \sin(\phi)$$
-
-
-onde $r$ possui dois valores distintos. Para a parte interna da roda é utilizado o $r_i$ e para a
-parte externa o $r_e$. Os dentes são gerados na circunferência exterior, com o aumento do raio em
-determinadas posições.
-
-\subsubsection{Geração dos Vértices}
-
-Para discretizar a superfície da roda dentada, divide-se o intervalo de $\phi$ em \emph{slices}, e
-o intervalo de $y$ em \emph{stacks}. Assim, as incrementações angulares são calculadas da seguinte
-forma:
-
-$$
-\Delta \phi = \frac{2\pi}{N_\text{slices}}
-\hspace{1cm}
-\Delta y = \frac{h}{N_\text{stacks}}
-$$
-
-A construção dos vértices segue os seguintes passos:
-
-1. Superfície lateral externa: Para cada \emph{stack}, os valores de $\phi$ são iterados,
-determinando a posição dos pontos ao longo da circunferência externa. Nos intervalos correspondentes
-aos dentes, o raio é aumentado em $r_e + h_t$, onde $h_t$ é a altura do dente.
-
-2. Superfície lateral interna: De forma similar à superfície lateral externa, é gerada a superfície
-interna do cilindro, mas o raio mantém-se constante em $r_i$.
-
-\subsubsection{Construção das Faces}
-
-Após a geração dos vértices, é necessário definir as faces triangulares que compõem a roda dentada.
-A triangulação é realizada da seguinte forma:
-
-1. Superfície lateral externa: Os pontos adjacentes de duas \emph{stacks} consecutivas são
-ligados, isto forma quadriláteros que são divididos individualmente em dois triângulos.
-
-2. Superfície lateral interna: É aplicada a mesma estratégia ao cilindro interno, com a ligação
-dos pontos entre diferentes \emph{stacks}.
-
-3. Bases superior e inferior: Os pontos da última \emph{stack} são ligados ao vértice central
-correspondente, de modo a formar triângulos radiais.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\textwidth]{res/phase2/figures/gear.pdf}
-    \caption{Representação da estrutura da roda dentada.}
-\end{figure}
-
 \subsection{UI (Interface Gráfica)}
 
-A interface do projeto foi desenvolvida com o auxílio da biblioteca \texttt{Dear ImGui}. Esta
-biblioteca simplifica a gestão e atualização dos componentes, pois os elementos gráficos são
-recriados a cada \textit{frame}.
+Como funcionalidade adicional, foi implementada uma interface gráfica, com o auxílio da biblioteca
+\texttt{Dear ImGui}. \cite{dear-imgui} Esta biblioteca simplifica a gestão e atualização dos
+componentes, pois os elementos gráficos são recriados a cada \textit{frame}.
 
-A classe responsável pela configuração e renderização da interface é a \texttt{UI}.
-Assim, no processo de inicialização realizado no construtor da classe, a criação do contexto
-\texttt{ImGui} é realizada (garante que a biblioteca encontra-se bem configurada), bem como a
-configuração do estilo da interface (aqui, o estilo \textit{Dark} foi escolhido para se obter uma
-melhor visualização dos elementos gráficos) e é efetuada a inicialização das implementações para a
-\texttt{OpenGL} e \texttt{GLFW} (assegura que há compatibilidade entre o motor de renderização
-utilizado com o sistema de janelas).
+A classe responsável pela configuração e renderização da interface é a \texttt{UI}. No processo de
+inicialização realizado no seu construtor, a criação do contexto \texttt{ImGui} é realizada, bem
+como a configuração do estilo da interface (o estilo \textit{Dark} foi escolhido por preferência dos
+autores deste trabalho) e é efetuada a inicialização das implementações \texttt{OpenGL3} e
+\texttt{GLFW} da biblioteca, algo que é necessário, visto que a biblioteca suporta diversos outros
+\emph{backends}.
 
 A interface é composta por um menu, sendo este renderizado na função \texttt{UI::render} com os
 seguintes elementos:
@@ -657,20 +522,20 @@ seguintes elementos:
     \item Acompanhamento do Desempenho:
     \begin{itemize}
         \item FPS (\textit{Frames Per Second}): apresenta o número de \textit{frames}
-        renderizados por segundo.
+            renderizados por segundo.
         \item Apresenta o número de entidades renderizadas em relação ao número total de entidades
-        existentes. Esta métrica é útil para testar a eficiência do \textit{frustum culling},
-        pois permite avaliar se apenas as entidades dentro da visão da câmara estão a ser
-        renderizadas.
+            existentes. Esta métrica é útil para testar a eficiência do \textit{frustum culling},
+            pois permite avaliar se apenas as entidades dentro da visão da câmara estão a ser
+            renderizadas.
     \end{itemize}
     \item Configurações:
     \begin{itemize}
         \item Preenchimento de polígonos: permite alternar entre o preenchimento
-        (\textit{fill polygons}) e o modo \textit{wireframe}.
-        \item \textit{Back face culling}: ativa ou desativa o \textit{back-face culling}.
+            (\textit{fill polygons}) e o modo \textit{wireframe}.
+        \item \textit{Back-face culling}: ativa ou desativa o \textit{back-face culling}.
         \item Exibir eixos: ativa ou desativa a visualização dos eixos.
         \item \textit{Bounding spheres}: ativa ou desativa a visualização das esferas encapsuladoras
-        das entidades.
+            das entidades (ver \emph{frustum culling}).
     \end{itemize}
     \item Câmara: permite modificar as coordenadas da posição da câmara.
 \end{itemize}
@@ -684,7 +549,153 @@ Após a definição dos elementos gráficos, a interface é renderizada através
     \caption{Interface Gráfica.}
 \end{figure}
 
-\section{\emph{Frustum culling}}
+\subsection{Câmara Orbital}
+
+A câmara orbital é uma câmara virtual que permite observar uma cena a partir de um ponto que orbita
+à volta de ou de um objeto ou de um ponto fixo (\texttt{lookAt}). Na implementação atual, este ponto
+de interesse está fixado na origem do espaço tridimensional. Esta abordagem é útil para observar um
+objeto de diversos ângulos possíveis com o foco num ponto em específico.
+
+A câmara orbital é definida por 3 parâmetros:
+
+\begin{itemize}
+    \item Raio ($r$): determina a distância do ponto de interesse à câmara;
+    \item Ângulo azimutal ($\phi$): define a rotação da câmara em torno do eixo vertical,
+    o que permite uma visualização de 360º em redor do objeto;
+    \item Ângulo polar ($\theta$): controla o ângulo de elevação da câmara.
+\end{itemize}
+
+A atualização da posição da câmara é dada pela soma do ponto de interesse (\texttt{lookAt}) com
+as coordenadas cartesianas obtidas a partir das coordenadas esféricas. As fórmulas utilizadas para
+a conversão são as seguintes, tendo como ponto de interesse a origem do referencial:
+
+$$x = r \sin \theta \cos \phi$$
+$$y = r \cos \theta$$
+$$z = r \sin \theta \sin \phi$$
+
+De forma a garantir um comportamento estável e consistente, alguns valores devem ser restringidos a
+intervalos pré-definidos. O raio encontra-se limitado entre $0.5$ e $100$, para evitar que a câmara
+se aproxime demasiado ou se afaste demasiado do ponto de interesse. O ângulo azimutal varia entre
+$0$ e $2\pi$, sendo reajustado quando a câmara completa uma volta. Impedir que este valor fique
+demasiado alto ou demasiado baixo faz com que não sejam causados erros de precisão de vírgula
+flutuante caso se deem milhões de voltas à câmara. Por fim, o ângulo polar encontra-se entre
+$0.01$ e $\pi - 0.01$ para evitar que a câmara alcance os polos e cause instabilidade no
+movimento. Sem esta restrição, caso $\theta > \pi$, o vetor $\vec{up}$ da câmara deixaria de ser
+válido e a movimentação vertical da câmara ficaria invertida, tornando a navegação confusa e pouco
+intuitiva.
+
+Para controlar a câmara orbital, o utilizador utiliza o teclado, sendo que as teclas associadas a
+cada ação são:
+
+\begin{itemize}
+    \item \texttt{W/S}: inclinar a câmara para cima e para baixo, respetivamente;
+    \item \texttt{A/D}: rodar a câmara para a esquerda e para a direita, respetivamente;
+    \item \texttt{F}: aproximar a câmara do ponto de interesse;
+    \item \texttt{B}: afastar a câmara do ponto de interesse.
+\end{itemize}
+
+\subsection{Câmara Livre}
+
+A câmara livre permite que o utilizador se desloque de forma intuitiva, sendo semelhante à de
+jogos de exploração na primeira pessoa, como simuladores de voo, e ambientes de realidade
+virtual.
+
+A câmara pode deslocar-se e rodar de forma contínua no espaço tridimensional, sendo os seus
+movimentos definidos pelos seguintes vetores:
+
+\begin{itemize}
+    \item Vetor $\vec{d}$: Direção do olhar da câmara.
+    \item Vetor $\vec{r}$: Direção perpendicular ao vetor $\vec{d}$, ao longo do plano horizontal.
+    \item Vetor $\vec{up}$: Aproximação do eixo vertical da câmara.
+\end{itemize}
+
+A posição da câmara, $P$, é atualizada de acordo com a seguinte equação:
+
+$$
+P' = P + v \cdot \vec{d'},
+$$
+
+onde $v$ representa a velocidade da câmara e $\vec{d'}$ a direção do movimento, que depende do
+movimento escolhido pelo utilizador:
+
+\begin{itemize}
+    \item Translação horizontal: O movimento para a frente e para trás ocorre ao longo do vetor
+        $\vec{d}$ ($\vec{d'} = \pm \widehat{d}$), enquanto o movimento lateral ocorre ao longo do
+        vetor $\vec{r}$ ($\vec{d'} = \pm \widehat{r}$).
+    \item Translação vertical: O movimento vertical acontece ao longo do vetor $\widehat{up}$
+        ($\vec{d'} = \pm \widehat{up}$), permitindo ao utilizador subir e descer a câmara.
+\end{itemize}
+
+Para as transformações de rotação, é importante saber que a orientação da câmara é definida pelos
+ângulos $\theta$ (\emph{yaw}), responsável pela rotação horizontal, e $\phi$ (\emph{pitch}),
+responsável pela inclinação vertical. Ambos estes ângulos determinam a direção do vetor $\vec{d}$.
+A atualização da orientação da câmara obtém-se através da conversão dos ângulos $\theta$ e $\phi$
+para um vetor de direção tridimensional. A relação entre os ângulos e os componentes do vetor
+$\vec{d}$ é dada por:
+
+$$d_x = \cos \phi  \cos \theta$$
+$$d_y = \sin \phi $$
+$$d_z = \cos \phi  \sin \theta$$
+
+Após serem calculados os componentes do vetor, este é normalizado, uma vez que é necessário
+garantir que este mantém um comprimento unitário. Esta normalização é fundamental para garantir
+que a câmara mantém uma velocidade constante em qualquer direção.
+
+Além disso, foram tomadas medidas para prevenir o \emph{gimbal lock}. Este é um problema que ocorre
+quando dois eixos de rotação se alinham, ou seja, quando $\phi$ atinge $90^\circ$ ou $-90^\circ$.
+Além disso, no caso de $|\phi|$ exceder $90^\circ$, tal como na câmara livre, o \emph{vetor}
+$\vec{up}$ deixa de ser válido e a movimentação vertical da câmara fica invertida. Para resolver
+estes dois problemas, foi imposto o seguinte limite:
+
+$$
+-89^\circ \leq \phi \leq 89^\circ
+$$
+
+Este impede que a câmara olhe completamente para cima ou para baixo, garantindo que o vetor
+$\vec{up}$ mantenha uma orientação bem definida e evitando a perda de controlo sobre a rotação
+horizontal.
+
+Sempre que a câmara sofre alterações, é necessário recalcular os seus vetores $\vec{r}$ e
+$\vec{up}$. O vetor $\vec{r}$ é obtido como o produto externo entre a direção do olhar da câmara,
+$\vec{d}$, e o vetor de referência vertical, $(0,1,0)$:
+
+$$
+\def\arraystretch{1}
+\vec{r} = \vec{d} \times
+\begin{bmatrix}
+    0 \\ 1 \\ 0
+\end{bmatrix}
+$$
+
+Depois, o vetor $\vec{up}$ é recalculado para ser ortogonal aos outros dois vetores:
+
+$$
+\vec{up} = \vec{r} \times \vec{d}
+$$
+
+Isto assegura que os movimentos laterais, verticais e de rotação permanecem coerentes em
+qualquer orientação da câmara, garantindo um comportamento previsível para o utilizador. Ademais,
+como a função \texttt{glm::lookAt} leva como argumento um ponto para o qual a câmara aponta, e
+não o vetor $\vec{d}$, é necessário calcular as coordenadas de um ponto possível para gerar a nova
+matriz de visualização:
+
+$$
+L = P + \vec{d}
+$$
+
+O utilizador pode controlar a câmara de forma intuitiva, utilizando o teclado para movimentação
+e as setas direcionais para rotação:
+
+\begin{itemize}
+    \item \texttt{W/S}: Mover a câmara para a frente / trás, respetivamente;
+    \item \texttt{A/D}: Mover a câmara para os lados esquerdo e direito, respetivamente;
+    \item Espaço: Sobir a câmara;
+    \item \emph{Shift} Esquerdo: Descer a câmara;
+    \item Setas Esquerda / Direita: Rodar a câmara para a esquerda/direita;
+    \item Setas Cima / Baixo: Inclinar a câmara para cima/baixo.
+\end{itemize}
+
+\subsection{\emph{Frustum Culling}}
 
 Cada \emph{draw call} tem um custo elevado para o desempenho da aplicação. Logo, procurando reduzir
 o número de \emph{draw calls}, foi implementado \emph{frustum culling}, para apenas ser requisitada
@@ -771,12 +782,28 @@ $$
 r' = \max \left \lbrace d(C', C) + r \mid (C, r) \in S \right \rbrace
 $$
 
+Foi adicionada à \texttt{engine}, para depuração, a possibilidade de visualizar as esferas
+encapsuladoras dos grupos e das entidades na cena. Abaixo, apresenta-se uma captura de ecrã da
+\texttt{engine} com esta funcionalidade ativa:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/phase2/BoundingSpheres.png}
+    \caption{Esferas encapsuladoras de grupos e entidades.}
+\end{figure}
+
 Depois de saber como determinar as esferas encapsuladoras das entidades, é necessário determinar
 o \emph{view fustum} da câmara, para se poder verificar a posição das esferas em relação aos planos
 do \emph{view fustum}. Para determinar o \emph{view frustum}, é necessário obter alguns vetores
-importantes da câmara \cite{lighthouse3d-frustum-planes}:
+importantes da câmara \cite{lighthouse3d-frustum-planes}, os mesmos necessários para o funcionamento
+da câmara livre, $\vec{d}$, $\vec{r}$ e $\vec{up}$. É importante também notar que o vetor $\vec{up}$
+utilizado dado na descrição XML da cena pode não ser adequado para o cálculo do \emph{frustum}: é
+necessário garantir que $\vec{up} \bot \vec{d}$. Para tal, o vetor $\vec{up}$ pode sofrer a seguinte
+transformação:
 
-\textbf{\color{red} TODO - com a fusão das partes do relatório, referenciar vetores da câmara livre}
+$$
+\vec{up} \leftarrow \left ( \vec{d} \times \vec{up} \right ) \times \vec{d}
+$$
 
 Além destes vetores, é também necessário conhecer as dimensões dos planos \emph{near} e \emph{far}.
 Apesar de, matematicamente, planos não terem uma altura e uma largura, utiliza-se esta linguagem
@@ -843,37 +870,31 @@ os planos do \emph{view frustum} apontem para o seu interior, para que o conteú
 não no seu exterior) seja desenhado. \cite{lighthouse3d-frustum-planes} Por este motivo, a ordem em
 que os pontos $P_1$, $P_2$ e $P_3$ são especificados é relevante.
 
-\section{Resultados obtidos}
+\section{Resultados Obtidos}
 
-Nesta fase, implementámos câmaras orbital e livre, transformações hierárquicas, frustum culling e
-novas primitivas geométricas. Os resultados incluem novos modelos de primitivas gerados pelo
-\texttt{generator}, testes de renderização, uma representação funcional do sistema solar e a
-implementação de \textit{frustum culling}.
+Nesta secção, procuram-se apresentar algumas capturas de ecrã da \texttt{engine} das novas cenas
+criadas e das cenas fornecidas pela docência da UC.
 
-\subsection{Figuras geométricas geradas}
+\subsection{Figuras Geométricas Geradas}
 
-Os seguintes modelos foram criados utilizando o \texttt{generator} implementado:
+Os seguintes modelos foram criados utilizando o \texttt{generator}:
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
+    \begin{minipage}{0.32\textwidth}
         \centering
-        \includegraphics[width=0.5\textwidth]{res/phase2/results/KleinBottle.png}
-        \caption{Garrafa de Klein (\texttt{kleinBottle})}
-    \end{minipage}\hfill
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=0.5\textwidth]{res/phase2/results/MobiusStrip.png}
-        \caption{Fita de Möbius (\texttt{möbius strip})}
+        \includegraphics[width=0.8\textwidth]{res/phase2/results/KleinBottle.png}
+        \caption{Garrafa de Klein.}
     \end{minipage}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \begin{minipage}{0.48\textwidth}
+    \begin{minipage}{0.32\textwidth}
         \centering
-        \includegraphics[width=0.5\textwidth]{res/phase2/results/Gear.png}
-        \caption{Roda dentada (\texttt{gear})}
+        \includegraphics[width=0.8\textwidth]{res/phase2/results/MobiusStrip.png}
+        \caption{Fita de Möbius.}
+    \end{minipage}
+    \begin{minipage}{0.32\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{res/phase2/results/Gear.png}
+        \caption{Roda dentada.}
     \end{minipage}\hfill
 \end{figure}
 
@@ -893,50 +914,48 @@ trabalho. A \texttt{engine} renderizou-as como esperado:
     \end{adjustwidth}
 \end{figure}
 
-\subsection{Sistema Solar}
-
-A hierarquia implementada produziu com sucesso as órbitas e relações de escala do sistema solar.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{res/phase2/results/SolarSystem.png}
-    \caption{Renderização do sistema solar.}
-\end{figure}
-
-\subsection{Frustum Culling}
-
-O \textit{frustum culling} utiliza as esferas vermelhas para verificar se um objeto
-se encontra dentro do campo de visão da câmara. Se a esfera estiver dentro da área visível, o
-modelo correspondente é renderizado. Os objetos que se encontrem fora do \textit{frustum} têm as
-suas esferas ignoradas, o que evita um processamento desnecessário.
-
-\begin{figure}[H]
-    \begin{adjustwidth}{-2cm}{-2cm}
-        \centering
-        \includegraphics[width=0.4\textwidth]{res/phase2/results/FrustumCulling.png}
-        \includegraphics[width=0.4\textwidth]{res/phase2/results/FrustumCullingpt2.png}
-        \caption{Frustum Culling}
-    \end{adjustwidth}
-\end{figure}
-
 \section{Conclusão e Trabalho Futuro}
 
-\textbf{\color{red} TODO - conclusão}
+Consideramos que esta segunda fase deste trabalho prático foi concluída com sucesso. Em primeiro
+lugar, não tivemos qualquer problema com a implementação das funcionalidades obrigatórias: as
+transformações dos objetos nas cenas e a geração do Sistema Solar. Em relação aos objetivos que
+tínhamos traçado na conclusão da última fase, conseguimos representar cenas numa estrutura
+hierárquica, e implementar dois novos tipos de câmara, a câmara orbital e a câmara livre. No
+entanto, não nos focámos na implementação da câmara em terceira pessoa, preferindo investir o nosso
+tempo em outras funcionalidades que nos despertaram mais curiosidade. Todavia, ainda pretendemos
+implementar este tipo de câmara, mas isso será algo para as próximas fases deste trabalho.
+
+Além do que tínhamos planeado, implementámos diversas outras funcionalidades. Em primeiro lugar, do
+lado do \texttt{generator}, implementámos diversas novas figuras, a roda dentada e alguns objetos
+conhecidos da topologia, a fita de Möbius e a garrafa de Klein. Ademais, do lado da
+\texttt{engine}, implementámos uma interface gráfica, para ser possível controlar vários parâmetros
+possíveis da \texttt{engine}. Por último, implementámos também \emph{frustum culling}, para melhorar
+o desempenho da \texttt{engine} através da redução do número de \emph{draw calls}.
+
+Ao longo desta fase, a nossa principal dificuldade foi a implementação do \emph{frustum culling}.
+Qualquer pequena falha (um sinal errado, uma troca entre duas variáveis, \emph{etc.}) pode fazer
+com que este não funcione, pelo que foi necessário o desenvolvimento de uma boa infraestrutura
+para depuração (como a apresentação das \emph{bounding spheres}) para encontrar e corrigir os erros
+que fomos cometendo durante a implementação desta funcionalidade.
+
+Para a próxima fase deste trabalho, desejamos implementar as funcionalidades obrigatórias pedidas,
+a geração de modelos com base em \emph{patches} de Bézier, e a animação dos objetos da cena com
+translações e rotações que variam ao longo do tempo. Além disso, como funcionalidades adicionais,
+desejamos implementar a já mencionada câmara em terceira pessoa, bem como \emph{object picking} e
+\emph{instanced rendering}.
 
 \begingroup
 \section{Bibliografia}
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
-    \bibitem{fita de Möbius}
-        "fita de Möbius."{} Wolfram MathWorld. Accessed: Mar. 25, 2025. [Online.] Available:
+    \bibitem{mobius-strip}
+        ``Möbius Strip.'' Wolfram MathWorld. Accessed: Mar. 25, 2025. [Online.] Available:
         \url{https://mathworld.wolfram.com/MoebiusStrip.html}
-    \bibitem{bottleKlein}
-        "Klein bottle"{} Mathematics: Mar. 28, 2025. [Online.] Available:
-     \url{https://math.stackexchange.com/questions/2982429/whats-the-surface-area-of-a-klein-bottle}
-    \bibitem{Dear ImGui}
-        "Dear ImGui."{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
-        \url{https://github.com/ocornut/imgui}
+    \bibitem{klein-bottle}
+        A. Norman and G. Newcomb, ``Klein surfaces and real algebraic function fields.'',
+        \emph{Bulletin of the American Mathematical Society}, vol. 75, no. 4, pp. 869-872,
+        Apr. 1969, \url{doi:10.1090/S0002-9904-1969-12332-3}.
     \bibitem{glm-transform}
         ``GLM\textunderscore EXT\textunderscore matrix\textunderscore transform''. GLM 0.9.9 API
         documentation. Accessed: Mar. 27, 2025. [Online.] Available:
@@ -945,6 +964,9 @@ suas esferas ignoradas, o que evita um processamento desnecessário.
         ``OpenGL (R) 2.1, GLX, and GLU Reference Pages ''. Khronos Registry.
         Accessed: Mar. 27, 2025. [Online.] Available:
         \url{https://registry.khronos.org/OpenGL-Refpages/gl2.1}
+    \bibitem{dear-imgui}
+        ``Dear ImGui.'' GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/ocornut/imgui}
     \bibitem{lighthouse3d-frustum-planes}
         ``Geometric Approach -- Extracting the Planes.''. Lighthouse3d.com. Accessed:
         Mar. 29, 2025. [Online.] Available:
