@@ -393,6 +393,95 @@ proporções, para facilitar a experiência do utilizador.
 
 \section{Extras}
 
+\subsection{\emph{Fita de Möbius}}
+
+Para gerar uma \emph{fita de Möbius} é necessário ter um raio, uma largura, o número de slices,
+o número de stacks e o ficheiro onde se irá colocar os vértices e as faces desta figura.
+Uma \emph{fita de Möbius} clássica possui uma torção (uma meia volta), mas para tornar a geração
+da figura mais interessante, é possível incluir o parâmetro de número de torções, permitindo
+variações no modelo.
+\begin{verbatim}
+    ./generator mobiusStrip <radius> <width> <twist> <slices> <stacks> <file>
+\end{verbatim}
+
+Matematicamente, as coordenadas de um ponto da \emph{fita de Möbius} são definidas do seguinte modo:
+
+$$x = (R + \theta \times \frac{W}{2} \times \cos (\frac{T}{2} \times \phi)) \times
+\cos (\phi)$$
+$$y = \theta \times \frac{W}{2} \times \sin (\frac{T}{2} \times \phi)$$
+$$z = (R + \theta \times \frac{W}{2} \times \cos (\frac{T}{2} \times \phi)) \times
+\sin (\phi)$$
+
+$$\phi \in \left [ 0, 2 \pi \right [$$
+$$\theta \in \left [ -1, 1 \right ]$$
+
+R, W e T são os parâmetros dados para a geração da \emph{fita de Möbius}, o raio, a
+largura e o número de torções, respetivamente.
+
+$\phi$ varia entre 0 e $2 \pi$ e $\theta$ varia entre -1 e 1.
+
+Para gerar uma nuvem de pontos uniformemente distribuídos percorre-se a faixa pelo seu comprimento
+(pelas fatias) e pela sua largura (pelos segmentos).
+
+$$
+\phi_i = i \cdot \frac{2\pi}{N_\text{slices}}
+\hspace{1cm}
+i \in \left \lbrace 0, 1, \ldots, N_\text{slices} \right \rbrace
+$$
+
+$$
+\theta_j = j \cdot \frac{2}{N_\text{stacks}} -1
+\hspace{1cm}
+j \in \left \lbrace 0, 1, \ldots, N_\text{stacks} \right \rbrace
+$$
+
+Assim, a \emph{fita de Möbius} é gerado iterando sobre os valores inteiros possíveis de i e j,
+o que dá origem à nuvem de pontos desejada.
+
+Após a geração dos vértices, estes são agrupados nos triângulos que compõem a superfície da
+\emph{fita de Möbius}.
+Para isso, considera-se um vértice de referência, como $P_1$, juntamente com o vértice
+adjacente na mesma fatia ($P_3$) e os dois vértices correspondentes na fatia seguinte
+($P_2$ e $P_4$), e geram-se quatro faces triangulares: duas faces de um lado e outras duas
+faces do outro lado do quadrilátero formado por estes quatro vértices. Este processo
+repete-se para todos os vértices onde é aplicável, garantindo que cada célula quadrangular
+é subdividida em quatro triângulos. A figura seguinte ilustra esse processo, mostrando
+a organização dos triângulos resultantes:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/phase2/figures/MobiusStrip.pdf}
+    \caption{Faces da \emph{fita de Möbius} geradas numa iteração.}
+\end{figure}
+
+Como a \emph{fita de Möbius} é uma faixa, então desenha-se os dois lados da faixa. É por
+isto que geramos faces com os mesmos pontos mas com ordenações dos pontos diferentes:
+geramos tanto as faces de um lado da faixa como as faces do outro lado. Essa duplicação é
+necessária porque o backface culling está ativado, garantindo que ambas as faces sejam
+visíveis corretamente. Para os quatro pontos apresentados acima, os triângulos gerados
+são os seguintes:
+
+$$
+T_1 = (P_1, P_2, P_3)
+\hspace{1cm}
+T_2 = (P_2, P_1, P_3)
+\hspace{1cm}
+T_3 = (P_3, P_2, P_4)
+\hspace{1cm}
+T_4 = (P_2, P_3, P_4)
+$$
+
+Com o \texttt{generator} foi criado um modelo da \emph{fita de Möbius}. Com esse modelo
+foi criada uma cena que foi renderizada pela \texttt{engine} da seguinte forma:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/phase2/figures/MobiusStrip.png}
+    \caption{Uma \emph{fita de Möbius}}
+\end{figure}
+
+\textbf{\color{red} TODO - extras continuação}
+
 \subsection{Câmara Orbital}
 
 A câmara orbital é uma câmara virtual que permite observar uma scene a partir de um ponto que
@@ -839,6 +928,9 @@ suas esferas ignoradas, o que evita um processamento desnecessário.
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
+    \bibitem{fita de Möbius}
+        "fita de Möbius."{} Wolfram MathWorld. Accessed: Mar. 25, 2025. [Online.] Available:
+        \url{https://mathworld.wolfram.com/MoebiusStrip.html}
     \bibitem{bottleKlein}
         "Klein bottle"{} Mathematics: Mar. 28, 2025. [Online.] Available:
      \url{https://math.stackexchange.com/questions/2982429/whats-the-surface-area-of-a-klein-bottle}
