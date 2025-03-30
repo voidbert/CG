@@ -15,7 +15,6 @@
 #include "engine/window/UI.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
@@ -25,7 +24,9 @@
 
 namespace engine::window {
 
-UI::UI(Window &window, camera::Camera &_camera) : camera(_camera) {
+UI::UI(Window &window, camera::Camera &_camera, int _entityCount) :
+    camera(_camera), showAxes(true), showBoundingSpheres(false), entityCount(_entityCount) {
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
@@ -34,7 +35,13 @@ UI::UI(Window &window, camera::Camera &_camera) : camera(_camera) {
     ImGui_ImplOpenGL3_Init("#version 460 core");
 }
 
-void UI::render() {
+UI::~UI() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
+void UI::render(int renderedEntities) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -49,6 +56,10 @@ void UI::render() {
         lastTime = currentTime;
     }
     ImGui::Text("FPS: %d", fps);
+
+    std::string entityText = std::to_string(renderedEntities) + " / " +
+        std::to_string(this->entityCount) + " entities rendered";
+    ImGui::Text(entityText.c_str());
 
     ImGui::Separator();
     ImGui::Text("Render Options");
@@ -67,7 +78,8 @@ void UI::render() {
         }
     }
 
-    if (ImGui::Checkbox("Show Axes", &showAxes)) {}
+    if (ImGui::Checkbox("Show Axes", &this->showAxes)) {}
+    if (ImGui::Checkbox("Show Bounding Spheres", &this->showBoundingSpheres)) {}
 
     ImGui::Separator();
     ImGui::Text("Camera Options");
@@ -83,18 +95,12 @@ void UI::render() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-UI::~UI() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-}
-
-void UI::setShowAxes(bool value) {
-    this->showAxes = value;
-}
-
 bool UI::isShowAxesEnabled() const {
     return this->showAxes;
+}
+
+bool UI::isShowBoundingSpheresEnabled() const {
+    return this->showBoundingSpheres;
 }
 
 }

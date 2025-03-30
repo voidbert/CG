@@ -29,7 +29,7 @@ private:
     render::RenderPipeline pipeline;
     scene::Scene scene;
     render::Axis xAxis, yAxis, zAxis;
-    UI _UI;
+    UI ui;
 
 public:
     explicit SceneWindow(const std::string &sceneFile);

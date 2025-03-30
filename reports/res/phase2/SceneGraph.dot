@@ -1,0 +1,12 @@
+graph {
+    G1 [label=<G<SUB>1</SUB>> fontcolor="crimson" color="crimson"]
+    G2 [label=<G<SUB>2</SUB>>]
+    G3 [label=<G<SUB>3</SUB>> fontcolor="crimson" color="crimson"]
+    G4 [label=<G<SUB>4</SUB>> fontcolor="crimson" color="crimson"]
+    G5 [label=<G<SUB>3</SUB>>]
+
+    G1 -- G2
+    G1 -- G3 [color="crimson"]
+    G3 -- G4 [color="crimson"]
+    G3 -- G5
+}

@@ -23,16 +23,17 @@ namespace engine::window {
 class UI {
 private:
     camera::Camera &camera;
-    bool showAxes = true;
+    bool showAxes, showBoundingSpheres;
+    int entityCount;
 
 public:
-    UI(Window &window, camera::Camera &_camera);
-    void render();
+    UI(Window &window, camera::Camera &_camera, int _entityCount);
     ~UI();
 
-    void setShowAxes(bool value);
+    void render(int renderedEntities);
 
     bool isShowAxesEnabled() const;
+    bool isShowBoundingSpheresEnabled() const;
 };
 
 }
