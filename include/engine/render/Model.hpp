@@ -17,6 +17,7 @@
 #include <glad/glad.h>
 #include <vector>
 
+#include "engine/render/BoundingSphere.hpp"
 #include "utils/Vertex.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
@@ -26,6 +27,7 @@ class Model {
 private:
     GLuint vao, vbo, ibo;
     unsigned int vertexCount;
+    BoundingSphere boundingSphere;
 
 public:
     Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
@@ -34,10 +36,13 @@ public:
     Model(Model &&) = delete;
     ~Model();
 
+    const BoundingSphere &getBoundingSphere() const;
+
     void draw() const;
 
 private:
     explicit Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices);
+    void calculateBoundingSphere();
 };
 
 }
