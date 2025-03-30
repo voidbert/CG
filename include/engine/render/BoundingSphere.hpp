@@ -14,30 +14,35 @@
 
 #pragma once
 
-#include <memory>
+#include <glm/vec4.hpp>
+#include <vector>
 
-#include "engine/render/Axis.hpp"
+#include "engine/render/BoundingSphere.hpp"
 #include "engine/render/RenderPipeline.hpp"
-#include "engine/scene/Scene.hpp"
-#include "engine/window/UI.hpp"
-#include "engine/window/Window.hpp"
+#include "utils/Vertex.hpp"
 
-namespace engine::window {
+namespace engine::render {
 
-class SceneWindow : public Window {
+class Model; // Importing model would lead to a recursive inclusion
+
+class BoundingSphere {
 private:
-    render::RenderPipeline pipeline;
-    scene::Scene scene;
-    render::Axis xAxis, yAxis, zAxis;
-    UI ui;
+    glm::vec4 center;
+    float radius;
+
+    static Model *sphereModel;
+    static bool initializingSphereModel;
 
 public:
-    explicit SceneWindow(const std::string &sceneFile);
+    BoundingSphere();
+    BoundingSphere(const glm::vec4 &_center, float _radius);
+    explicit BoundingSphere(const std::vector<utils::Vertex> &vertices);
+    BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform);
 
-protected:
-    void onUpdate(float time, float timeElapsed) override;
-    void onRender() override;
-    void onResize(int _width, int _height) override;
+    glm::vec4 getCenter() const;
+    float getRadius() const;
+
+    void draw(const RenderPipeline &pipeline, const glm::mat4 &cameraMatrix) const;
 };
 
 }

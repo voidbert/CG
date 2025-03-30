@@ -12,6 +12,8 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <execution>
+#include <numeric>
 #include <stdexcept>
 
 #include "engine/scene/Group.hpp"
@@ -52,16 +54,103 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
     }
 }
 
-void Group::draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) const {
+int Group::getEntityCount() const {
+    return std::transform_reduce(
+        std::execution::par,
+        this->groups.cbegin(),
+        this->groups.cend(),
+        this->entities.size(),
+        std::plus<>(),
+        [](const std::unique_ptr<Group> &group) { return group->getEntityCount(); });
+}
+
+void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
+    const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
+
+    // Calculate center of group (approximation for objects around the same size)
+    glm::vec4 groupCenter(0.0f);
+
+    groupCenter += std::transform_reduce(std::execution::par,
+                                         this->entities.cbegin(),
+                                         this->entities.cend(),
+                                         glm::vec4(0.0f),
+                                         std::plus<>(),
+                                         [subTransform](const std::unique_ptr<Entity> &entity) {
+                                             entity->updateBoundingSphere(subTransform);
+                                             return entity->getBoundingSphere().getCenter();
+                                         });
+
+    groupCenter += std::transform_reduce(std::execution::par,
+                                         this->groups.cbegin(),
+                                         this->groups.cend(),
+                                         glm::vec4(0.0f),
+                                         std::plus<>(),
+                                         [subTransform](const std::unique_ptr<Group> &group) {
+                                             group->updateBoundingSphere(subTransform);
+                                             return group->boundingSphere.getCenter();
+                                         });
+
+    groupCenter /= this->entities.size() + this->groups.size();
+
+    const float entitiesRadius = std::transform_reduce(
+        std::execution::par,
+        this->entities.cbegin(),
+        this->entities.cend(),
+        0.0f,
+        [](float d1, float d2) { return std::max(d1, d2); },
+        [groupCenter](const std::unique_ptr<Entity> &entity) {
+            const render::BoundingSphere &entitySphere = entity->getBoundingSphere();
+            return glm::distance(entitySphere.getCenter(), groupCenter) + entitySphere.getRadius();
+        });
+
+    const float groupsRadius = std::transform_reduce(
+        std::execution::par,
+        this->groups.cbegin(),
+        this->groups.cend(),
+        0.0f,
+        [](float d1, float d2) { return std::max(d1, d2); },
+        [groupCenter](const std::unique_ptr<Group> &group) {
+            const render::BoundingSphere &groupSphere = group->boundingSphere;
+            return glm::distance(groupSphere.getCenter(), groupCenter) + groupSphere.getRadius();
+        });
+
+    const float radius = std::max(entitiesRadius, groupsRadius);
+    this->boundingSphere = render::BoundingSphere(groupCenter, radius);
+}
+
+int Group::draw(const render::RenderPipeline &pipeline,
+                const camera::Camera &camera,
+                const glm::mat4 &_transform,
+                bool drawBoundingSpheres) const {
+
     const glm::mat4 subTransform = _transform * this->transform.getMatrix();
+    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
+    int renderedEntities = 0;
+
+    if (!camera.isInFrustum(this->boundingSphere))
+        return renderedEntities;
 
     for (const std::unique_ptr<Entity> &entity : this->entities) {
-        entity->draw(pipeline, subTransform);
+        const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
+
+        if (camera.isInFrustum(entityBoundingSphere)) {
+            entity->draw(pipeline, subTransform);
+            renderedEntities++; // cppcheck-suppress useStlAlgorithm
+
+            if (drawBoundingSpheres)
+                entityBoundingSphere.draw(pipeline, cameraMatrix);
+        }
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
-        group->draw(pipeline, subTransform);
+        // cppcheck-suppress useStlAlgorithm
+        renderedEntities += group->draw(pipeline, camera, subTransform, drawBoundingSpheres);
     }
+
+    if (drawBoundingSpheres)
+        this->boundingSphere.draw(pipeline, cameraMatrix);
+
+    return renderedEntities;
 }
 
 }
