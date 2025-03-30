@@ -16,7 +16,8 @@
 
 namespace engine::render {
 
-Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices) {
+Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices) :
+    boundingSphere(vertices) {
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
 
@@ -49,6 +50,10 @@ Model::~Model() {
     glDeleteBuffers(1, &this->vbo);
     glDeleteBuffers(1, &this->ibo);
     glDeleteVertexArrays(1, &this->vao);
+}
+
+const BoundingSphere &Model::getBoundingSphere() const {
+    return this->boundingSphere;
 }
 
 void Model::draw() const {
