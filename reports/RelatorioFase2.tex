@@ -282,6 +282,66 @@ proporções, para facilitar a experiência do utilizador.
 
 \section{Extras}
 
+\subsection{Roda Dentada}
+
+A roda dentada é uma derivaçaão do cilindro, na medida em que possui uma estrutura básica
+cilíndrica, no entanto tem o complemento dos dentes no exterior e uma coroa no interior. A
+construção desta primitiva tem por base coordenadas cilíndricas, onde a posição de cada ponto é
+dada pelo raio interno ($r_i$), raio externo ($r_e$), ângulo azimutal ($\phi$) e altura ($h$).
+
+A parametrização de um ponto sobre uma roda dentada de raio \( r \) pode ser definida
+pelas seguintes equações:
+
+$$x = r \cos(\phi)$$
+$$y \in \left [ 0, h \right ]$$
+$$z =  r \sin(\phi)$$
+
+
+onde $r$ possui dois valores distintos. Para a parte interna da roda é utilizado o $r_i$ e para a
+parte externa o $r_e$. Os dentes são gerados na circunferência exterior, com o aumento do raio em
+determinadas posições.
+
+\subsubsection{Geração dos Vértices}
+
+Para discretizar a superfície da roda dentada, divide-se o intervalo de $\phi$ em \emph{slices}, e
+o intervalo de $y$ em \emph{stacks}. Assim, as incrementações angulares são calculadas da seguinte
+forma:
+
+$$
+\Delta \phi = \frac{2\pi}{N_\text{slices}}
+\hspace{1cm}
+\Delta y = \frac{h}{N_\text{stacks}}
+$$
+
+A construção dos vértices segue os seguintes passos:
+
+1. Superfície lateral externa: Para cada \emph{stack}, os valores de $\phi$ são iterados,
+determinando a posição dos pontos ao longo da circunferência externa. Nos intervalos correspondentes
+aos dentes, o raio é aumentado em $r_e + h_t$, onde $h_t$ é a altura do dente.
+
+2. Superfície lateral interna: De forma similar à superfície lateral externa, é gerada a superfície
+interna do cilindro, mas o raio mantém-se constante em $r_i$.
+
+\subsubsection{Construção das Faces}
+
+Após a geração dos vértices, é necessário definir as faces triangulares que compõem a roda dentada.
+A triangulação é realizada da seguinte forma:
+
+1. Superfície lateral externa: Os pontos adjacentes de duas \emph{stacks} consecutivas são
+ligados, isto forma quadriláteros que são divididos individualmente em dois triângulos.
+
+2. Superfície lateral interna: É aplicada a mesma estratégia ao cilindro interno, com a ligação
+dos pontos entre diferentes \emph{stacks}.
+
+3. Bases superior e inferior: Os pontos da última \emph{stack} são ligados ao vértice central
+correspondente, de modo a formar triângulos radiais.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{res/phase2/figures/gear.pdf}
+    \caption{Representação da estrutura da roda dentada.}
+\end{figure}
+
 \subsection{UI (Interface Gráfica)}
 
 A interface do projeto foi desenvolvida com o auxílio da biblioteca \texttt{Dear ImGui}. Esta
