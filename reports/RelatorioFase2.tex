@@ -798,8 +798,8 @@ do \emph{view fustum}. Para determinar o \emph{view frustum}, é necessário obt
 importantes da câmara \cite{lighthouse3d-frustum-planes}, os mesmos necessários para o funcionamento
 da câmara livre, $\vec{d}$, $\vec{r}$ e $\vec{up}$. É importante também notar que o vetor $\vec{up}$
 utilizado dado na descrição XML da cena pode não ser adequado para o cálculo do \emph{frustum}: é
-necessário garantir que $\vec{up} \bot \vec{d}$. Para tal, o vetor $\vec{up}$ pode sofrer a seguinte
-transformação:
+necessário garantir que $\vec{up} \; \bot \; \vec{d}$. Para tal, o vetor $\vec{up}$ pode sofrer a
+seguinte transformação:
 
 $$
 \vec{up} \leftarrow \left ( \vec{d} \times \vec{up} \right ) \times \vec{d}
