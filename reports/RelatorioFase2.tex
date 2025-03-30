@@ -282,6 +282,54 @@ proporções, para facilitar a experiência do utilizador.
 
 \section{Extras}
 
+\subsection{UI (Interface Gráfica)}
+
+A interface do projeto foi desenvolvida com o auxílio da biblioteca \texttt{Dear ImGui}. Esta
+biblioteca simplifica a gestão e atualização dos componentes, pois os elementos gráficos são
+recriados a cada \textit{frame}.
+
+A classe responsável pela configuração e renderização da interface é a \texttt{UI}.
+Assim, no processo de inicialização realizado no construtor da classe, a criação do contexto
+\texttt{ImGui} é realizada (garante que a biblioteca encontra-se bem configurada), bem como a
+configuração do estilo da interface (aqui, o estilo \textit{Dark} foi escolhido para se obter uma
+melhor visualização dos elementos gráficos) e é efetuada a inicialização das implementações para a
+\texttt{OpenGL} e \texttt{GLFW} (assegura que há compatibilidade entre o motor de renderização
+utilizado com o sistema de janelas).
+
+A interface é composta por um menu, sendo este renderizado na função \texttt{UI::render} com os
+seguintes elementos:
+
+\begin{itemize}
+    \item Acompanhamento do Desempenho:
+    \begin{itemize}
+        \item FPS (\textit{Frames Per Second}): apresenta o número de \textit{frames}
+        renderizados por segundo.
+        \item Apresenta o número de entidades renderizadas em relação ao número total de entidades
+        existentes. Esta métrica é útil para testar a eficiência do \textit{frustum culling},
+        pois permite avaliar se apenas as entidades dentro da visão da câmara estão a ser
+        renderizadas.
+    \end{itemize}
+    \item Configurações:
+    \begin{itemize}
+        \item Preenchimento de polígonos: permite alternar entre o preenchimento
+        (\textit{fill polygons}) e o modo \textit{wireframe}.
+        \item \textit{Back face culling}: ativa ou desativa o \textit{back-face culling}.
+        \item Exibir eixos: ativa ou desativa a visualização dos eixos.
+        \item \textit{Bounding spheres}: ativa ou desativa a visualização das esferas encapsuladoras
+        das entidades.
+    \end{itemize}
+    \item Câmara: permite modificar as coordenadas da posição da câmara.
+\end{itemize}
+
+Após a definição dos elementos gráficos, a interface é renderizada através das funções
+\texttt{ImGui::Render} e \texttt{ImGui\_ImplOpenGL3\_RenderDrawData}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{res/phase2/UI.png}
+    \caption{Interface Gráfica.}
+\end{figure}
+
 \section{\emph{Frustum culling}}
 
 Cada \emph{draw call} tem um custo elevado para o desempenho da aplicação. Logo, procurando reduzir
@@ -526,6 +574,9 @@ suas esferas ignoradas, o que evita um processamento desnecessário.
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
+    \bibitem{Dear ImGui}
+        "Dear ImGui."{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
+        \url{https://github.com/ocornut/imgui}
     \bibitem{glm-transform}
         ``GLM\textunderscore EXT\textunderscore matrix\textunderscore transform''. GLM 0.9.9 API
         documentation. Accessed: Mar. 27, 2025. [Online.] Available:
