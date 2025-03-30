@@ -282,6 +282,53 @@ proporções, para facilitar a experiência do utilizador.
 
 \section{Extras}
 
+\subsection{Garrafa de Klein}
+
+A garrafa de Klein é uma superfície não orientável, ou seja, não possui um lado interno e externo
+distinguíveis. Esta não possui fronteira e trata-se de uma variedade bidimensional onde não se pode
+definir um vetor normal em todos os pontos.
+
+\subsubsection{Geração dos vértices}
+
+A parametrização de um vértice sobre a garrafa de klein de raio $r$ pode ser definida pelas
+seguintes equações \cite{bottleKlein}:
+
+$$
+x = r \left( \frac{-2}{15} \right) \cos(\theta) \left(3 \cos(\phi) - 30 \sin(\theta) +
+90 \cos^4(\theta) \sin(\theta) - 60 \cos^6(\theta) \sin(\theta) +
+5 \cos(\theta) \cos(\phi) \sin(\theta) \right)
+$$
+
+$$
+y = r \left( \frac{-1}{15} \right) \sin(\theta) \left( 3 \cos(\phi) - 3 \cos^2(\theta) \cos(\phi)
+- 48 \cos^4(\theta) \cos(\phi) + 48 \cos^6(\theta) \cos(\phi) - 60 \sin(\theta) \right.
+$$
+$$
+\quad \left. + 5 \cos(\theta) \cos(\phi) \sin(\theta) - 5 \cos^3(\theta) \cos(\phi) \sin(\theta)
+- 80 \cos^5(\theta) \cos(\phi) \sin(\theta) + 80 \cos^7(\theta) \cos(\phi) \sin(\theta) \right)
+$$
+
+$$
+z = r \left( \frac{2}{15} \right) (3 + 5 \cos(\theta) \sin(\theta)) \sin(\phi)
+$$
+
+Para a geração da garrafa de Klein, a superfície foi discretizada com a utilização de coordenadas
+paramétricas, com o auxílio de duas variáveis ($\theta$ e $\phi$).
+
+A variável $\theta$ varia entre $0$ e $\pi$ e $\phi$ varia entre $0$ e $2\pi$. Além disso, o
+intervalo de valores de $\theta$ e $\phi$ varia de acordo com o número de slices e stacks.
+
+\subsubsection{Construção das faces}
+
+Após a geração dos vértices, constroem-se as faces da garrafa de Klein. Cada quadrilátero entre duas
+\emph{stacks} sucessivas é dividido em duas faces triangulares.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{res/phase2/figures/kleinBottle.pdf}
+    \caption{Garrafa de Klein}
+\end{figure}
+
 \subsection{Roda Dentada}
 
 A roda dentada é uma derivaçaão do cilindro, na medida em que possui uma estrutura básica
@@ -634,6 +681,9 @@ suas esferas ignoradas, o que evita um processamento desnecessário.
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
+    \bibitem{bottleKlein}
+        "Klein bottle"{} Mathematics: Mar. 28, 2025. [Online.] Available:
+     \url{https://math.stackexchange.com/questions/2982429/whats-the-surface-area-of-a-klein-bottle}
     \bibitem{Dear ImGui}
         "Dear ImGui."{} GitHub. Accessed: Mar. 2, 2025. [Online.] Available:
         \url{https://github.com/ocornut/imgui}
