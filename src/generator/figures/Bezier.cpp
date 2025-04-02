@@ -13,6 +13,7 @@
 /// limitations under the License.
 
 #include "generator/figures/Bezier.hpp"
+#include <algorithm>
 #include <fstream>
 #include <glm/glm.hpp>
 #include <sstream>
@@ -75,10 +76,11 @@ Bezier::Bezier(const std::string &filePath, int tessellation) {
     }
 
     for (const auto &patch : patches) {
-        std::vector<glm::vec3> points;
-        for (int index : patch) {
-            points.push_back(controlPoints[index]);
-        }
+        std::vector<glm::vec3> points(patch.size());
+
+        std::transform(patch.begin(), patch.end(), points.begin(), [&](int idx) {
+            return controlPoints[idx];
+        });
 
         for (int i = 0; i < tessellation; ++i) {
             float u = static_cast<float>(i) / tessellation;
