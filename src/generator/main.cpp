@@ -16,6 +16,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "generator/figures/Bezier.hpp"
 #include "generator/figures/Box.hpp"
 #include "generator/figures/Cone.hpp"
 #include "generator/figures/Cylinder.hpp"
@@ -70,6 +71,10 @@ void printUsage(const std::string &programName) {
     std::cerr
         << "  " << programName
         << " gear         <majorRadius>  <minorRadius>    <height>           <stacks>         <teeth>          <toothHeight>                          <file>"
+        << std::endl;
+    std::cerr
+        << "  " << programName
+        << " bezier       <patchFile>    <tessellation>                                                                                               <file>"
         << std::endl;
 }
 
@@ -215,6 +220,14 @@ int main(int argc, char **argv) {
             const std::string &file = args.at(8);
             figures::Gear gear(majorRadius, minorRadius, height, stacks, teeth, toothHeight);
             gear.writeToFile(file);
+        } else if (args.at(1) == "bezier") {
+            validateArgumentCount(argc, 5);
+            const std::string &patchFile = args.at(2);
+            int tessellation = stringToInt(args.at(3));
+            const std::string &file = args.at(4);
+
+            figures::Bezier bezier(patchFile, tessellation);
+            bezier.writeToFile(file);
         } else {
             printUsage(args[0]);
             return 1;
