@@ -53,11 +53,12 @@ Bezier::Bezier(const std::string &filePath, int tessellation) {
     std::vector<std::vector<int>> patches(numPatches);
     for (int i = 0; i < numPatches; ++i) {
         for (int j = 0; j < 16; ++j) {
-            char c;
             int index;
             file >> index;
-            if (j < 15)
+            if (j < 15) {
+                char c;
                 file >> c; // read comma
+            }
             patches[i].push_back(index);
         }
     }
