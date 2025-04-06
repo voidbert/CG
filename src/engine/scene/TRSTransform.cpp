@@ -16,8 +16,10 @@
 #include <stdexcept>
 
 #include "engine/scene/Rotation.hpp"
+#include "engine/scene/AnimatedRotation.hpp"
 #include "engine/scene/Scale.hpp"
 #include "engine/scene/Translation.hpp"
+#include "engine/scene/AnimatedTranslation.hpp"
 #include "engine/scene/TRSTransform.hpp"
 #include "utils/XMLUtils.hpp"
 
@@ -42,11 +44,25 @@ TRSTransform::TRSTransform(const tinyxml2::XMLElement *transformElement) : TRSTr
     for (i = 0; i < 3 && child; ++i, child = child->NextSiblingElement()) {
         std::string name = child->Name();
         if (name == "translate" && !hasTranslation) {
-            this->transformations[i] = std::make_unique<Translation>(child);
-            hasTranslation = true;
+            const char* timeAttr = child->Attribute("time");
+            if (timeAttr != nullptr) {
+                this->transformations[i] = std::make_unique<AnimatedTranslation>(child);
+                hasTranslation = true;
+            }
+            else {
+                this->transformations[i] = std::make_unique<Translation>(child);
+                hasTranslation = true;
+            }
         } else if (name == "rotate" && !hasRotation) {
-            this->transformations[i] = std::make_unique<Rotation>(child);
-            hasRotation = true;
+            const char* timeAttr = child->Attribute("time");
+            if (timeAttr != nullptr) {
+                this->transformations[i] = std::make_unique<AnimatedRotation>(child);
+                hasRotation = true;
+            }
+            else {
+                this->transformations[i] = std::make_unique<Rotation>(child);
+                hasRotation = true;
+            }
         } else if (name == "scale" && !hasScale) {
             this->transformations[i] = std::make_unique<Scale>(child);
             hasScale = true;
