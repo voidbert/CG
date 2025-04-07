@@ -13,45 +13,45 @@
 /// limitations under the License.
 
 #include <cmath>
-#include <vector>
+#include <glm/gtc/constants.hpp>
 
 #include "generator/figures/KleinBottle.hpp"
 
 namespace generator::figures {
 
 KleinBottle::KleinBottle(float radius, int slices, int stacks) {
-    float stackStep = M_PI / stacks;
-    float sliceStep = 2 * M_PI / slices;
+    const float stackStep = glm::pi<float>() / stacks;
+    const float sliceStep = 2 * glm::pi<float>() / slices;
 
     for (int iStack = 0; iStack < stacks; iStack++) {
-        float theta = iStack * stackStep;
+        const float theta = iStack * stackStep;
 
-        for (int jSlice = 0; jSlice < slices; jSlice++) {
-            float phi = jSlice * sliceStep;
+        for (int jSlice = 0; jSlice <= slices; jSlice++) {
+            const float phi = jSlice * sliceStep;
 
-            float cosTheta = cosf(theta);
-            float sinTheta = sinf(theta);
-            float cosPhi = cosf(phi);
-            float sinPhi = sinf(phi);
+            const float cosTheta = cosf(theta);
+            const float sinTheta = sinf(theta);
+            const float cosPhi = cosf(phi);
+            const float sinPhi = sinf(phi);
 
-            float cosTheta2 = pow(cosTheta, 2);
-            float cosTheta3 = pow(cosTheta, 3);
-            float cosTheta4 = pow(cosTheta, 4);
-            float cosTheta5 = pow(cosTheta, 5);
-            float cosTheta6 = pow(cosTheta, 6);
-            float cosTheta7 = pow(cosTheta, 7);
+            const float cosTheta2 = powf(cosTheta, 2);
+            const float cosTheta3 = powf(cosTheta, 3);
+            const float cosTheta4 = powf(cosTheta, 4);
+            const float cosTheta5 = powf(cosTheta, 5);
+            const float cosTheta6 = powf(cosTheta, 6);
+            const float cosTheta7 = powf(cosTheta, 7);
 
-            float x = radius * (-2.0f / 15.0f) * cosTheta *
+            const float x = radius * (-2.0f / 15.0f) * cosTheta *
                 (3 * cosPhi - 30 * sinTheta + 90 * cosTheta4 * sinTheta -
                  60 * cosTheta6 * sinTheta + 5 * cosTheta * cosPhi * sinTheta);
 
-            float y = radius * (-1.0f / 15.0f) * sinTheta *
+            const float y = radius * (-1.0f / 15.0f) * sinTheta *
                 (3 * cosPhi - 3 * cosTheta2 * cosPhi - 48 * cosTheta4 * cosPhi +
                  48 * cosTheta6 * cosPhi - 60 * sinTheta + 5 * cosTheta * cosPhi * sinTheta -
                  5 * cosTheta3 * cosPhi * sinTheta - 80 * cosTheta5 * cosPhi * sinTheta +
                  80 * cosTheta7 * cosPhi * sinTheta);
 
-            float z = radius * (2.0f / 15.0f) * (3 + 5 * cosTheta * sinTheta) * sinPhi;
+            const float z = radius * (2.0f / 15.0f) * (3 + 5 * cosTheta * sinTheta) * sinPhi;
 
             positions.push_back(glm::vec4(x, y, z, 1.0f));
         }
@@ -59,13 +59,13 @@ KleinBottle::KleinBottle(float radius, int slices, int stacks) {
 
     for (int iStack = 0; iStack < stacks - 1; ++iStack) {
         for (int jSlice = 0; jSlice < slices; ++jSlice) {
-            int currentTop = iStack * slices + jSlice;
-            int nextTop = iStack * slices + (jSlice + 1) % slices;
-            int currentBottom = (iStack + 1) * slices + jSlice;
-            int nextBottom = (iStack + 1) * slices + (jSlice + 1) % slices;
+            const int currentTop = iStack * (slices + 1) + jSlice;
+            const int nextTop = currentTop + 1;
+            const int currentBottom = currentTop + slices + 1;
+            const int nextBottom = currentBottom + 1;
 
-            faces.push_back(utils::TriangleFace(currentTop, currentBottom, nextBottom));
-            faces.push_back(utils::TriangleFace(currentTop, nextBottom, nextTop));
+            faces.push_back(utils::TriangleFace(currentTop, nextBottom, currentBottom));
+            faces.push_back(utils::TriangleFace(currentTop, nextTop, nextBottom));
         }
     }
 }

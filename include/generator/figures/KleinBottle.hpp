@@ -22,4 +22,5 @@ class KleinBottle : public utils::WavefrontOBJ {
 public:
     KleinBottle(float radius, int slices, int stacks);
 };
+
 }
