@@ -13,69 +13,51 @@
 /// limitations under the License.
 
 #include <cmath>
+#include <glm/gtc/constants.hpp>
 
 #include "generator/figures/MobiusStrip.hpp"
 
 namespace generator::figures {
 
-MobiusStrip::MobiusStrip(float radius, float width, int twist, int slices, int stacks) {
+MobiusStrip::MobiusStrip(float radius, float width, int twists, int slices, int stacks) {
+    const float sliceStep = 2.0f * glm::pi<float>() / slices;
+    const float stackStep = 2.0f * glm::pi<float>() / stacks;
+    const float halfWidth = width / 2.0f;
 
-    float halfWidth = width / 2.0f;
+    twists *= 2;
 
-    for (int i = 0; i <= slices; i++) {
-        float t = (float) i / slices * 2.0f * M_PI;
-        float cosT = cos(t);
-        float sinT = sin(t);
+    for (int iSlice = 0; iSlice <= slices; iSlice++) {
+        float t = iSlice * sliceStep;
+        float cosT = cosf(t);
+        float sinT = sinf(t);
 
-        float twistAngle = twist * t / 2.0f;
-        float cosTwist = cos(twistAngle);
-        float sinTwist = sin(twistAngle);
+        const float twistAngle = twists * t / 2.0f;
+        const float cosTwist = cosf(twistAngle);
+        const float sinTwist = sinf(twistAngle);
 
-        for (int j = 0; j <= stacks; j++) {
-            float v = (float) j / stacks * 2.0f - 1.0f;
+        for (int jStack = 0; jStack <= stacks; jStack++) {
+            const float v = jStack * stackStep - 1.0f;
 
-            float x = (radius + v * halfWidth * cosTwist) * cosT;
-            float z = (radius + v * halfWidth * cosTwist) * sinT;
-            float y = v * halfWidth * sinTwist;
+            const float x = (radius + v * halfWidth * cosTwist) * cosT;
+            const float z = (radius + v * halfWidth * cosTwist) * sinT;
+            const float y = v * halfWidth * sinTwist;
 
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
         }
     }
 
-    for (int i = 0; i < slices - 1; i++) {
-        for (int j = 0; j < stacks; j++) {
-            int idx1 = i * (stacks + 1) + j;
-            int idx2 = idx1 + stacks + 1;
-            int idx3 = idx1 + 1;
-            int idx4 = idx2 + 1;
+    for (int iSlice = 0; iSlice < slices; iSlice++) {
+        for (int jStack = 0; jStack < stacks; jStack++) {
+            const int currentBottom = iSlice * (stacks + 1) + jStack;
+            const int nextBottom = currentBottom + 1;
+            const int currentTop = currentBottom + stacks + 1;
+            const int nextTop = currentTop + 1;
 
-            this->faces.push_back(utils::TriangleFace(idx1, idx2, idx3));
-            this->faces.push_back(utils::TriangleFace(idx2, idx1, idx3));
-            this->faces.push_back(utils::TriangleFace(idx3, idx2, idx4));
-            this->faces.push_back(utils::TriangleFace(idx2, idx3, idx4));
+            this->faces.push_back(utils::TriangleFace(currentBottom, currentTop, nextBottom));
+            this->faces.push_back(utils::TriangleFace(currentTop, currentBottom, nextBottom));
+            this->faces.push_back(utils::TriangleFace(nextBottom, currentTop, nextTop));
+            this->faces.push_back(utils::TriangleFace(currentTop, nextBottom, nextTop));
         }
-    }
-
-    int start;
-    int direction;
-    if (twist % 2 == 0) {
-        start = 0;
-        direction = 1;
-    } else {
-        start = stacks;
-        direction = -1;
-    }
-
-    for (int j = 0; j < stacks; j++) {
-        int idx1 = (slices - 1) * (stacks + 1) + j;
-        int idx2 = start + j * direction;
-        int idx3 = idx1 + 1;
-        int idx4 = start + (j + 1) * direction;
-
-        this->faces.push_back(utils::TriangleFace(idx1, idx2, idx3));
-        this->faces.push_back(utils::TriangleFace(idx2, idx1, idx3));
-        this->faces.push_back(utils::TriangleFace(idx3, idx2, idx4));
-        this->faces.push_back(utils::TriangleFace(idx2, idx3, idx4));
     }
 }
 
