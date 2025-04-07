@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -23,12 +24,16 @@
 namespace utils {
 
 class WavefrontOBJ {
+private:
+    static std::regex lineRegex;
+
 protected:
     std::vector<glm::vec4> positions;
     std::vector<TriangleFace> faces;
 
-public:
     WavefrontOBJ();
+
+public:
     explicit WavefrontOBJ(const std::string &filename);
 
     void writeToFile(const std::string &filename) const;

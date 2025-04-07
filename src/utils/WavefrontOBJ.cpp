@@ -13,8 +13,8 @@
 /// limitations under the License.
 
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
-#include <sstream>
 #include <unordered_map>
 
 #include "utils/WavefrontOBJ.hpp"
@@ -31,26 +31,35 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
     }
 
     std::string line;
+    int lineNumber = 1;
     while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        ss.exceptions(std::ios::failbit);
+        std::smatch match;
+        if (std::regex_match(line, match, WavefrontOBJ::lineRegex)) {
+            if (match.str(1).length() > 0) {
+                const float x = std::atof(match.str(1).c_str());
+                const float y = std::atof(match.str(2).c_str());
+                const float z = std::atof(match.str(3).c_str());
 
-        // TODO - In the future, with a more complex format, change to RegEx approach
+                std::string wString = match.str(4).c_str();
+                float w = 1.0f;
+                if (wString.length() > 0) {
+                    w = std::atof(wString.c_str());
+                }
 
-        std::string type;
-        ss >> type;
+                this->positions.push_back(glm::vec4(x, y, z, w));
+            } else if (match.str(5).length() > 0) {
+                const int p1 = std::atoi(match.str(5).c_str()) - 1;
+                const int p2 = std::atoi(match.str(6).c_str()) - 1;
+                const int p3 = std::atoi(match.str(7).c_str()) - 1;
 
-        if (type == "v") {
-            float x, y, z;
-            ss >> x >> y >> z;
-            this->positions.push_back(glm::vec4(x, y, z, 1.0f));
-        } else if (type == "f") {
-            uint32_t p1, p2, p3;
-            ss >> p1 >> p2 >> p3;
-
-            // 1-based index to 0-based index
-            this->faces.push_back(TriangleFace(p1 - 1, p2 - 1, p3 - 1));
+                this->faces.push_back(TriangleFace(p1, p2, p3));
+            }
+        } else {
+            throw std::runtime_error("Failed to parse OBJ file " + filename + ": line " +
+                                     std::to_string(lineNumber));
         }
+
+        lineNumber++;
     }
 
     if (file.bad()) {
@@ -63,7 +72,7 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
                         [this](const uint32_t &positionIndex) {
                             return positionIndex >= this->positions.size();
                         })) {
-            throw std::runtime_error("Invalid data in OBJ file: " + filename);
+            throw std::runtime_error("Invalid indices in OBJ file: " + filename);
         }
     }
 }
@@ -117,6 +126,18 @@ std::pair<std::vector<Vertex>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVe
     return std::make_pair(vertices, indices);
 }
 
-// TODO - model optimization before writing? Maybe a possible feature?
+// clang-format off
+std::regex WavefrontOBJ::lineRegex(
+    "\\s*"
+    "|"
+    "#.*"
+    "|"
+    "v\\s+" "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)\\s+"
+            "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)\\s+"
+            "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)"
+            "(\\s+(?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e[0-9]+)?)?\\s*"
+    "|"
+    "f\\s+([0-9]+)\\s+([0-9]+)\\s+([0-9]+)\\s*", std::regex_constants::ECMAScript);
+// clang-format on
 
 }
