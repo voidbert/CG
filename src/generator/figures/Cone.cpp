@@ -13,49 +13,54 @@
 /// limitations under the License.
 
 #include <cmath>
+#include <glm/gtc/constants.hpp>
 
 #include "generator/figures/Cone.hpp"
 
 namespace generator::figures {
 
 Cone::Cone(float radius, float height, int slices, int stacks) {
-
-    float stackStep = height / stacks;
-    float sliceStep = 2 * M_PI / slices;
+    const float stackStep = height / stacks;
+    const float sliceStep = 2 * glm::pi<float>() / slices;
 
     this->positions.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
     for (int iStack = 0; iStack < stacks; iStack++) {
-        float y = iStack * stackStep;
-        float new_radius = ((height - y) * radius) / height;
-        for (int jSlice = 0; jSlice < slices; jSlice++) {
-            float angle = jSlice * sliceStep;
-            float x = new_radius * cosf(angle);
-            float z = new_radius * sinf(angle);
+        const float y = iStack * stackStep;
+        const float stackRadius = ((height - y) * radius) / height;
+
+        for (int jSlice = 0; jSlice <= slices; jSlice++) {
+            const float angle = jSlice * sliceStep;
+            const float x = stackRadius * cosf(angle);
+            const float z = stackRadius * sinf(angle);
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
         }
     }
+
+    const int topVertexIndex = this->positions.size();
     this->positions.push_back(glm::vec4(0.0f, height, 0.0f, 1.0f));
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {
-        int nextSlice = (jSlice + 1) % slices;
-        this->faces.push_back(utils::TriangleFace(0, 1 + jSlice, 1 + nextSlice));
+        this->faces.push_back(utils::TriangleFace(0, jSlice + 1, jSlice + 2));
     }
 
-    int curr = 1;
     for (int iStack = 0; iStack < stacks - 1; iStack++) {
         for (int jSlice = 0; jSlice < slices; jSlice++) {
-            int next = curr % slices + 1 + slices * iStack;
-            int curr_top = curr + slices;
-            int next_top = next + slices;
-            this->faces.push_back(utils::TriangleFace(curr, curr_top, next_top));
-            this->faces.push_back(utils::TriangleFace(curr, next_top, next));
-            curr++;
+            const int currentBottom = iStack * (slices + 1) + jSlice + 1;
+            const int nextBottom = currentBottom + 1;
+            const int currentTop = currentBottom + slices + 1;
+            const int nextTop = currentTop + 1;
+
+            this->faces.push_back(utils::TriangleFace(currentBottom, currentTop, nextTop));
+            this->faces.push_back(utils::TriangleFace(currentBottom, nextTop, nextBottom));
         }
     }
-    int top = slices * stacks + 1;
+
+    const int topStackStart = topVertexIndex - slices - 1;
     for (int jSlice = 0; jSlice < slices; jSlice++) {
-        int nextSlice = (curr + jSlice) % slices + slices * (stacks - 1);
-        this->faces.push_back(utils::TriangleFace(curr + jSlice, top, nextSlice + 1));
+        const int current = topStackStart + jSlice;
+        const int next = current + 1;
+        this->faces.push_back(utils::TriangleFace(current, topVertexIndex, next));
     }
 }
 
