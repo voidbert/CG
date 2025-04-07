@@ -20,26 +20,21 @@ Plane::Plane(float size, int divisions) {
     const float step = size / divisions;
     const float half = size / 2.0f;
 
-    for (int i = 0; i <= divisions; ++i) {
-        for (int j = 0; j <= divisions; ++j) {
+    for (int i = 0; i <= divisions; i++) {
+        for (int j = 0; j <= divisions; j++) {
             this->positions.push_back(glm::vec4(i * step - half, 0.0f, j * step - half, 1.0));
         }
     }
 
-    for (int i = 0; i < divisions; ++i) {
-        const int line_start = i * (divisions + 1);
-        const int next_line_start = line_start + (divisions + 1);
+    for (int i = 0; i < divisions; i++) {
+        for (int j = 0; j < divisions; j++) {
+            const int currentBottom = i * (divisions + 1) + j;
+            const int currentTop = currentBottom + divisions + 1;
+            const int nextBottom = currentBottom + 1;
+            const int nextTop = currentTop + 1;
 
-        for (int j = 0; j < divisions; ++j) {
-            // clang-format off
-            this->faces.push_back(utils::TriangleFace(line_start + j + 1,
-                                                      next_line_start + j,
-                                                      line_start + j));
-
-            this->faces.push_back(utils::TriangleFace(line_start + j + 1,
-                                                      next_line_start + j + 1,
-                                                      next_line_start + j));
-            // clang-format on
+            this->faces.push_back(utils::TriangleFace(currentBottom, nextBottom, currentTop));
+            this->faces.push_back(utils::TriangleFace(nextBottom, nextTop, currentTop));
         }
     }
 }
