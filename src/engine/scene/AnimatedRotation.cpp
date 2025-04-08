@@ -25,7 +25,7 @@ namespace engine::scene {
 AnimatedRotation::AnimatedRotation(const tinyxml2::XMLElement *rotateElement) {
     this->time = rotateElement->FloatAttribute("time", NAN);
     this->rotationAxis = utils::XMLUtils::getXYZ(rotateElement);
-
+    this->direction = rotateElement->BoolAttribute("clockwise", false) ? -1 : 1;
     if (std::isnan(this->time) || this->time <= 0) {
         throw std::runtime_error("Invalid rotation time <rotate> in scene XML file");
     }
@@ -33,7 +33,7 @@ AnimatedRotation::AnimatedRotation(const tinyxml2::XMLElement *rotateElement) {
 
 glm::mat4 AnimatedRotation::getMatrix() const {
     float elapsedTime = glfwGetTime();
-    float rotationAngle = (elapsedTime * glm::pi<float>() * 2.0f) / this->time;
+    float rotationAngle = this->direction * ((elapsedTime * glm::pi<float>() * 2.0f) / this->time);
     return glm::rotate(rotationAngle, this->rotationAxis);
 }
 

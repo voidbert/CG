@@ -26,6 +26,7 @@ class AnimatedRotation : public ITransform {
 private:
     float time;
     glm::vec3 rotationAxis;
+    float direction;
 
 public:
     explicit AnimatedRotation(const tinyxml2::XMLElement *rotateElement);
