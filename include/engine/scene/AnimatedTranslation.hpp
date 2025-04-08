@@ -29,6 +29,17 @@ private:
     bool align;
     std::vector<glm::vec3> points;
     mutable glm::vec3 lastUp = glm::vec3(0, 1, 0);
+    void getCatmullRomPoint(float t,
+                            const glm::vec3 &p0,
+                            const glm::vec3 &p1,
+                            const glm::vec3 &p2,
+                            const glm::vec3 &p3,
+                            glm::vec3 &pos,
+                            glm::vec3 &deriv) const;
+    void getGlobalCatmullRomPoint(float globalT,
+                                  const std::vector<glm::vec3> &points,
+                                  glm::vec3 &pos,
+                                  glm::vec3 &deriv) const;
 
 public:
     explicit AnimatedTranslation(const tinyxml2::XMLElement *translateElement);

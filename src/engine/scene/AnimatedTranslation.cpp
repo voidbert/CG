@@ -41,15 +41,13 @@ AnimatedTranslation::AnimatedTranslation(const tinyxml2::XMLElement *translateEl
     }
 }
 
-namespace {
-
-void getCatmullRomPoint(float t,
-                        const glm::vec3 &p0,
-                        const glm::vec3 &p1,
-                        const glm::vec3 &p2,
-                        const glm::vec3 &p3,
-                        glm::vec3 &pos,
-                        glm::vec3 &deriv) {
+void AnimatedTranslation::getCatmullRomPoint(float t,
+                                             const glm::vec3 &p0,
+                                             const glm::vec3 &p1,
+                                             const glm::vec3 &p2,
+                                             const glm::vec3 &p3,
+                                             glm::vec3 &pos,
+                                             glm::vec3 &deriv) const {
 
     float t2 = t * t;
     float t3 = t2 * t;
@@ -75,10 +73,10 @@ void getCatmullRomPoint(float t,
     deriv = glm::vec3(dx, dy, dz);
 }
 
-void getGlobalCatmullRomPoint(float globalT,
-                              const std::vector<glm::vec3> &points,
-                              glm::vec3 &pos,
-                              glm::vec3 &deriv) {
+void AnimatedTranslation::getGlobalCatmullRomPoint(float globalT,
+                                                   const std::vector<glm::vec3> &points,
+                                                   glm::vec3 &pos,
+                                                   glm::vec3 &deriv) const {
     int pointCount = points.size();
     float t = globalT;
     int segment = (int) floor(t);
@@ -90,7 +88,6 @@ void getGlobalCatmullRomPoint(float globalT,
     glm::vec3 p3 = points[(segment + 2) % pointCount];
 
     getCatmullRomPoint(localT, p0, p1, p2, p3, pos, deriv);
-}
 }
 
 glm::mat4 AnimatedTranslation::getMatrix() const {
@@ -104,11 +101,6 @@ glm::mat4 AnimatedTranslation::getMatrix() const {
     if (this->align == true) {
         glm::vec3 forward = glm::normalize(deriv);
         glm::vec3 right = glm::normalize(glm::cross(lastUp, forward));
-
-        // Se estiver degenerado (pouco movimento ou vetores colineares)
-        if (glm::length(right) < 0.001f) {
-            right = glm::vec3(1, 0, 0); // fallback
-        }
 
         glm::vec3 newUp = glm::normalize(glm::cross(forward, right));
 
