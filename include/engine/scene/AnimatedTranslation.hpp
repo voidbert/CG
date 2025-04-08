@@ -28,6 +28,7 @@ private:
     float time;
     bool align;
     std::vector<glm::vec3> points;
+    mutable glm::vec3 lastUp = glm::vec3(0, 1, 0);
 
 public:
     explicit AnimatedTranslation(const tinyxml2::XMLElement *translateElement);

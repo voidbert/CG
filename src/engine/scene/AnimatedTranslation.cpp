@@ -54,25 +54,21 @@ void getCatmullRomPoint(float t,
     float t2 = t * t;
     float t3 = t2 * t;
 
-    // Vetor T = [t^3, t^2, t, 1]
     glm::vec4 T(t3, t2, t, 1.0f);
     glm::vec4 dT(3 * t2, 2 * t, 1.0f, 0.0f);
 
     // Matriz M (Catmull-Rom)
-    glm::mat4 M = 0.5f * glm::mat4(-1, 2, -1, 0, 3, -5, 0, 2, -3, 4, 1, 0, 1, -1, 0, 0);
+    glm::mat4 M = glm::mat4(-0.5, 1, -0.5, 0, 1.5, -2.5, 0, 1, -1.5, 2, 0.5, 0, 0.5, -0.5, 0, 0);
 
-    // Vetores com as componentes x, y e z dos pontos de controle
     glm::vec4 px(p0.x, p1.x, p2.x, p3.x);
     glm::vec4 py(p0.y, p1.y, p2.y, p3.y);
     glm::vec4 pz(p0.z, p1.z, p2.z, p3.z);
 
-    // Multiplicações para posição
     float x = glm::dot(T, M * px);
     float y = glm::dot(T, M * py);
     float z = glm::dot(T, M * pz);
     pos = glm::vec3(x, y, z);
 
-    // Multiplicações para derivada
     float dx = glm::dot(dT, M * px);
     float dy = glm::dot(dT, M * py);
     float dz = glm::dot(dT, M * pz);
@@ -105,7 +101,29 @@ glm::mat4 AnimatedTranslation::getMatrix() const {
     glm::vec3 pos, deriv;
     getGlobalCatmullRomPoint(curveT, points, pos, deriv);
 
-    return glm::translate(pos);
+    if (this->align == true) {
+        glm::vec3 forward = glm::normalize(deriv);
+        glm::vec3 right = glm::normalize(glm::cross(lastUp, forward));
+
+        // Se estiver degenerado (pouco movimento ou vetores colineares)
+        if (glm::length(right) < 0.001f) {
+            right = glm::vec3(1, 0, 0); // fallback
+        }
+
+        glm::vec3 newUp = glm::normalize(glm::cross(forward, right));
+
+        lastUp = newUp;
+
+        glm::mat4 rotation = glm::mat4(1.0f);
+        rotation[0] = glm::vec4(right, 0.0f);
+        rotation[1] = glm::vec4(newUp, 0.0f);
+        rotation[2] = glm::vec4(forward, 0.0f);
+
+        glm::mat4 translation = glm::translate(glm::mat4(1.0f), pos);
+        return translation * rotation;
+    } else {
+        return glm::translate(pos);
+    }
 }
 
 }
