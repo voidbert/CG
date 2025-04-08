@@ -13,12 +13,12 @@
 /// limitations under the License.
 
 #include <cmath>
+#include <GLFW/glfw3.h>
 #include <glm/gtx/transform.hpp>
 #include <stdexcept>
 
 #include "engine/scene/AnimatedRotation.hpp"
 #include "utils/XMLUtils.hpp"
-#include <GLFW/glfw3.h>
 
 namespace engine::scene {
 
