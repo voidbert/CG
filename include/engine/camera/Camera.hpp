@@ -20,6 +20,7 @@
 #include <glm/vec3.hpp>
 
 #include "engine/render/BoundingSphere.hpp"
+#include "engine/render/RenderPipeline.hpp"
 
 namespace engine::camera {
 
@@ -65,6 +66,8 @@ public:
     const glm::mat4 &getCameraMatrix() const;
 
     bool isInFrustum(const render::BoundingSphere &sphere) const;
+
+    virtual void renderPlayer(const render::RenderPipeline &, const glm::mat4 &) const {}
 
 protected:
     void updateCameraMatrix();

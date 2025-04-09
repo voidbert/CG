@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <tinyxml2.h>
 
@@ -23,7 +24,10 @@ namespace engine::camera {
 
 class CameraFactory {
 public:
-    static std::unique_ptr<Camera> createFromXML(const tinyxml2::XMLElement *cameraElement);
+    static std::unique_ptr<Camera> createFromXML(
+        const tinyxml2::XMLElement *cameraElement,
+        const std::filesystem::path &sceneDirectory,
+        std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
 };
 
 }

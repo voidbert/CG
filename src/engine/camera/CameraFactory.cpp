@@ -12,16 +12,23 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <filesystem>
 #include <glm/vec3.hpp>
+#include <unordered_map>
 
 #include "engine/camera/CameraFactory.hpp"
 #include "engine/camera/FreeCamera.hpp"
 #include "engine/camera/OrbitalCamera.hpp"
+#include "engine/camera/ThirdPersonCamera.hpp"
+#include "engine/scene/Entity.hpp"
 #include "utils/XMLUtils.hpp"
 
 namespace engine::camera {
 
-std::unique_ptr<Camera> CameraFactory::createFromXML(const tinyxml2::XMLElement *cameraElement) {
+std::unique_ptr<Camera> CameraFactory::createFromXML(
+    const tinyxml2::XMLElement *cameraElement,
+    const std::filesystem::path &sceneDirectory,
+    std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels) {
     // View matrix
     const glm::vec3 position =
         utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "position"));
@@ -53,8 +60,29 @@ std::unique_ptr<Camera> CameraFactory::createFromXML(const tinyxml2::XMLElement 
     } else if (cameraType == "free") {
         return std::make_unique<camera::FreeCamera>(position, lookAt, up, fov, near, far);
     } else if (cameraType == "thirdperson") {
-        // TODO - Ana - ThirdPersonCamera
-        return std::unique_ptr<camera::Camera>(nullptr);
+        const tinyxml2::XMLElement *modelElement =
+            utils::XMLUtils::getSingleChild(cameraElement, "model");
+        if (!modelElement) {
+            throw std::runtime_error("Missing <model> in thirdperson camera");
+        }
+
+        const char *modelFile = modelElement->Attribute("file");
+        if (!modelFile) {
+            throw std::runtime_error("Missing 'file' attribute in <model>");
+        }
+
+        const float speed = modelElement->FloatAttribute("speed", 1.0f);
+
+        auto playerEntity =
+            std::make_shared<scene::Entity>(modelElement, sceneDirectory, loadedModels);
+        return std::make_unique<camera::ThirdPersonCamera>(playerEntity,
+                                                           position,
+                                                           lookAt,
+                                                           up,
+                                                           fov,
+                                                           near,
+                                                           far,
+                                                           speed);
     } else {
         throw std::runtime_error("Invalid camera type in scene XML file");
     }

@@ -16,6 +16,7 @@
 #include <numeric>
 
 #include "engine/camera/CameraFactory.hpp"
+#include "engine/camera/ThirdPersonCamera.hpp"
 #include "engine/scene/Scene.hpp"
 #include "utils/XMLUtils.hpp"
 
@@ -44,7 +45,9 @@ Scene::Scene(const std::string &file) {
 
     // Get camera properties
     this->camera = camera::CameraFactory::createFromXML(
-        utils::XMLUtils::getSingleChild(worldElement, "camera"));
+        utils::XMLUtils::getSingleChild(worldElement, "camera"),
+        sceneDirectory,
+        loadedModels);
 
     // Get rendering groups
     const tinyxml2::XMLElement *groupElement = worldElement->FirstChildElement("group");
@@ -91,6 +94,8 @@ int Scene::draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres
         group->updateBoundingSphere(glm::mat4(1.0f));
         entityCount += group->draw(pipeline, *this->camera, cameraMatrix, drawBoundingSpheres);
     }
+
+    this->camera->renderPlayer(pipeline, glm::mat4(1.0f));
 
     // Reset camera after transforms
     pipeline.setMatrix(cameraMatrix);
