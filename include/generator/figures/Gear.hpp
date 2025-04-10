@@ -22,10 +22,10 @@ class Gear : public utils::WavefrontOBJ {
 public:
     Gear(float majorRadius,
          float minorRadius,
+         float toothHeight,
          float height,
-         int stacks,
          int teeth,
-         float toothHeight);
+         int stacks);
 };
 
 }
