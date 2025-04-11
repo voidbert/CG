@@ -19,6 +19,8 @@
 namespace generator::figures {
 
 Box::Box(float size, int divisions) {
+    this->comment = "box " + std::to_string(size) + " " + std::to_string(divisions);
+
     const float step = size / divisions;
     const float half = size / 2.0f;
 

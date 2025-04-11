@@ -26,7 +26,7 @@ namespace generator {
 SolarSystem::SolarSystem(float sunScale, float rockyScale, float gasScale) :
     rng(10), bodyScale(1.0f) {
 
-    this->createPreamble();
+    this->createPreamble(sunScale, rockyScale, gasScale);
     this->createCamera();
     this->createObjects(sunScale, rockyScale, gasScale);
 }
@@ -140,9 +140,14 @@ tinyxml2::XMLElement *
     return group;
 }
 
-void SolarSystem::createPreamble() {
+void SolarSystem::createPreamble(float sunScale, float rockyScale, float gasScale) {
+    const std::string description = " solarSystem " + std::to_string(sunScale) + " " +
+        std::to_string(rockyScale) + " " + std::to_string(gasScale) + " ";
+    tinyxml2::XMLComment *comment = this->document.NewComment(description.c_str());
+    this->document.InsertEndChild(comment);
+
     this->world = this->document.NewElement("world");
-    this->document.InsertFirstChild(this->world);
+    this->document.InsertEndChild(this->world);
 
     tinyxml2::XMLElement *window = this->world->InsertNewChildElement("window");
     window->SetAttribute("width", 1024);

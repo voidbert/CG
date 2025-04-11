@@ -21,7 +21,7 @@
 
 namespace utils {
 
-WavefrontOBJ::WavefrontOBJ() : positions(), faces() {}
+WavefrontOBJ::WavefrontOBJ() : comment(), positions(), faces() {}
 
 WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
     std::ifstream file;
@@ -81,6 +81,9 @@ void WavefrontOBJ::writeToFile(const std::string &filename) const {
     std::ofstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     file.open(filename, std::ios::out | std::ios::trunc);
+
+    if (this->comment.length() > 0)
+        file << "# " << this->comment << std::endl;
 
     for (const glm::vec4 &v : this->positions) {
         file << "v " << v.x << " " << v.y << " " << v.z;

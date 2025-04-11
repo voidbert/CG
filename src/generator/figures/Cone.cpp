@@ -20,6 +20,9 @@
 namespace generator::figures {
 
 Cone::Cone(float radius, float height, int slices, int stacks) {
+    this->comment = "cone " + std::to_string(radius) + " " + std::to_string(height) + " " +
+        std::to_string(slices) + " " + std::to_string(stacks);
+
     const float stackStep = height / stacks;
     const float sliceStep = 2 * glm::pi<float>() / slices;
 

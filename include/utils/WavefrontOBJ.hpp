@@ -28,6 +28,7 @@ private:
     static std::regex lineRegex;
 
 protected:
+    std::string comment;
     std::vector<glm::vec4> positions;
     std::vector<TriangleFace> faces;
 

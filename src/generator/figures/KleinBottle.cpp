@@ -20,10 +20,13 @@
 namespace generator::figures {
 
 KleinBottle::KleinBottle(float radius, int slices, int stacks) {
+    this->comment = "kleinBottle " + std::to_string(radius) + " " + std::to_string(slices) + " " +
+        std::to_string(stacks);
+
     const float stackStep = glm::pi<float>() / stacks;
     const float sliceStep = 2 * glm::pi<float>() / slices;
 
-    for (int iStack = 0; iStack < stacks; iStack++) {
+    for (int iStack = 0; iStack <= stacks; iStack++) {
         const float theta = iStack * stackStep;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
@@ -57,7 +60,7 @@ KleinBottle::KleinBottle(float radius, int slices, int stacks) {
         }
     }
 
-    for (int iStack = 0; iStack < stacks - 1; ++iStack) {
+    for (int iStack = 0; iStack < stacks; ++iStack) {
         for (int jSlice = 0; jSlice < slices; ++jSlice) {
             const int currentTop = iStack * (slices + 1) + jSlice;
             const int nextTop = currentTop + 1;

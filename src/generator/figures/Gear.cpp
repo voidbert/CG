@@ -26,6 +26,10 @@ Gear::Gear(float majorRadius,
            int teeth,
            int stacks) {
 
+    this->comment = "gear " + std::to_string(majorRadius) + " " + std::to_string(minorRadius) +
+        " " + std::to_string(toothHeight) + " " + std::to_string(height) + " " +
+        std::to_string(teeth) + " " + std::to_string(stacks);
+
     const int slices = 4 * teeth;
     const float sliceStep = 2.0 * glm::pi<float>() / slices;
     const float stackStep = height / stacks;

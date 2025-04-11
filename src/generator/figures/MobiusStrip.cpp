@@ -20,6 +20,9 @@
 namespace generator::figures {
 
 MobiusStrip::MobiusStrip(float radius, float width, int twists, int slices, int stacks) {
+    this->comment = "mobiusStrip " + std::to_string(radius) + " " + std::to_string(width) + " " +
+        std::to_string(twists) + " " + std::to_string(slices) + " " + std::to_string(stacks);
+
     const float sliceStep = 2.0f * glm::pi<float>() / slices;
     const float stackStep = 2.0f * glm::pi<float>() / stacks;
     const float halfWidth = width / 2.0f;

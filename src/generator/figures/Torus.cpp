@@ -21,6 +21,9 @@
 namespace generator::figures {
 
 Torus::Torus(float majorRadius, float minorRadius, int slices, int sides) {
+    this->comment = "torus " + std::to_string(majorRadius) + " " + std::to_string(minorRadius) +
+        " " + std::to_string(slices) + " " + std::to_string(sides);
+
     const float sliceStep = 2 * glm::pi<float>() / slices;
     const float sideStep = 2 * glm::pi<float>() / sides;
 

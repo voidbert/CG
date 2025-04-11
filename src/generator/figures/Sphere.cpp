@@ -20,6 +20,9 @@
 namespace generator::figures {
 
 Sphere::Sphere(float radius, int slices, int stacks) {
+    this->comment = "sphere " + std::to_string(radius) + " " + std::to_string(slices) + " " +
+        std::to_string(stacks);
+
     const float stackStep = glm::pi<float>() / stacks;
     const float sliceStep = 2 * glm::pi<float>() / slices;
 

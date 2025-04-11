@@ -31,7 +31,7 @@ private:
     float bodyScale;
 
 public:
-    SolarSystem(float sunScale = 1.0f, float rockyScale = 10.0f, float gasScale = 10.0f);
+    explicit SolarSystem(float sunScale = 1.0f, float rockyScale = 10.0f, float gasScale = 10.0f);
 
     void writeToFile(const std::string &dirname);
 
@@ -43,7 +43,7 @@ private:
     tinyxml2::XMLElement *
         createAsteroidBelt(float minDistance, float maxDistance, int numAsteroids);
 
-    void createPreamble();
+    void createPreamble(float sunScale, float rockyScale, float gasScale);
     void createCamera();
     void createObjects(float sunScale, float rockyScale, float gasScale);
 };
