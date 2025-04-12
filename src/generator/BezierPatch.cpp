@@ -15,6 +15,7 @@
 #include <cmath>
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/vec4.hpp>
 #include <stdexcept>
 
 #include "generator/BezierPatch.hpp"
@@ -74,6 +75,8 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
 
     // Generate the mesh
     for (const std::vector<int> &patch : patches) {
+        const int patchOffset = this->positions.size();
+
         // Gather the vertices
         std::vector<glm::vec3> patchPoints(patch.size());
         std::transform(patch.cbegin(), patch.cend(), patchPoints.begin(), [points](int idx) {
@@ -86,27 +89,31 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
         const glm::mat4 mz = this->preComputePatchMatrix(patchPoints, 2);
 
         const float tessellationStep = 1.0f / tessellation;
+        for (int i = 0; i <= tessellation; ++i) {
+            const float u = i * tessellationStep;
+            const glm::vec4 uVec = glm::vec4(powf(u, 3), powf(u, 2), u, 1.0f);
+
+            for (int j = 0; j <= tessellation; ++j) {
+                const float v = j * tessellationStep;
+                const glm::vec4 vVec = glm::vec4(powf(v, 3), powf(v, 2), v, 1.0f);
+
+                this->positions.push_back(glm::vec4(glm::dot(uVec * mx, vVec),
+                                                    glm::dot(uVec * my, vVec),
+                                                    glm::dot(uVec * mz, vVec),
+                                                    1.0f));
+            }
+        }
+
+        // Indexing
         for (int i = 0; i < tessellation; ++i) {
-            const glm::vec4 u = this->computeVectorPolynomial(i * tessellationStep);
-            const glm::vec4 uNext = this->computeVectorPolynomial((i + 1) * tessellationStep);
-
             for (int j = 0; j < tessellation; ++j) {
-                const glm::vec4 v = this->computeVectorPolynomial(j * tessellationStep);
-                const glm::vec4 vNext = this->computeVectorPolynomial((j + 1) * tessellationStep);
+                const int currentBottom = patchOffset + i * (tessellation + 1) + j;
+                const int currentTop = currentBottom + tessellation + 1;
+                const int nextBottom = currentBottom + 1;
+                const int nextTop = currentTop + 1;
 
-                const glm::vec4 p1 = this->computePointCoordinates(mx, my, mz, u, v);
-                const glm::vec4 p2 = this->computePointCoordinates(mx, my, mz, u, vNext);
-                const glm::vec4 p3 = this->computePointCoordinates(mx, my, mz, uNext, v);
-                const glm::vec4 p4 = this->computePointCoordinates(mx, my, mz, uNext, vNext);
-
-                int i1 = this->positions.size();
-                this->positions.push_back(p1);
-                this->positions.push_back(p2);
-                this->positions.push_back(p3);
-                this->positions.push_back(p4);
-
-                this->faces.push_back(utils::TriangleFace(i1, i1 + 2, i1 + 1));
-                this->faces.push_back(utils::TriangleFace(i1 + 1, i1 + 2, i1 + 3));
+                this->faces.push_back(utils::TriangleFace(currentBottom, nextBottom, currentTop));
+                this->faces.push_back(utils::TriangleFace(nextBottom, nextTop, currentTop));
             }
         }
     }
@@ -183,22 +190,6 @@ glm::mat4 BezierPatch::preComputePatchMatrix(const std::vector<glm::vec3> &patch
     }
 
     return m * pointsMatrix * transposed;
-}
-
-glm::vec4 BezierPatch::computeVectorPolynomial(float uv) {
-    return glm::vec4(powf(uv, 3), powf(uv, 2), uv, 1.0f);
-}
-
-glm::vec4 BezierPatch::computePointCoordinates(const glm::mat4 &my,
-                                               const glm::mat4 &mx,
-                                               const glm::mat4 &mz,
-                                               const glm::vec4 &uVec,
-                                               const glm::vec4 &vVec) {
-
-    return glm::vec4(glm::dot(uVec * mx, vVec),
-                     glm::dot(uVec * my, vVec),
-                     glm::dot(uVec * mz, vVec),
-                     1.0f);
 }
 
 }
