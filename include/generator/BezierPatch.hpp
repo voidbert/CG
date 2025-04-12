@@ -14,15 +14,26 @@
 
 #pragma once
 
+#include <glm/vec3.hpp>
+#include <regex>
 #include <string>
+#include <vector>
 
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
 
 class BezierPatch : public utils::WavefrontOBJ {
+
 public:
-    BezierPatch(const std::string &filePath, int tessellation);
+    BezierPatch(const std::string &filename, int tessellation);
+
+private:
+    int stringToUnsignedInt(std::string str);
+    float stringToFloat(std::string str);
+
+    glm::vec3 stringToVector(const std::string &str);
+    std::vector<int> stringToArray(const std::string &str);
 };
 
 }

@@ -12,12 +12,12 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <algorithm>
+#include <iostream>
+// #include <algorithm>
 #include <fstream>
-#include <glm/glm.hpp>
-#include <sstream>
+#include <glm/common.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <stdexcept>
-#include <vector>
 
 #include "generator/BezierPatch.hpp"
 
@@ -44,45 +44,60 @@ glm::vec3 bezierPatch(const std::vector<glm::vec3> &controlPoints, float u, floa
     return bezierCurve(uCurve, v);
 }
 
-BezierPatch::BezierPatch(const std::string &filePath, int tessellation) {
-    std::ifstream file(filePath);
-    if (!file.is_open())
-        throw std::runtime_error("Failed to open .patch file");
+BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
+    std::ifstream file;
+    file.open(filename);
+    if (!file.is_open()) {
+        throw std::ios_base::failure("Failed to open patch file: " + filename);
+    }
 
-    int numPatches;
-    file >> numPatches;
+    int numPatches = -1, numPoints = -1, remainingPatches = -1, remainingPoints = -1;
+    std::vector<std::vector<int>> patches;
+    std::vector<glm::vec3> points;
 
-    std::vector<std::vector<int>> patches(numPatches);
-    for (int i = 0; i < numPatches; ++i) {
-        for (int j = 0; j < 16; ++j) {
-            int index;
-            file >> index;
-            if (j < 15) {
-                char c;
-                file >> c; // read comma
+    std::string line;
+    int lineNumber = 1;
+    try {
+        while (std::getline(file, line)) {
+            // Trim the line first
+            line.erase(line.find_last_not_of(" \t\n\r") + 1);
+            line.erase(0, line.find_first_not_of(" \t\n\r"));
+
+            if (numPatches < 0) {
+                // Number of patches
+                remainingPatches = numPatches = this->stringToUnsignedInt(line);
+                patches.reserve(numPatches);
+            } else if (remainingPatches > 0) {
+                // Patch indices
+                patches.push_back(this->stringToArray(line));
+                remainingPatches--;
+            } else if (numPoints < 0) {
+                // Number of points
+                remainingPoints = numPoints = this->stringToUnsignedInt(line);
+                points.reserve(numPoints);
+            } else if (remainingPoints > 0) {
+                // Point coordinates
+                points.push_back(this->stringToVector(line));
+                remainingPoints--;
+            } else if (line.length() != 0) {
+                throw std::runtime_error("");
             }
-            patches[i].push_back(index);
+
+            lineNumber++;
         }
+    } catch (const std::exception &e) {
+        throw std::runtime_error("Failed to parse patch file " + filename + ": line " +
+                                 std::to_string(lineNumber));
     }
 
-    int numPoints;
-    file >> numPoints;
-
-    std::vector<glm::vec3> controlPoints(numPoints);
-    for (int i = 0; i < numPoints; ++i) {
-        float x, y, z;
-        char comma;
-        file >> x >> comma >> y >> comma >> z;
-        controlPoints[i] = glm::vec3(x, y, z);
-    }
-
-    for (const auto &patch : patches) {
-        std::vector<glm::vec3> points(patch.size());
-
-        std::transform(patch.begin(), patch.end(), points.begin(), [&](int idx) {
-            return controlPoints[idx];
+    for (const std::vector<int> &patch : patches) {
+        // Gather the vertices
+        std::vector<glm::vec3> patchPoints(patch.size());
+        std::transform(patch.cbegin(), patch.cend(), points.begin(), [points](int idx) {
+            return points[idx];
         });
 
+        // Generate the mesh
         for (int i = 0; i < tessellation; ++i) {
             float u = static_cast<float>(i) / tessellation;
             float uNext = static_cast<float>(i + 1) / tessellation;
@@ -91,10 +106,12 @@ BezierPatch::BezierPatch(const std::string &filePath, int tessellation) {
                 float v = static_cast<float>(j) / tessellation;
                 float vNext = static_cast<float>(j + 1) / tessellation;
 
-                glm::vec3 p1 = bezierPatch(points, u, v);
-                glm::vec3 p2 = bezierPatch(points, u, vNext);
-                glm::vec3 p3 = bezierPatch(points, uNext, v);
-                glm::vec3 p4 = bezierPatch(points, uNext, vNext);
+                glm::vec3 p1 = bezierPatch(patchPoints, u, v);
+                glm::vec3 p2 = bezierPatch(patchPoints, u, vNext);
+                glm::vec3 p3 = bezierPatch(patchPoints, uNext, v);
+                glm::vec3 p4 = bezierPatch(patchPoints, uNext, vNext);
+
+                std::cout << glm::to_string(p1) << std::endl;
 
                 int i1 = this->positions.size();
                 this->positions.push_back(glm::vec4(p1, 1.0f));
@@ -107,6 +124,59 @@ BezierPatch::BezierPatch(const std::string &filePath, int tessellation) {
             }
         }
     }
+}
+
+int BezierPatch::stringToUnsignedInt(std::string str) {
+    str.erase(str.find_last_not_of(" \t\n\r") + 1);
+    str.erase(0, str.find_first_not_of(" \t\n\r"));
+
+    size_t charactersParsed;
+    const int ret = std::stoul(str, &charactersParsed);
+    if (charactersParsed != str.length())
+        throw std::invalid_argument("str is not an unsigned integer");
+
+    return ret;
+}
+
+float BezierPatch::stringToFloat(std::string str) {
+    str.erase(str.find_last_not_of(" \t\n\r") + 1);
+    str.erase(0, str.find_first_not_of(" \t\n\r"));
+
+    size_t charactersParsed;
+    const float ret = std::stof(str, &charactersParsed);
+    if (charactersParsed != str.length())
+        throw std::invalid_argument("str is not a floating-point number");
+
+    return ret;
+}
+
+glm::vec3 BezierPatch::stringToVector(const std::string &str) {
+    const int c1 = str.find(',');
+    const int c2 = str.find(',', c1 + 1);
+    if (c1 == -1 || c2 == -1)
+        throw std::invalid_argument("str is not an vector");
+
+    glm::vec3 ret;
+    ret.x = this->stringToFloat(str.substr(0, c1));
+    ret.y = this->stringToFloat(str.substr(c1 + 1, c2 - c1 - 1));
+    ret.y = this->stringToFloat(str.substr(c2 + 1));
+    return ret;
+}
+
+std::vector<int> BezierPatch::stringToArray(const std::string &str) {
+    std::vector<int> ret;
+
+    int start = 0;
+    do {
+        const int comma = str.find(',', start);
+
+        const std::string value = str.substr(start, comma < 0 ? str.length() : comma - start);
+        ret.push_back(this->stringToUnsignedInt(value));
+
+        start = comma + 1;
+    } while (start != 0);
+
+    return ret;
 }
 
 }
