@@ -18,11 +18,11 @@
 
 #include "utils/WavefrontOBJ.hpp"
 
-namespace generator::figures {
+namespace generator {
 
-class Bezier : public utils::WavefrontOBJ {
+class BezierPatch : public utils::WavefrontOBJ {
 public:
-    Bezier(const std::string &filePath, int tessellation);
+    BezierPatch(const std::string &filePath, int tessellation);
 };
 
 }

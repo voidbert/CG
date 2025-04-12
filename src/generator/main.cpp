@@ -18,7 +18,7 @@
 #include <iostream>
 #include <numeric>
 
-#include "generator/figures/Bezier.hpp"
+#include "generator/BezierPatch.hpp"
 #include "generator/figures/Box.hpp"
 #include "generator/figures/Cone.hpp"
 #include "generator/figures/Cylinder.hpp"
@@ -213,8 +213,8 @@ int main(int argc, char **argv) {
             const std::string &patchFile = args.at(2);
             const int tessellation = stringToInt(args.at(3));
 
-            figures::Bezier bezier(patchFile, tessellation);
-            bezier.writeToFile(file);
+            BezierPatch patch(patchFile, tessellation);
+            patch.writeToFile(file);
         } else {
             printUsage(args[0]);
             return 1;

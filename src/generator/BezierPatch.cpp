@@ -12,7 +12,6 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "generator/figures/Bezier.hpp"
 #include <algorithm>
 #include <fstream>
 #include <glm/glm.hpp>
@@ -20,7 +19,9 @@
 #include <stdexcept>
 #include <vector>
 
-namespace generator::figures {
+#include "generator/BezierPatch.hpp"
+
+namespace generator {
 
 glm::vec3 bezierCurve(const std::vector<glm::vec3> &points, float t) {
     glm::vec3 a = glm::mix(points[0], points[1], t);
@@ -43,7 +44,7 @@ glm::vec3 bezierPatch(const std::vector<glm::vec3> &controlPoints, float u, floa
     return bezierCurve(uCurve, v);
 }
 
-Bezier::Bezier(const std::string &filePath, int tessellation) {
+BezierPatch::BezierPatch(const std::string &filePath, int tessellation) {
     std::ifstream file(filePath);
     if (!file.is_open())
         throw std::runtime_error("Failed to open .patch file");
