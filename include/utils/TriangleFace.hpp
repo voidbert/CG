@@ -19,7 +19,8 @@
 
 namespace utils {
 
-struct TriangleFace {
+class TriangleFace {
+public:
     std::array<uint32_t, 3> positions;
 
     TriangleFace(uint32_t p1, uint32_t p2, uint32_t p3);

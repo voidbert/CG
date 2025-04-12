@@ -13,7 +13,6 @@
 /// limitations under the License.
 
 #define GLM_ENABLE_EXPERIMENTAL
-
 #include <glm/gtx/hash.hpp>
 
 #include "utils/Vertex.hpp"
@@ -22,6 +21,8 @@ namespace utils {
 
 Vertex::Vertex(const glm::vec4 &_position) : position(_position) {}
 Vertex::Vertex(float x, float y, float z) : position(x, y, z, 1.0f) {}
+
+static_assert(sizeof(Vertex) == 4 * sizeof(float), "There can't be padding in Vertex");
 
 }
 

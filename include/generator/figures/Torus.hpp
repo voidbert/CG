@@ -22,7 +22,7 @@ namespace generator::figures {
 
 class Torus : public utils::WavefrontOBJ {
 public:
-    Torus(float majorRadius, float minorRadius, int slices, int stacks);
+    Torus(float majorRadius, float minorRadius, int slices, int sides);
 };
 
 }

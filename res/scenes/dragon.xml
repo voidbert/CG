@@ -1,0 +1,14 @@
+<world>
+    <window width="2048" height="1024" />
+    <camera type="orbital">
+        <position x="-5" y="0" z="-3" />
+        <lookAt x="0" y="0" z="0" />
+        <up x="0" y="1" z="0" />
+        <projection fov="50" near="1" far="100" />
+    </camera>
+    <group>
+        <models>
+            <model file="../models/dragon.obj" />
+        </models>
+    </group>
+</world>
