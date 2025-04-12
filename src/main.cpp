@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::string programName = std::filesystem::path(argv[0]).filename();
+    const std::string &programName = std::filesystem::path(argv[0]).filename();
     if (programName == "engine") {
         return engine::main(argc, argv);
     } else if (programName == "generator") {

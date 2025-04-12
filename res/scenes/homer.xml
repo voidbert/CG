@@ -1,0 +1,14 @@
+<world>
+    <window width="512" height="512" />
+    <camera type="orbital">
+        <position x="6" y="3" z="2" />
+        <lookAt x="0" y="0.1" z="0" />
+        <up x="0" y="0.06" z="0" />
+        <projection fov="19" near="0.1" far="100" />
+    </camera>
+    <group>
+        <models>
+            <model file="../models/homer.obj" />
+        </models>
+    </group>
+</world>

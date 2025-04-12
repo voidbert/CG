@@ -20,7 +20,7 @@ namespace generator::figures {
 
 class MobiusStrip : public utils::WavefrontOBJ {
 public:
-    MobiusStrip(float radius, float width, int twist, int slices, int stacks);
+    MobiusStrip(float radius, float width, int twists, int slices, int stacks);
 };
 
 }

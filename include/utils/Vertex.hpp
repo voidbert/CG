@@ -18,7 +18,8 @@
 
 namespace utils {
 
-struct Vertex {
+class Vertex {
+public:
     glm::vec4 position;
 
     explicit Vertex(const glm::vec4 &_position);

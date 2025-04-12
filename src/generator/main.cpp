@@ -13,8 +13,10 @@
 /// limitations under the License.
 
 #include <cmath>
+#include <execution>
+#include <iomanip>
 #include <iostream>
-#include <sstream>
+#include <numeric>
 
 #include "generator/figures/Box.hpp"
 #include "generator/figures/Cone.hpp"
@@ -23,54 +25,56 @@
 #include "generator/figures/KleinBottle.hpp"
 #include "generator/figures/MobiusStrip.hpp"
 #include "generator/figures/Plane.hpp"
-#include "generator/figures/SolarSystem.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
+#include "generator/SolarSystem.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
+
+const std::vector<std::vector<std::string>> FIGURE_USAGES = {
+    { "plane", "<length>", "<divisions>" },
+    { "box", "<length>", "<divisions>" },
+    { "sphere", "<radius>", "<slices>", "<stacks>" },
+    { "cone", "<radius>", "<height>", "<slices>", "<stacks>" },
+    { "cylinder", "<radius>", "<height>", "<slices>", "<stacks>" },
+    { "torus", "<majorRadius>", "<minorRadius>", "<slices>", "<sides>" },
+    { "mobiusStrip", "<radius>", "<width>", "<twists>", "<slices>", "<stacks>" },
+    { "kleinBottle", "<radius>", "<slices>", "<stacks>" },
+    { "gear", "<majorRadius>", "<minorRadius>", "<toothHeight>", "<height>", "<teeth>", "<stacks>" }
+};
+
+size_t getLengthOfUsageColumn(size_t column) {
+    return std::transform_reduce(
+        std::execution::par,
+        FIGURE_USAGES.cbegin(),
+        FIGURE_USAGES.cend(),
+        0,
+        [](int l1, int l2) { return std::max(l1, l2); },
+        [column](const std::vector<std::string> &usage) {
+            return column < usage.size() ? usage[column].length() : 0;
+        });
+}
+
 void printUsage(const std::string &programName) {
-    std::cerr << "Wrong usage. Here's the correct one:" << std::endl;
-    std::cerr
-        << "  " << programName
-        << " plane        <length>       <divisions>                                                                                                  <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " box          <length>       <grid>                                                                                                       <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " sphere       <radius>       <slices>         <stacks>                                                                                    <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " cone         <radius>       <height>         <slices>           <stacks>                                                                 <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " cylinder     <radius>       <height>         <slices>           <stacks>                                                                 <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " torus        <majorRadius>  <minorRadius>    <slices>           <stacks>                                                                 <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " kleinBottle  <radius>       <slices>         <stacks>                                                                                    <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " mobiusStrip  <radius>       <width>          <twist>            <slices>         <stacks>                                                <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " solarSystem  <sceneScale>   <sunSizeFactor>  <planetSizeFactor> <moonSizeFactor> <distanceFactor> <asteroidBeltDensity> <ringSizeFactor> <file>"
-        << std::endl;
-    std::cerr
-        << "  " << programName
-        << " gear         <majorRadius>  <minorRadius>    <height>           <stacks>         <teeth>          <toothHeight>                          <file>"
-        << std::endl;
+    std::cerr << "Wrong usage. Here's the correct one:" << std::endl << std::endl;
+
+    std::cerr << "Figure generation:" << std::endl;
+    std::cerr << std::left;
+    for (const std::vector<std::string> &usage : FIGURE_USAGES) {
+        std::cerr << "  " << programName << " ";
+
+        for (size_t i = 0; i < usage.size(); ++i) {
+            const size_t length = getLengthOfUsageColumn(i);
+            std::cerr << std::setw(length) << usage[i] << " ";
+        }
+
+        std::cerr << std::setw(0) << "<file>" << std::endl;
+    }
+
+    std::cerr << std::endl << "Scene generation:" << std::endl;
+    std::cerr << "  " << programName
+              << " solarSystem [<sunScale> <rockyScale> <gasScale>] <directory>" << std::endl;
 }
 
 float stringToFloat(const std::string &str) {
@@ -95,35 +99,36 @@ int stringToInt(const std::string &str) {
 
 void validateArgumentCount(int providedArgs, int expectedArgs) {
     if (providedArgs != expectedArgs)
-        throw std::invalid_argument("wrong number of arguments");
+        throw std::invalid_argument("Wrong number of command-line arguments");
 }
 
 int main(int argc, char **argv) {
-    std::vector<std::string> args(argv, argv + argc);
+    const std::vector<std::string> args(argv, argv + argc);
 
     try {
+        const std::string &file = args.at(args.size() - 1);
+
         if (args.at(1) == "plane") {
             validateArgumentCount(argc, 5);
-            float length = stringToFloat(args.at(2));
-            int divisions = stringToInt(args.at(3));
-            const std::string &file = args.at(4);
+            const float length = stringToFloat(args.at(2));
+            const int divisions = stringToInt(args.at(3));
 
             figures::Plane plane(length, divisions);
             plane.writeToFile(file);
         } else if (args.at(1) == "box") {
             validateArgumentCount(argc, 5);
-            float length = stringToFloat(args.at(2));
-            int grid = stringToInt(args.at(3));
-            const std::string &file = args.at(4);
+
+            const float length = stringToFloat(args.at(2));
+            const int grid = stringToInt(args.at(3));
 
             figures::Box box(length, grid);
             box.writeToFile(file);
         } else if (args.at(1) == "sphere") {
             validateArgumentCount(argc, 6);
-            float radius = stringToFloat(args.at(2));
-            int slices = stringToInt(args.at(3));
-            int stacks = stringToInt(args.at(4));
-            const std::string &file = args.at(5);
+
+            const float radius = stringToFloat(args.at(2));
+            const int slices = stringToInt(args.at(3));
+            const int stacks = stringToInt(args.at(4));
 
             figures::Sphere sphere(radius, slices, stacks);
             sphere.writeToFile(file);
@@ -134,7 +139,6 @@ int main(int argc, char **argv) {
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
 
-            const std::string &file = args.at(6);
             figures::Cone cone(radius, height, slices, stacks);
             cone.writeToFile(file);
         } else if (args.at(1) == "cylinder") {
@@ -143,7 +147,6 @@ int main(int argc, char **argv) {
             float height = stringToFloat(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
-            const std::string &file = args.at(6);
 
             figures::Cylinder cylinder(radius, height, slices, stacks);
             cylinder.writeToFile(file);
@@ -153,68 +156,54 @@ int main(int argc, char **argv) {
             float minorRadius = stringToFloat(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
-            const std::string &file = args.at(6);
 
             figures::Torus torus(majorRadius, minorRadius, slices, stacks);
             torus.writeToFile(file);
+        } else if (args.at(1) == "mobiusStrip") {
+            validateArgumentCount(argc, 8);
+
+            const float radius = stringToFloat(args.at(2));
+            const float width = stringToFloat(args.at(3));
+            const int twist = stringToInt(args.at(4));
+            const int slices = stringToInt(args.at(5));
+            const int stacks = stringToInt(args.at(6));
+
+            figures::MobiusStrip mobius(radius, width, twist, slices, stacks);
+            mobius.writeToFile(file);
         } else if (args.at(1) == "kleinBottle") {
             validateArgumentCount(argc, 6);
             float radius = stringToFloat(args.at(2));
             int slices = stringToInt(args.at(3));
             int stacks = stringToInt(args.at(4));
-            const std::string &file = args.at(5);
 
             figures::KleinBottle kleinbottle(radius, slices, stacks);
             kleinbottle.writeToFile(file);
-        } else if (args.at(1) == "mobiusStrip") {
-            validateArgumentCount(argc, 8);
-            float radius = stringToFloat(args.at(2));
-            float width = stringToFloat(args.at(3));
-            int twist = stringToInt(args.at(4));
-            int slices = stringToInt(args.at(5));
-            int stacks = stringToInt(args.at(6));
-            const std::string &file = args.at(7);
-
-            figures::MobiusStrip mobius(radius, width, twist, slices, stacks);
-            mobius.writeToFile(file);
-        } else if (args.at(1) == "solarSystem") {
-            if (argc == 4) {
-                double sceneScale = stringToFloat(args.at(2));
-                const std::string &file = args.at(3);
-
-                figures::SolarSystem solarSystem(sceneScale, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
-                solarSystem.writeToFile(file);
-            } else if (argc == 10) {
-                float sceneScale = stringToFloat(args.at(2));
-                float sunSizeFactor = stringToFloat(args.at(3));
-                float planetSizeFactor = stringToFloat(args.at(4));
-                float moonSizeFactor = stringToFloat(args.at(5));
-                float distanceFactor = stringToFloat(args.at(6));
-                float asteroidBeltDensity = stringToFloat(args.at(7));
-                float ringSizeFactor = stringToFloat(args.at(8));
-                const std::string &file = args.at(9);
-
-                figures::SolarSystem solarSystem(sceneScale,
-                                                 sunSizeFactor,
-                                                 planetSizeFactor,
-                                                 moonSizeFactor,
-                                                 distanceFactor,
-                                                 asteroidBeltDensity,
-                                                 ringSizeFactor);
-
-                solarSystem.writeToFile(file);
-            }
         } else if (args.at(1) == "gear") {
             validateArgumentCount(argc, 9);
-            float majorRadius = stringToFloat(args.at(2));
-            float minorRadius = stringToFloat(args.at(3));
-            float height = stringToFloat(args.at(4));
-            int stacks = stringToInt(args.at(5));
-            int teeth = stringToInt(args.at(6));
-            float toothHeight = stringToFloat(args.at(7));
-            const std::string &file = args.at(8);
-            figures::Gear gear(majorRadius, minorRadius, height, stacks, teeth, toothHeight);
+
+            const float majorRadius = stringToFloat(args.at(2));
+            const float minorRadius = stringToFloat(args.at(3));
+            const float toothHeight = stringToFloat(args.at(4));
+            const float height = stringToFloat(args.at(5));
+            const int teeth = stringToInt(args.at(6));
+            const int stacks = stringToInt(args.at(7));
+
+            figures::Gear gear(majorRadius, minorRadius, toothHeight, height, teeth, stacks);
             gear.writeToFile(file);
+        } else if (args.at(1) == "solarSystem") {
+            if (argc == 3) {
+                SolarSystem solarSystem;
+                solarSystem.writeToFile(file);
+            } else if (argc == 6) {
+                const float sunScale = stringToFloat(args.at(2));
+                const float rockyScale = stringToFloat(args.at(3));
+                const float gasScale = stringToFloat(args.at(4));
+
+                SolarSystem solarSystem(sunScale, rockyScale, gasScale);
+                solarSystem.writeToFile(file);
+            } else {
+                throw std::invalid_argument("Wrong number of command-line arguments");
+            }
         } else {
             printUsage(args[0]);
             return 1;

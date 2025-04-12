@@ -13,35 +13,44 @@
 /// limitations under the License.
 
 #include <cmath>
-#include <glm/trigonometric.hpp>
+#include <glm/gtc/constants.hpp>
 #include <glm/vec3.hpp>
 
 #include "generator/figures/Torus.hpp"
 
 namespace generator::figures {
 
-Torus::Torus(float majorRadius, float minorRadius, int slices, int stacks) {
-    for (int i = 0; i <= slices; i++) {
-        float theta = i * 2 * M_PI / slices;
-        glm::vec3 circleCenter = glm::vec3(glm::cos(theta), 0.0f, glm::sin(theta)) * majorRadius;
+Torus::Torus(float majorRadius, float minorRadius, int slices, int sides) {
+    this->comment = "torus " + std::to_string(majorRadius) + " " + std::to_string(minorRadius) +
+        " " + std::to_string(slices) + " " + std::to_string(sides);
 
-        for (int j = 0; j <= stacks; j++) {
-            float phi = j * 2 * M_PI / stacks;
-            glm::vec3 normal = glm::vec3(glm::cos(theta) * glm::cos(phi),
-                                         glm::sin(phi),
-                                         glm::sin(theta) * glm::cos(phi));
-            glm::vec3 vertex = -circleCenter + normal * minorRadius;
+    const float sliceStep = 2 * glm::pi<float>() / slices;
+    const float sideStep = 2 * glm::pi<float>() / sides;
+
+    for (int iSlice = 0; iSlice <= slices; iSlice++) {
+        const float theta = iSlice * sliceStep;
+        const glm::vec3 circleCenter = glm::vec3(cosf(theta), 0.0f, sinf(theta)) * majorRadius;
+
+        for (int jSide = 0; jSide <= sides; jSide++) {
+            const float phi = jSide * sideStep;
+
+            const glm::vec3 normal =
+                glm::vec3(cosf(theta) * cosf(phi), sinf(phi), sinf(theta) * cosf(phi));
+            const glm::vec3 vertex = circleCenter + normal * minorRadius;
+
             this->positions.push_back(glm::vec4(vertex, 1.0f));
         }
     }
 
-    for (int i = 0; i < slices; i++) {
-        for (int j = 0; j < stacks; j++) {
-            int idx = i * (stacks + 1) + j;
-            int nextIdx = ((i + 1) % slices) * (stacks + 1) + j;
+    for (int iSlice = 0; iSlice < slices; iSlice++) {
+        for (int jSide = 0; jSide < sides; jSide++) {
+            const int currentBottom = iSlice * (sides + 1) + jSide;
+            const int nextBottom = currentBottom + 1;
+            const int currentTop = currentBottom + (sides + 1);
+            const int nextTop = currentTop + 1;
 
-            this->faces.push_back(utils::TriangleFace(idx, nextIdx, nextIdx + 1));
-            this->faces.push_back(utils::TriangleFace(idx, nextIdx + 1, idx + 1));
+            this->faces.push_back(utils::TriangleFace(currentBottom, nextTop, currentTop));
+            this->faces.push_back(utils::TriangleFace(currentBottom, nextBottom, nextTop));
         }
     }
 }
