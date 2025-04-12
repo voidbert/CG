@@ -23,6 +23,8 @@
 namespace generator {
 
 BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
+    this->comment = "bezier " + filename + " " + std::to_string(tessellation);
+
     std::ifstream file;
     file.open(filename);
     if (!file.is_open()) {
@@ -30,13 +32,14 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
     }
 
     // Parse the patch file
-    int numPatches = -1, numPoints = -1, remainingPatches = -1, remainingPoints = -1;
     std::vector<std::vector<int>> patches;
     std::vector<glm::vec3> points;
 
-    std::string line;
     int lineNumber = 1;
     try {
+        std::string line;
+        int numPatches = -1, numPoints = -1, remainingPatches = -1, remainingPoints = -1;
+
         while (std::getline(file, line)) {
             // Trim the line first
             line.erase(line.find_last_not_of(" \t\n\r") + 1);
