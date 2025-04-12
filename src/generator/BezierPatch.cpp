@@ -12,37 +12,14 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <iostream>
-// #include <algorithm>
+#include <cmath>
 #include <fstream>
-#include <glm/common.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <stdexcept>
 
 #include "generator/BezierPatch.hpp"
 
 namespace generator {
-
-glm::vec3 bezierCurve(const std::vector<glm::vec3> &points, float t) {
-    glm::vec3 a = glm::mix(points[0], points[1], t);
-    glm::vec3 b = glm::mix(points[1], points[2], t);
-    glm::vec3 c = glm::mix(points[2], points[3], t);
-    glm::vec3 d = glm::mix(a, b, t);
-    glm::vec3 e = glm::mix(b, c, t);
-    return glm::mix(d, e, t);
-}
-
-glm::vec3 bezierPatch(const std::vector<glm::vec3> &controlPoints, float u, float v) {
-    std::vector<glm::vec3> uCurve(4);
-    for (int i = 0; i < 4; ++i) {
-        std::vector<glm::vec3> row = { controlPoints[i * 4 + 0],
-                                       controlPoints[i * 4 + 1],
-                                       controlPoints[i * 4 + 2],
-                                       controlPoints[i * 4 + 3] };
-        uCurve[i] = bezierCurve(row, u);
-    }
-    return bezierCurve(uCurve, v);
-}
 
 BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
     std::ifstream file;
@@ -51,6 +28,7 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
         throw std::ios_base::failure("Failed to open patch file: " + filename);
     }
 
+    // Parse the patch file
     int numPatches = -1, numPoints = -1, remainingPatches = -1, remainingPoints = -1;
     std::vector<std::vector<int>> patches;
     std::vector<glm::vec3> points;
@@ -69,7 +47,11 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
                 patches.reserve(numPatches);
             } else if (remainingPatches > 0) {
                 // Patch indices
-                patches.push_back(this->stringToArray(line));
+                std::vector<int> indices = this->stringToArray(line);
+                if (indices.size() != 16)
+                    throw std::runtime_error("");
+
+                patches.push_back(std::move(indices));
                 remainingPatches--;
             } else if (numPoints < 0) {
                 // Number of points
@@ -90,34 +72,38 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
                                  std::to_string(lineNumber));
     }
 
+    // Generate the mesh
     for (const std::vector<int> &patch : patches) {
         // Gather the vertices
         std::vector<glm::vec3> patchPoints(patch.size());
-        std::transform(patch.cbegin(), patch.cend(), points.begin(), [points](int idx) {
+        std::transform(patch.cbegin(), patch.cend(), patchPoints.begin(), [points](int idx) {
             return points[idx];
         });
 
-        // Generate the mesh
+        // Tessellate
+        const glm::mat4 mx = this->preComputePatchMatrix(patchPoints, 0);
+        const glm::mat4 my = this->preComputePatchMatrix(patchPoints, 1);
+        const glm::mat4 mz = this->preComputePatchMatrix(patchPoints, 2);
+
+        const float tessellationStep = 1.0f / tessellation;
         for (int i = 0; i < tessellation; ++i) {
-            float u = static_cast<float>(i) / tessellation;
-            float uNext = static_cast<float>(i + 1) / tessellation;
+            const glm::vec4 u = this->computeVectorPolynomial(i * tessellationStep);
+            const glm::vec4 uNext = this->computeVectorPolynomial((i + 1) * tessellationStep);
 
             for (int j = 0; j < tessellation; ++j) {
-                float v = static_cast<float>(j) / tessellation;
-                float vNext = static_cast<float>(j + 1) / tessellation;
+                const glm::vec4 v = this->computeVectorPolynomial(j * tessellationStep);
+                const glm::vec4 vNext = this->computeVectorPolynomial((j + 1) * tessellationStep);
 
-                glm::vec3 p1 = bezierPatch(patchPoints, u, v);
-                glm::vec3 p2 = bezierPatch(patchPoints, u, vNext);
-                glm::vec3 p3 = bezierPatch(patchPoints, uNext, v);
-                glm::vec3 p4 = bezierPatch(patchPoints, uNext, vNext);
-
-                std::cout << glm::to_string(p1) << std::endl;
+                const glm::vec4 p1 = this->computePointCoordinates(mx, my, mz, u, v);
+                const glm::vec4 p2 = this->computePointCoordinates(mx, my, mz, u, vNext);
+                const glm::vec4 p3 = this->computePointCoordinates(mx, my, mz, uNext, v);
+                const glm::vec4 p4 = this->computePointCoordinates(mx, my, mz, uNext, vNext);
 
                 int i1 = this->positions.size();
-                this->positions.push_back(glm::vec4(p1, 1.0f));
-                this->positions.push_back(glm::vec4(p2, 1.0f));
-                this->positions.push_back(glm::vec4(p3, 1.0f));
-                this->positions.push_back(glm::vec4(p4, 1.0f));
+                this->positions.push_back(p1);
+                this->positions.push_back(p2);
+                this->positions.push_back(p3);
+                this->positions.push_back(p4);
 
                 this->faces.push_back(utils::TriangleFace(i1, i1 + 2, i1 + 1));
                 this->faces.push_back(utils::TriangleFace(i1 + 1, i1 + 2, i1 + 3));
@@ -159,7 +145,7 @@ glm::vec3 BezierPatch::stringToVector(const std::string &str) {
     glm::vec3 ret;
     ret.x = this->stringToFloat(str.substr(0, c1));
     ret.y = this->stringToFloat(str.substr(c1 + 1, c2 - c1 - 1));
-    ret.y = this->stringToFloat(str.substr(c2 + 1));
+    ret.z = this->stringToFloat(str.substr(c2 + 1));
     return ret;
 }
 
@@ -177,6 +163,42 @@ std::vector<int> BezierPatch::stringToArray(const std::string &str) {
     } while (start != 0);
 
     return ret;
+}
+
+glm::mat4 BezierPatch::preComputePatchMatrix(const std::vector<glm::vec3> &patchPoints,
+                                             int coordinate) {
+
+    const glm::mat4 m = {
+        { -1, 3,  -3, 1 },
+        { 3,  -6, 3,  0 },
+        { -3, 3,  0,  0 },
+        { 1,  0,  0,  0 }
+    };
+    const glm::mat4 transposed = glm::transpose(m);
+
+    glm::mat4 pointsMatrix;
+    float *coordinates = glm::value_ptr(pointsMatrix);
+    for (int i = 0; i < 16; ++i) {
+        coordinates[i] = patchPoints[i][coordinate];
+    }
+
+    return m * pointsMatrix * transposed;
+}
+
+glm::vec4 BezierPatch::computeVectorPolynomial(float uv) {
+    return glm::vec4(powf(uv, 3), powf(uv, 2), uv, 1.0f);
+}
+
+glm::vec4 BezierPatch::computePointCoordinates(const glm::mat4 &my,
+                                               const glm::mat4 &mx,
+                                               const glm::mat4 &mz,
+                                               const glm::vec4 &uVec,
+                                               const glm::vec4 &vVec) {
+
+    return glm::vec4(glm::dot(uVec * mx, vVec),
+                     glm::dot(uVec * my, vVec),
+                     glm::dot(uVec * mz, vVec),
+                     1.0f);
 }
 
 }

@@ -14,7 +14,9 @@
 
 #pragma once
 
+#include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <regex>
 #include <string>
 #include <vector>
@@ -31,9 +33,16 @@ public:
 private:
     int stringToUnsignedInt(std::string str);
     float stringToFloat(std::string str);
-
     glm::vec3 stringToVector(const std::string &str);
     std::vector<int> stringToArray(const std::string &str);
+
+    glm::mat4 preComputePatchMatrix(const std::vector<glm::vec3> &patchPoints, int coordinate);
+    glm::vec4 computeVectorPolynomial(float uv);
+    glm::vec4 computePointCoordinates(const glm::mat4 &patchMatrixX,
+                                      const glm::mat4 &patchMatrixY,
+                                      const glm::mat4 &patchMatrixZ,
+                                      const glm::vec4 &uVec,
+                                      const glm::vec4 &vVec);
 };
 
 }
