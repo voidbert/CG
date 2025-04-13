@@ -51,10 +51,6 @@ glm::mat4 ThirdPersonCamera::getViewMatrix() const {
     return glm::lookAt(position, lookAt, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-glm::vec3 ThirdPersonCamera::getPosition() const {
-    return position;
-}
-
 void ThirdPersonCamera::renderPlayer(const render::RenderPipeline &pipeline,
                                      const glm::mat4 &initialTransform) const {
     if (playerEntity) {

@@ -34,7 +34,6 @@ public:
     void update();
     void move(MovementDirection dir, float deltaTime) override;
     glm::mat4 getViewMatrix() const;
-    glm::vec3 getPosition() const;
     void renderPlayer(const render::RenderPipeline &pipeline,
                       const glm::mat4 &initialTransform) const override;
     void calculatePosition();
