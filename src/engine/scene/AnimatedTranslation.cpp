@@ -140,7 +140,6 @@ std::vector<utils::Vertex> AnimatedTranslation::getLinePoints() const {
 
 int AnimatedTranslation::draw(const render::RenderPipeline &pipeline,
                               const glm::mat4 &_transform) const {
-    // this->catmullRomMotionLine.update(this->catmullRomMotionLinePoints);
     this->catmullRomMotionLine.draw(pipeline, _transform);
     return 0;
 }
