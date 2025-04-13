@@ -20,6 +20,7 @@
 #include <tinyxml2.h>
 
 #include "engine/render/Line.hpp"
+#include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/ITransform.hpp"
 #include "utils/Vertex.hpp"
 
@@ -36,7 +37,9 @@ public:
     TRSTransform();
     explicit TRSTransform(const tinyxml2::XMLElement *transformElement);
     glm::mat4 getMatrix() const override;
-    int draw();
+    int draw(const render::RenderPipeline &pipeline,
+             const glm::mat4 &cameraMatrix,
+             const glm::mat4 &_transform);
 };
 
 }

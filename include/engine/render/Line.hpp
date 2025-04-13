@@ -17,6 +17,7 @@
 #include <glad/glad.h>
 #include <vector>
 
+#include "engine/render/RenderPipeline.hpp"
 #include "utils/Vertex.hpp"
 
 namespace engine::render {
@@ -32,7 +33,9 @@ public:
     void update(const std::vector<utils::Vertex> &points);
     ~Line();
 
-    void draw() const;
+    void draw(const render::RenderPipeline &pipeline,
+              const glm::mat4 &cameraMatrix,
+              const glm::mat4 &_transform) const;
 };
 
 }

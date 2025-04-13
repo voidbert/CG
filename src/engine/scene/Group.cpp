@@ -124,12 +124,13 @@ int Group::draw(const render::RenderPipeline &pipeline,
                 bool drawBoundingSpheres,
                 bool drawCatmullRomMotionLines) {
 
+    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
+
     if (drawCatmullRomMotionLines == true) {
-        this->transform.draw();
+        this->transform.draw(pipeline, cameraMatrix, _transform);
     }
 
     const glm::mat4 subTransform = _transform * this->transform.getMatrix();
-    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
     int renderedEntities = 0;
 
     if (!camera.isInFrustum(this->boundingSphere))

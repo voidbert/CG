@@ -64,7 +64,11 @@ Line::~Line() {
     glDeleteVertexArrays(1, &this->vao);
 }
 
-void Line::draw() const {
+void Line::draw(const render::RenderPipeline &pipeline,
+                const glm::mat4 &cameraMatrix,
+                const glm::mat4 &_transform) const {
+    pipeline.setMatrix(_transform);
+    pipeline.setColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
     glBindVertexArray(this->vao);
     glDrawArrays(GL_LINE_STRIP, 0, this->pointCount);
 }

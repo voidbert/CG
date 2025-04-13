@@ -87,7 +87,9 @@ glm::mat4 TRSTransform::getMatrix() const {
         this->transformations[2]->getMatrix();
 }
 
-int TRSTransform::draw() {
+int TRSTransform::draw(const render::RenderPipeline &pipeline,
+                       const glm::mat4 &cameraMatrix,
+                       const glm::mat4 &_transform) {
     if (this->iAnimatedTranslation != -1) {
         glm::mat4 remainingTransform = glm::mat4(1.0f);
         for (int i = iAnimatedTranslation + 1; i < 3; i++) {
@@ -96,13 +98,13 @@ int TRSTransform::draw() {
         std::vector<utils::Vertex> transformedVertices;
 
         for (const glm::vec3 &point : this->catmullRomPoints) {
-            glm::vec4 transformedPoint = remainingTransform * glm::vec4(point, 1.0f);
+            glm::vec4 transformedPoint = glm::vec4(point, 1.0f);
             utils::Vertex transformedVertex(transformedPoint);
 
             transformedVertices.push_back(transformedVertex);
         }
         this->catmullRomMotionLine.update(transformedVertices);
-        this->catmullRomMotionLine.draw();
+        this->catmullRomMotionLine.draw(pipeline, cameraMatrix, _transform);
         return 0;
     } else {
         return -1;
