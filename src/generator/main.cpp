@@ -18,6 +18,7 @@
 #include <iostream>
 #include <numeric>
 
+#include "generator/BezierPatch.hpp"
 #include "generator/figures/Box.hpp"
 #include "generator/figures/Cone.hpp"
 #include "generator/figures/Cylinder.hpp"
@@ -75,6 +76,9 @@ void printUsage(const std::string &programName) {
     std::cerr << std::endl << "Scene generation:" << std::endl;
     std::cerr << "  " << programName
               << " solarSystem [<sunScale> <rockyScale> <gasScale>] <directory>" << std::endl;
+
+    std::cerr << std::endl << "Model conversion:" << std::endl;
+    std::cerr << "  " << programName << " bezier <patchFile> <tessellation> <file>" << std::endl;
 }
 
 float stringToFloat(const std::string &str) {
@@ -204,6 +208,13 @@ int main(int argc, char **argv) {
             } else {
                 throw std::invalid_argument("Wrong number of command-line arguments");
             }
+        } else if (args.at(1) == "bezier") {
+            validateArgumentCount(argc, 5);
+            const std::string &patchFile = args.at(2);
+            const int tessellation = stringToInt(args.at(3));
+
+            BezierPatch patch(patchFile, tessellation);
+            patch.writeToFile(file);
         } else {
             printUsage(args[0]);
             return 1;
