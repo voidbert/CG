@@ -50,7 +50,8 @@ public:
     int draw(const render::RenderPipeline &pipeline,
              const camera::Camera &camera,
              const glm::mat4 &_transform,
-             bool drawBoundingSpheres) const;
+             bool drawBoundingSpheres,
+             bool drawCatmullRomMotionLines);
 };
 
 }

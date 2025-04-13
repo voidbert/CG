@@ -19,18 +19,24 @@
 #include <memory>
 #include <tinyxml2.h>
 
+#include "engine/render/Line.hpp"
 #include "engine/scene/ITransform.hpp"
+#include "utils/Vertex.hpp"
 
 namespace engine::scene {
 
 class TRSTransform : public ITransform {
 private:
     std::array<std::unique_ptr<ITransform>, 3> transformations;
+    render::Line catmullRomMotionLine;
+    int iAnimatedTranslation = -1;
+    std::vector<glm::vec3> catmullRomPoints;
 
 public:
     TRSTransform();
     explicit TRSTransform(const tinyxml2::XMLElement *transformElement);
     glm::mat4 getMatrix() const override;
+    int draw();
 };
 
 }

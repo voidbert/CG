@@ -13,28 +13,26 @@
 /// limitations under the License.
 
 #pragma once
-#include <engine/render/RenderPipeline.hpp>
-#include <engine/scene/Scene.hpp>
-#include <engine/window/Window.hpp>
-#include <functional>
 
-namespace engine::window {
+#include <glad/glad.h>
+#include <vector>
 
-class UI {
+#include "utils/Vertex.hpp"
+
+namespace engine::render {
+
+class Line {
 private:
-    camera::Camera &camera;
-    bool showAxes, showBoundingSpheres, showCatmullRomMotionLines;
-    int entityCount;
+    GLuint vao, vbo;
+    unsigned int pointCount;
 
 public:
-    UI(Window &window, camera::Camera &_camera, int _entityCount);
-    ~UI();
+    Line();
+    explicit Line(const std::vector<utils::Vertex> &points);
+    void update(const std::vector<utils::Vertex> &points);
+    ~Line();
 
-    void render(int renderedEntities);
-
-    bool isShowAxesEnabled() const;
-    bool isShowBoundingSpheresEnabled() const;
-    bool isShowCatmullRomMotionLinesEnabled() const;
+    void draw() const;
 };
 
 }

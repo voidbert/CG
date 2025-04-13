@@ -74,18 +74,18 @@ void AnimatedTranslation::getCatmullRomPoint(float t,
 }
 
 void AnimatedTranslation::getGlobalCatmullRomPoint(float globalT,
-                                                   const std::vector<glm::vec3> &points,
+                                                   const std::vector<glm::vec3> &ppoints,
                                                    glm::vec3 &pos,
                                                    glm::vec3 &deriv) const {
-    int pointCount = points.size();
+    int pointCount = ppoints.size();
     float t = globalT;
     int segment = (int) floor(t);
     float localT = t - segment;
 
-    glm::vec3 p0 = points[(segment - 1 + pointCount) % pointCount];
-    glm::vec3 p1 = points[segment % pointCount];
-    glm::vec3 p2 = points[(segment + 1) % pointCount];
-    glm::vec3 p3 = points[(segment + 2) % pointCount];
+    glm::vec3 p0 = ppoints[(segment - 1 + pointCount) % pointCount];
+    glm::vec3 p1 = ppoints[segment % pointCount];
+    glm::vec3 p2 = ppoints[(segment + 1) % pointCount];
+    glm::vec3 p3 = ppoints[(segment + 2) % pointCount];
 
     getCatmullRomPoint(localT, p0, p1, p2, p3, pos, deriv);
 }
@@ -116,6 +116,21 @@ glm::mat4 AnimatedTranslation::getMatrix() const {
     } else {
         return glm::translate(pos);
     }
+}
+
+std::vector<glm::vec3> AnimatedTranslation::getLine() const {
+    std::vector<glm::vec3> pointsLine;
+    float tessellation = 0.01f;
+    int numSegments = (int) (1.0f / tessellation);
+    glm::vec3 pos, deriv;
+
+    for (int i = 0; i <= numSegments; i++) {
+        float t = (float) i / (float) numSegments;
+        float globalT = t * points.size();
+        getGlobalCatmullRomPoint(globalT, points, pos, deriv);
+        pointsLine.push_back(pos);
+    }
+    return pointsLine;
 }
 
 }

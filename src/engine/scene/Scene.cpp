@@ -82,14 +82,20 @@ camera::Camera &Scene::getCamera() {
     return *camera;
 }
 
-int Scene::draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const {
+int Scene::draw(const render::RenderPipeline &pipeline,
+                bool drawBoundingSpheres,
+                bool drawCatmullRomMotionLines) const {
     const glm::mat4 &cameraMatrix = this->camera->getCameraMatrix();
 
     int entityCount = 0;
 
     for (const std::unique_ptr<Group> &group : this->groups) {
         group->updateBoundingSphere(glm::mat4(1.0f));
-        entityCount += group->draw(pipeline, *this->camera, cameraMatrix, drawBoundingSpheres);
+        entityCount += group->draw(pipeline,
+                                   *this->camera,
+                                   cameraMatrix,
+                                   drawBoundingSpheres,
+                                   drawCatmullRomMotionLines);
     }
 
     // Reset camera after transforms

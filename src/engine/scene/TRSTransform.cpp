@@ -15,6 +15,7 @@
 #include <glm/gtx/transform.hpp>
 #include <stdexcept>
 
+#include "engine/render/Line.hpp"
 #include "engine/scene/AnimatedRotation.hpp"
 #include "engine/scene/AnimatedTranslation.hpp"
 #include "engine/scene/Rotation.hpp"
@@ -46,8 +47,14 @@ TRSTransform::TRSTransform(const tinyxml2::XMLElement *transformElement) : TRSTr
         if (name == "translate" && !hasTranslation) {
             const char *timeAttr = child->Attribute("time");
             if (timeAttr != nullptr) {
+                this->iAnimatedTranslation = i;
                 this->transformations[i] = std::make_unique<AnimatedTranslation>(child);
                 hasTranslation = true;
+                auto *catmullRom =
+                    dynamic_cast<AnimatedTranslation *>(this->transformations[i].get());
+                if (catmullRom) {
+                    this->catmullRomPoints = catmullRom->getLine();
+                }
             } else {
                 this->transformations[i] = std::make_unique<Translation>(child);
                 hasTranslation = true;
@@ -80,4 +87,25 @@ glm::mat4 TRSTransform::getMatrix() const {
         this->transformations[2]->getMatrix();
 }
 
+int TRSTransform::draw() {
+    if (this->iAnimatedTranslation != -1) {
+        glm::mat4 remainingTransform = glm::mat4(1.0f);
+        for (int i = iAnimatedTranslation + 1; i < 3; i++) {
+            remainingTransform *= transformations[i]->getMatrix();
+        }
+        std::vector<utils::Vertex> transformedVertices;
+
+        for (const glm::vec3 &point : this->catmullRomPoints) {
+            glm::vec4 transformedPoint = remainingTransform * glm::vec4(point, 1.0f);
+            utils::Vertex transformedVertex(transformedPoint);
+
+            transformedVertices.push_back(transformedVertex);
+        }
+        this->catmullRomMotionLine.update(transformedVertices);
+        this->catmullRomMotionLine.draw();
+        return 0;
+    } else {
+        return -1;
+    }
+}
 }

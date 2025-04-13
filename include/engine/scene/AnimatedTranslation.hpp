@@ -44,6 +44,7 @@ private:
 public:
     explicit AnimatedTranslation(const tinyxml2::XMLElement *translateElement);
     glm::mat4 getMatrix() const override;
+    std::vector<glm::vec3> getLine() const;
 };
 
 }
