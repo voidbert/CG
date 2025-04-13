@@ -18,23 +18,6 @@ namespace engine::render {
 
 Line::Line() : vao(0), vbo(0), pointCount(0) {}
 
-Line::Line(const std::vector<utils::Vertex> &points) {
-    glGenVertexArrays(1, &this->vao);
-    glBindVertexArray(this->vao);
-
-    glGenBuffers(1, &this->vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 points.size() * sizeof(utils::Vertex),
-                 points.data(),
-                 GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 4, GL_FLOAT, false, 4 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-
-    this->pointCount = points.size();
-}
-
 void Line::update(const std::vector<utils::Vertex> &points) {
     // Se já existir um VAO ou VBO, apaga
     if (this->vao != 0) {

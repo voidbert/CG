@@ -15,14 +15,12 @@
 #include <glm/gtx/transform.hpp>
 #include <stdexcept>
 
-#include "engine/render/Line.hpp"
 #include "engine/scene/AnimatedRotation.hpp"
 #include "engine/scene/AnimatedTranslation.hpp"
 #include "engine/scene/Rotation.hpp"
 #include "engine/scene/Scale.hpp"
 #include "engine/scene/Translation.hpp"
 #include "engine/scene/TRSTransform.hpp"
-#include "utils/XMLUtils.hpp"
 
 namespace engine::scene {
 
@@ -50,11 +48,6 @@ TRSTransform::TRSTransform(const tinyxml2::XMLElement *transformElement) : TRSTr
                 this->iAnimatedTranslation = i;
                 this->transformations[i] = std::make_unique<AnimatedTranslation>(child);
                 hasTranslation = true;
-                const auto *catmullRom =
-                    dynamic_cast<AnimatedTranslation *>(this->transformations[i].get());
-                if (catmullRom) {
-                    this->catmullRomPoints = catmullRom->getLine();
-                }
             } else {
                 this->transformations[i] = std::make_unique<Translation>(child);
                 hasTranslation = true;
@@ -87,20 +80,14 @@ glm::mat4 TRSTransform::getMatrix() const {
         this->transformations[2]->getMatrix();
 }
 
-int TRSTransform::draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) {
-    if (this->iAnimatedTranslation != -1) {
-        std::vector<utils::Vertex> transformedVertices;
-        for (const glm::vec3 &point : this->catmullRomPoints) {
-            glm::vec4 transformedPoint = glm::vec4(point, 1.0f);
-            utils::Vertex transformedVertex(transformedPoint);
-
-            transformedVertices.push_back(transformedVertex);
+int TRSTransform::draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) const {
+    if (iAnimatedTranslation != -1) {
+        const auto *animatedTranslation =
+            dynamic_cast<AnimatedTranslation *>(this->transformations[iAnimatedTranslation].get());
+        if (animatedTranslation) {
+            animatedTranslation->draw(pipeline, _transform);
         }
-        this->catmullRomMotionLine.update(transformedVertices);
-        this->catmullRomMotionLine.draw(pipeline, _transform);
-        return 0;
-    } else {
-        return -1;
     }
+    return 0;
 }
 }

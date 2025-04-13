@@ -122,7 +122,7 @@ int Group::draw(const render::RenderPipeline &pipeline,
                 const camera::Camera &camera,
                 const glm::mat4 &_transform,
                 bool drawBoundingSpheres,
-                bool drawCatmullRomMotionLines) {
+                bool drawCatmullRomMotionLines) const {
 
     const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
 

@@ -19,7 +19,10 @@
 #include <tinyxml2.h>
 #include <vector>
 
+#include "engine/render/Line.hpp"
+#include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/ITransform.hpp"
+#include "utils/Vertex.hpp"
 
 namespace engine::scene {
 
@@ -29,6 +32,10 @@ private:
     bool align;
     std::vector<glm::vec3> points;
     mutable glm::vec3 lastUp = glm::vec3(0, 1, 0);
+
+    mutable render::Line catmullRomMotionLine;
+    std::vector<utils::Vertex> catmullRomMotionLinePoints;
+
     void getCatmullRomPoint(float t,
                             const glm::vec3 &p0,
                             const glm::vec3 &p1,
@@ -40,11 +47,12 @@ private:
                                   const std::vector<glm::vec3> &points,
                                   glm::vec3 &pos,
                                   glm::vec3 &deriv) const;
+    std::vector<utils::Vertex> getLinePoints() const;
 
 public:
     explicit AnimatedTranslation(const tinyxml2::XMLElement *translateElement);
     glm::mat4 getMatrix() const override;
-    std::vector<glm::vec3> getLine() const;
+    int draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) const;
 };
 
 }

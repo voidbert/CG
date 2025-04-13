@@ -51,7 +51,7 @@ public:
              const camera::Camera &camera,
              const glm::mat4 &_transform,
              bool drawBoundingSpheres,
-             bool drawCatmullRomMotionLines);
+             bool drawCatmullRomMotionLines) const;
 };
 
 }

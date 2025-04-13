@@ -16,7 +16,9 @@
 #include <glm/gtx/transform.hpp>
 #include <stdexcept>
 
+#include "engine/render/Line.hpp"
 #include "engine/scene/AnimatedTranslation.hpp"
+#include "utils/Vertex.hpp"
 #include "utils/XMLUtils.hpp"
 
 namespace engine::scene {
@@ -39,6 +41,8 @@ AnimatedTranslation::AnimatedTranslation(const tinyxml2::XMLElement *translateEl
         throw std::runtime_error(
             "Invalid number of translation points <translate> in scene XML file");
     }
+    this->catmullRomMotionLinePoints = getLinePoints();
+    this->catmullRomMotionLine.update(this->catmullRomMotionLinePoints);
 }
 
 void AnimatedTranslation::getCatmullRomPoint(float t,
@@ -118,8 +122,8 @@ glm::mat4 AnimatedTranslation::getMatrix() const {
     }
 }
 
-std::vector<glm::vec3> AnimatedTranslation::getLine() const {
-    std::vector<glm::vec3> pointsLine;
+std::vector<utils::Vertex> AnimatedTranslation::getLinePoints() const {
+    std::vector<utils::Vertex> pointsLine;
     float tessellation = 0.01f;
     int numSegments = (int) (1.0f / tessellation);
     glm::vec3 pos, deriv;
@@ -128,9 +132,17 @@ std::vector<glm::vec3> AnimatedTranslation::getLine() const {
         float t = (float) i / (float) numSegments;
         float globalT = t * points.size();
         getGlobalCatmullRomPoint(globalT, points, pos, deriv);
-        pointsLine.push_back(pos);
+        utils::Vertex v = utils::Vertex(pos.x, pos.y, pos.z);
+        pointsLine.push_back(v);
     }
     return pointsLine;
+}
+
+int AnimatedTranslation::draw(const render::RenderPipeline &pipeline,
+                              const glm::mat4 &_transform) const {
+    // this->catmullRomMotionLine.update(this->catmullRomMotionLinePoints);
+    this->catmullRomMotionLine.draw(pipeline, _transform);
+    return 0;
 }
 
 }
