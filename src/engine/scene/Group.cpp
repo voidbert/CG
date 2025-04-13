@@ -127,7 +127,7 @@ int Group::draw(const render::RenderPipeline &pipeline,
     const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
 
     if (drawCatmullRomMotionLines == true) {
-        this->transform.draw(pipeline, cameraMatrix, _transform);
+        this->transform.draw(pipeline, _transform);
     }
 
     const glm::mat4 subTransform = _transform * this->transform.getMatrix();

@@ -50,7 +50,7 @@ TRSTransform::TRSTransform(const tinyxml2::XMLElement *transformElement) : TRSTr
                 this->iAnimatedTranslation = i;
                 this->transformations[i] = std::make_unique<AnimatedTranslation>(child);
                 hasTranslation = true;
-                auto *catmullRom =
+                const auto *catmullRom =
                     dynamic_cast<AnimatedTranslation *>(this->transformations[i].get());
                 if (catmullRom) {
                     this->catmullRomPoints = catmullRom->getLine();
@@ -87,16 +87,9 @@ glm::mat4 TRSTransform::getMatrix() const {
         this->transformations[2]->getMatrix();
 }
 
-int TRSTransform::draw(const render::RenderPipeline &pipeline,
-                       const glm::mat4 &cameraMatrix,
-                       const glm::mat4 &_transform) {
+int TRSTransform::draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) {
     if (this->iAnimatedTranslation != -1) {
-        glm::mat4 remainingTransform = glm::mat4(1.0f);
-        for (int i = iAnimatedTranslation + 1; i < 3; i++) {
-            remainingTransform *= transformations[i]->getMatrix();
-        }
         std::vector<utils::Vertex> transformedVertices;
-
         for (const glm::vec3 &point : this->catmullRomPoints) {
             glm::vec4 transformedPoint = glm::vec4(point, 1.0f);
             utils::Vertex transformedVertex(transformedPoint);
@@ -104,7 +97,7 @@ int TRSTransform::draw(const render::RenderPipeline &pipeline,
             transformedVertices.push_back(transformedVertex);
         }
         this->catmullRomMotionLine.update(transformedVertices);
-        this->catmullRomMotionLine.draw(pipeline, cameraMatrix, _transform);
+        this->catmullRomMotionLine.draw(pipeline, _transform);
         return 0;
     } else {
         return -1;

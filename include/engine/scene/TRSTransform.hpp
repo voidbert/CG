@@ -37,9 +37,7 @@ public:
     TRSTransform();
     explicit TRSTransform(const tinyxml2::XMLElement *transformElement);
     glm::mat4 getMatrix() const override;
-    int draw(const render::RenderPipeline &pipeline,
-             const glm::mat4 &cameraMatrix,
-             const glm::mat4 &_transform);
+    int draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform);
 };
 
 }
