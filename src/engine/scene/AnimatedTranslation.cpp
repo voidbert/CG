@@ -41,8 +41,7 @@ AnimatedTranslation::AnimatedTranslation(const tinyxml2::XMLElement *translateEl
         throw std::runtime_error(
             "Invalid number of translation points <translate> in scene XML file");
     }
-    this->catmullRomMotionLinePoints = getLinePoints();
-    this->catmullRomMotionLine.update(this->catmullRomMotionLinePoints);
+    this->catmullRomMotionLine.update(getLinePoints());
 }
 
 void AnimatedTranslation::getCatmullRomPoint(float t,

@@ -34,7 +34,6 @@ private:
     mutable glm::vec3 lastUp = glm::vec3(0, 1, 0);
 
     mutable render::Line catmullRomMotionLine;
-    std::vector<utils::Vertex> catmullRomMotionLinePoints;
 
     void getCatmullRomPoint(float t,
                             const glm::vec3 &p0,
