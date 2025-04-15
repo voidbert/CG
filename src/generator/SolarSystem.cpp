@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <glm/geometric.hpp>
 #include <glm/gtc/constants.hpp>
+#include <vector>
 
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
@@ -80,6 +81,8 @@ tinyxml2::XMLElement *
 
     // Translation
     const float translationAngle = fullAngleDistribution(this->rng);
+    this->lastTranslationAngle = translationAngle;
+
     const glm::vec3 position(distance * cosf(translationAngle),
                              y,
                              distance * sinf(translationAngle));
@@ -123,8 +126,21 @@ tinyxml2::XMLElement *SolarSystem::createRings(float radius) {
 tinyxml2::XMLElement *
     SolarSystem::createAsteroidBelt(float minDistance, float maxDistance, int numAsteroids) {
 
-    tinyxml2::XMLElement *group = this->document.NewElement("group");
+    // Initialize hierarchy
+    tinyxml2::XMLElement *parentGroup = this->document.NewElement("group");
 
+    const float averageRadius = (minDistance + maxDistance) / 2.0f;
+    const float beltWidth = maxDistance - minDistance;
+    const int numGroups = ceilf(2 * glm::pi<float>() * averageRadius / beltWidth);
+    const float groupArc = 2 * glm::pi<float>() / numGroups;
+
+    std::vector<tinyxml2::XMLElement *> subGroups;
+    subGroups.reserve(numGroups);
+    for (int i = 0; i < numGroups; ++i) {
+        subGroups.push_back(parentGroup->InsertNewChildElement("group"));
+    }
+
+    // Create asteroids
     for (int i = 0; i < numAsteroids; i++) {
         std::uniform_real_distribution distanceDistribution(minDistance, maxDistance);
         std::uniform_real_distribution radiusDistribution(0.02f, 0.10f);
@@ -134,10 +150,12 @@ tinyxml2::XMLElement *
         const float radius = radiusDistribution(this->rng);
         const float y = yDistribution(this->rng);
 
-        group->InsertEndChild(this->createBody(radius, distance, false, y));
+        tinyxml2::XMLElement *asteroid = this->createBody(radius, distance, false, y);
+        const int group = floorf(this->lastTranslationAngle / groupArc);
+        subGroups[group]->InsertEndChild(asteroid);
     }
 
-    return group;
+    return parentGroup;
 }
 
 void SolarSystem::createPreamble(float sunScale, float rockyScale, float gasScale) {
