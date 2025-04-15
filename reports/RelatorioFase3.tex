@@ -281,11 +281,61 @@ por \emph{patch}.
 
 \section{\emph{Engine}}
 
-\subsection{Animação dos objetos}
+\subsection{Animação dos Objetos}
 
-\subsection{\emph{Vertex Buffer Objects}}
+\subsection{\emph{Vertex Buffer Objects} (VBOs)}
 
-\subsection{Câmara}
+Um dos objetivos do nosso grupo foi utilizar uma versão atual do OpenGL devido ao maior número de
+funcionalidades suportadas e à possibilidade de depuração da \texttt{engine} com aplicações como
+RenderDoc \cite{renderdoc}. A versão 4.6 do OpenGL foi escolhida, pelo que, já desde o começo da
+primeira fase, o projeto desenvolvido utilizava não só VBOs, como também \emph{shaders},
+obrigatórios no \emph{core profile} do OpenGL.
+
+Em primeiro lugar, é importante conhecer como os \emph{shaders} de vértices e de fragmentos
+desenvolvidos se encaixam na \emph{pipeline} de renderização. Considere-se o diagrama abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{res/phase3/Shaders.pdf}
+    \caption{Esquema dos \emph{shaders} desenvolvidos na \emph{pipeline} de renderização.}
+\end{figure}
+
+Como se pode observar, a única responsabilidade do \emph{shader} de vértices é multiplicar as
+coordenadas das posições dos vértices que recebe por uma matriz de transformação passada numa
+variável uniforme. Após o processamento dos vértices, dar-se-á o \emph{clipping}, a montagem das
+primitivas, a divisão da perspetiva, a transformação pela \emph{viewport}, e a rasterização
+\cite{vertex-post-processing}. Depois, para cada fragmento, o \emph{shader} de fragmentos será
+invocado e, neste caso, atribuirá a todos os fragmentos das primitivas de um objeto a mesma cor,
+passada como uma variável uniforme. Após a aplicação destes \emph{shaders} e algum processamento por
+amostra, um objeto renderizado é colocado no \emph{framebuffer} para apresentação ao utilizador
+\cite{per-sample-processing}. É de notar que a funcionalidade implementada por estes \emph{shaders}
+é muito básica, apenas a necessária para o funcionamento correto da \texttt{engine} nesta terceira
+fase do trabalho prático.
+
+Após a criação dos \emph{shaders}, a \texttt{engine} carrega a cena e, para cada modelo, é criado um
+\emph{Vertex Array Object} (VAO), algo que é obrigatório no \emph{core profile} do OpenGL. Com este
+objeto vinculado, criam-se dois \emph{buffers}, um \texttt{GL\_ARRAY\_BUFFER}, no qual se armazenam
+as posições dos vértices do modelo, e um \texttt{GL\_ELEMENT\_ARRAY\_BUFFER}, no qual se armazenam,
+na forma de um \emph{array} de índices, a ordem em que estes vértices devem ser desenhados
+\cite{glBufferData}. O uso de índices permite diminuir o tamanho dos modelos e tirar proveito da
+cache de vértices da GPU. A figura abaixo mostra como estes três objetos estão relacionados:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{res/phase3/VAO.pdf}
+    \caption{Organização do VAO, VBO, e EBO de um modelo.}
+\end{figure}
+
+Depois de criados estes objetos, para desenhar uma entidade na cena, basta vincular o seu VAO
+correspondente e invocar a função \texttt{glDrawElements}.
+
+O processo de envio de geometria para a GPU é semelhante para os eixos e para as representações
+visuais das curvas de Catmull-Rom na cena. No entanto, não são criados \emph{arrays} de índices para
+estes objetos, visto que não se espera que tenham vértices em duplicado. Então, a função usada para
+desenhar estes objetos é \texttt{glDrawArrays}, e as primitivas são formadas com os vértices do VBO
+pela ordem em que surgem no mesmo.
+
+\subsection{Câmara em Terceira Pessoa}
 
 \section{Resultados Obtidos}
 
@@ -300,8 +350,20 @@ por \emph{patch}.
         ``Wavefront OBJ File Format Summary.'' FileFormat.Info. Accessed: Apr. 13, 2025. [Online.]
         Available: \url{https://www.fileformat.info/format/wavefrontobj/egff.htm}
     \bibitem{optimal-grid}
-        ``Optimal Grid Rendering''. Ignacio Castaño. Accessed: Apr. 14, 2025. [Online.] Available:
+        ``Optimal Grid Rendering.'' Ignacio Castaño. Accessed: Apr. 14, 2025. [Online.] Available:
         \url{https://www.ludicon.com/castano/blog/2009/02/optimal-grid-rendering/}
+    \bibitem{renderdoc}
+        ``RenderDoc.'' RenderDoc Accessed: Apr. 14, 2025. [Online.] Available:
+        \url{https://renderdoc.org/}
+    \bibitem{vertex-post-processing}
+        ``Vertex Post-Processing.'' OpenGL Wiki. Accessed: Apr. 13, 2025. [Online.] Available:
+        \url{https://www.khronos.org/opengl/wiki/Vertex_Post-Processing}
+    \bibitem{per-sample-processing}
+        ``Per-Sample Processing.'' OpenGL Wiki. Accessed: Apr. 13, 2025. [Online.] Available:
+        \url{https://www.khronos.org/opengl/wiki/Per-Sample_Processing}
+    \bibitem{glBufferData}
+        ``glBufferData.'' OpenGL 4.5 Reference Pages. Accessed: Apr. 15, 2025. [Online.] Available:
+        \url{https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml}
 \end{thebibliography}
 \endgroup
 

@@ -1,0 +1,73 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0" version="26.2.12">
+  <diagram name="Page-1" id="ngNzPQzKKI-gkR1TF8xa">
+    <mxGraphModel dx="1426" dy="787" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="550" pageHeight="200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2INRg8MjuntT7xOlTWfu-1" value="&lt;div&gt;VAO&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=CMU Serif;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DCMU%2BSerif;labelPosition=center;verticalLabelPosition=top;align=center;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-2" value="&amp;nbsp;VBO" style="rounded=0;whiteSpace=wrap;html=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;fontFamily=CMU Serif;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DCMU%2BSerif;" vertex="1" parent="1">
+          <mxGeometry x="220" y="40" width="250" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-3" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;p&lt;sub&gt;x&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="47.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-4" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;p&lt;sub&gt;y&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="47.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-5" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;p&lt;sub&gt;z&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="47.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-7" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;p&lt;sub&gt;w&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="47.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-8" value="&lt;font face=&quot;CMU Serif&quot;&gt;q&lt;sub&gt;x&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="47.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-9" value="&lt;font face=&quot;CMU Serif&quot;&gt;q&lt;sub&gt;y&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="47.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-10" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;...&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="440" y="47.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-11" value="&lt;font face=&quot;CMU Serif&quot;&gt;q&lt;sub&gt;z&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="47.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-12" value="&amp;nbsp;EBO" style="rounded=0;whiteSpace=wrap;html=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;fontFamily=CMU Serif;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DCMU%2BSerif;" vertex="1" parent="1">
+          <mxGeometry x="220" y="115" width="130" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2INRg8MjuntT7xOlTWfu-16" target="2INRg8MjuntT7xOlTWfu-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-16" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;i&lt;sub&gt;0&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="122.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="2INRg8MjuntT7xOlTWfu-17" target="2INRg8MjuntT7xOlTWfu-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-17" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;i&lt;sub&gt;1&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="122.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-18" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;i&lt;sub&gt;2&lt;/sub&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="122.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-19" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;...&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="320" y="122.5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2INRg8MjuntT7xOlTWfu-26" target="2INRg8MjuntT7xOlTWfu-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-26" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;Attribute Pointer 0&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="46.5" width="120" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2INRg8MjuntT7xOlTWfu-27" target="2INRg8MjuntT7xOlTWfu-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2INRg8MjuntT7xOlTWfu-27" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=CMU+Serif&quot; face=&quot;CMU Serif&quot;&gt;EBO&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="121" width="120" height="32.5" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
