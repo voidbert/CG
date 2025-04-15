@@ -76,7 +76,7 @@ tinyxml2::XMLElement *
 
     // Distributions for transforms
     std::uniform_real_distribution fullAngleDistribution(0.0f, 2.0f * glm::pi<float>());
-    std::uniform_real_distribution axisOffsetDistribution(-0.5f, 0.5f);
+    std::uniform_real_distribution axisOffsetDistribution(-0.2f, 0.2f);
 
     // Translation
     const float translationAngle = fullAngleDistribution(this->rng);
@@ -98,7 +98,7 @@ tinyxml2::XMLElement *
                                  axisOffset * sinf(rotationAngle));
 
     tinyxml2::XMLElement *rotate = this->createVector("rotate", glm::normalize(rotationAxis));
-    rotate->SetAttribute("angle", rotationAngle);
+    rotate->SetAttribute("angle", rotationAngle * 180.0 / glm::pi<float>());
     innerTransform->InsertEndChild(rotate);
 
     return group;
