@@ -12,7 +12,10 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{setspace}
+\usepackage{tikz}
 \usepackage{xcolor}
+
+\usetikzlibrary{arrows, arrows.meta}
 
 \lstdefinestyle{codestyle}{
     commentstyle=\color{teal},
@@ -204,9 +207,35 @@ Como se pode observar, no grupo exterior encontra-se a translação aplicada tan
 A Terra, como é orbitada pela Lua, é colocada num grupo interior com a sua escala e rotação. Quanto
 à Lua, como nada a orbita, no seu grupo encontram-se as suas três transformações.
 
-{\color{red} TODO - falar de animações}
+Também houve uma alteração à hierarquia de grupos das cinturas de asteroides. Anteriormente, cada
+asteroide era um grupo, e todos estes grupos tinham o mesmo pai. Isto não era ideal para o
+\emph{frustum culling}, porque era necessário verificar para todo o asteroide se ele se encontrava
+ou não no \emph{view frustum}. Seria possível evitar vários testes se um grupo contivesse vários
+asteroides e a esfera encapsuladora desse grupo não fosse visível.
 
-{\color{red} TODO - fazer e falar de divisão das cinturas de asteroides em grupos}
+Logo, para resolver este problema, cada cintura de asteroides é divida em subgrupos. Para determinar
+o tamanho de cada subgrupo, procura-se que o comprimento do arco a que está associado seja o mesmo
+que a largura da cintura de asteroides. Deste modo, a esfera que encapsula os asteroides não será
+nem pequena nem grande demais, o que levaria a um maior número de testes de \emph{frustum culling}.
+Assim, dados os raios externo ($R$) e interno ($r$) de uma cintura de asteroides, o seu número de
+grupos pode ser calculado do seguinte modo:
+
+$$
+N = \left \lceil \frac{2 \pi \cdot \frac{R + r}{2}}{R - r} \right \rceil
+  = \left \lceil \frac{\pi (R + r)}{R - r} \right \rceil
+$$
+
+Essencialmente, esta fórmula calcula quantas vezes a largura da cintura de asteroides ($R - r$) cabe
+no perímetro da sua circunferência média. Com esta divisão, as esferas encapsuladoras dos grupos de
+uma cintura de asteroides são visíveis na figura abaixo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{res/phase3/AsteroidBeltBoundingSpheres.png}
+    \caption{Esferas encapsuladoras dos grupos da cintura de asteroides interna.}
+\end{figure}
+
+{\color{red} TODO - falar de animações}
 
 Por último, tal como foi feito com os modelos 3D, uma cena do Sistema Solar começa com um comentário
 XML como o que pode ser visto abaixo, a enunciar os parâmetros com que foi gerada:
