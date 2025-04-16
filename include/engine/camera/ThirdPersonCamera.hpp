@@ -35,9 +35,9 @@ public:
                       float _far,
                       std::unique_ptr<scene::Group> _player);
 
-    void setPosition(const glm::vec3 &pos);
-    void move(MovementDirection direction, float deltaTime);
-    void draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres);
+    void setPosition(const glm::vec3 &pos) override;
+    void move(MovementDirection direction, float deltaTime) override;
+    void draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) override;
 
 private:
     void updatePosition();
