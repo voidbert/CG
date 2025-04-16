@@ -14,23 +14,33 @@
 
 #pragma once
 
-#include <filesystem>
 #include <memory>
-#include <string>
-#include <tinyxml2.h>
-#include <unordered_map>
 
 #include "engine/camera/Camera.hpp"
-#include "engine/render/Model.hpp"
+#include "engine/scene/Group.hpp"
 
 namespace engine::camera {
 
-class CameraFactory {
+class ThirdPersonCamera : public Camera {
+private:
+    float azimuth, polar, radius;
+    std::unique_ptr<scene::Group> player;
+
 public:
-    static std::unique_ptr<Camera> createFromXML(
-        const tinyxml2::XMLElement *cameraElement,
-        const std::filesystem::path &sceneDirectory,
-        std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
+    ThirdPersonCamera(const glm::vec3 &_position,
+                      const glm::vec3 &_lookAt,
+                      const glm::vec3 &_up,
+                      float _fov,
+                      float _near,
+                      float _far,
+                      std::unique_ptr<scene::Group> _player);
+
+    void setPosition(const glm::vec3 &pos);
+    void move(MovementDirection direction, float deltaTime);
+    void draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres);
+
+private:
+    void updatePosition();
 };
 
 }

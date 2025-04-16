@@ -14,12 +14,12 @@
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
-#include <iostream>
 #include <map>
 
 #include "engine/camera/Camera.hpp"
 #include "engine/camera/FreeCamera.hpp"
 #include "engine/camera/OrbitalCamera.hpp"
+#include "engine/camera/ThirdPersonCamera.hpp"
 #include "engine/window/SceneWindow.hpp"
 #include "engine/window/UI.hpp"
 
@@ -79,6 +79,23 @@ void SceneWindow::onUpdate(float time, float timeElapsed) {
             { GLFW_KEY_RIGHT,      camera::MovementDirection::LookRight },
             { GLFW_KEY_UP,         camera::MovementDirection::LookUp    },
             { GLFW_KEY_DOWN,       camera::MovementDirection::LookDown  }
+        };
+    }
+
+    camera::ThirdPersonCamera *thirdPersonCamera =
+        dynamic_cast<camera::ThirdPersonCamera *>(&baseCamera);
+    if (thirdPersonCamera) {
+        keyMapping = {
+            { GLFW_KEY_W,     camera::MovementDirection::Up        },
+            { GLFW_KEY_S,     camera::MovementDirection::Down      },
+            { GLFW_KEY_A,     camera::MovementDirection::Left      },
+            { GLFW_KEY_D,     camera::MovementDirection::Right     },
+            { GLFW_KEY_LEFT,  camera::MovementDirection::LookLeft  },
+            { GLFW_KEY_RIGHT, camera::MovementDirection::LookRight },
+            { GLFW_KEY_UP,    camera::MovementDirection::LookUp    },
+            { GLFW_KEY_DOWN,  camera::MovementDirection::LookDown  },
+            { GLFW_KEY_F,     camera::MovementDirection::Forward   },
+            { GLFW_KEY_B,     camera::MovementDirection::Backward  }
         };
     }
 
