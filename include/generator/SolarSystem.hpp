@@ -28,7 +28,7 @@ private:
     std::default_random_engine rng;
     tinyxml2::XMLDocument document;
     tinyxml2::XMLElement *world;
-    float bodyScale;
+    float bodyScale, lastTranslationAngle;
 
 public:
     explicit SolarSystem(float sunScale = 1.0f, float rockyScale = 10.0f, float gasScale = 10.0f);
