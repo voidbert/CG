@@ -108,6 +108,11 @@ void Camera::updateViewFrustum() {
     this->viewFrustum[5] = Camera::planeEquation(farBottomRight, farBottomLeft, nearBottomLeft);
 }
 
+void Camera::draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) {
+    static_cast<void>(pipeline);
+    static_cast<void>(drawBoundingSpheres);
+}
+
 glm::vec4 Camera::planeEquation(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3) {
     const glm::vec3 normal = glm::normalize(glm::cross(p2 - p1, p3 - p1));
     const float constantFactor = glm::dot(-normal, p1);

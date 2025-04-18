@@ -17,11 +17,16 @@
 #include "engine/camera/CameraFactory.hpp"
 #include "engine/camera/FreeCamera.hpp"
 #include "engine/camera/OrbitalCamera.hpp"
+#include "engine/camera/ThirdPersonCamera.hpp"
 #include "utils/XMLUtils.hpp"
 
 namespace engine::camera {
 
-std::unique_ptr<Camera> CameraFactory::createFromXML(const tinyxml2::XMLElement *cameraElement) {
+std::unique_ptr<Camera> CameraFactory::createFromXML(
+    const tinyxml2::XMLElement *cameraElement,
+    const std::filesystem::path &sceneDirectory,
+    std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels) {
+
     // View matrix
     const glm::vec3 position =
         utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "position"));
@@ -53,8 +58,17 @@ std::unique_ptr<Camera> CameraFactory::createFromXML(const tinyxml2::XMLElement 
     } else if (cameraType == "free") {
         return std::make_unique<camera::FreeCamera>(position, lookAt, up, fov, near, far);
     } else if (cameraType == "thirdperson") {
-        // TODO - Ana - ThirdPersonCamera
-        return std::unique_ptr<camera::Camera>(nullptr);
+        const tinyxml2::XMLElement *group = utils::XMLUtils::getSingleChild(cameraElement, "group");
+        std::unique_ptr<scene::Group> player =
+            std::make_unique<scene::Group>(group, sceneDirectory, loadedModels);
+
+        return std::make_unique<ThirdPersonCamera>(position,
+                                                   lookAt,
+                                                   up,
+                                                   fov,
+                                                   near,
+                                                   far,
+                                                   std::move(player));
     } else {
         throw std::runtime_error("Invalid camera type in scene XML file");
     }

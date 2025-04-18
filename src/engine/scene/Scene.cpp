@@ -44,7 +44,9 @@ Scene::Scene(const std::string &file) {
 
     // Get camera properties
     this->camera = camera::CameraFactory::createFromXML(
-        utils::XMLUtils::getSingleChild(worldElement, "camera"));
+        utils::XMLUtils::getSingleChild(worldElement, "camera"),
+        sceneDirectory,
+        loadedModels);
 
     // Get rendering groups
     const tinyxml2::XMLElement *groupElement = worldElement->FirstChildElement("group");
@@ -86,7 +88,7 @@ int Scene::draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres
     const glm::mat4 &cameraMatrix = this->camera->getCameraMatrix();
 
     int entityCount = 0;
-
+    this->camera->draw(pipeline, drawBoundingSpheres);
     for (const std::unique_ptr<Group> &group : this->groups) {
         group->updateBoundingSphere(glm::mat4(1.0f));
         entityCount += group->draw(pipeline, *this->camera, cameraMatrix, drawBoundingSpheres);
