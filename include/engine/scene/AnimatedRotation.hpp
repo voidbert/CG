@@ -13,28 +13,24 @@
 /// limitations under the License.
 
 #pragma once
-#include <engine/render/RenderPipeline.hpp>
-#include <engine/scene/Scene.hpp>
-#include <engine/window/Window.hpp>
-#include <functional>
 
-namespace engine::window {
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
+#include <tinyxml2.h>
 
-class UI {
+#include "engine/scene/ITransform.hpp"
+
+namespace engine::scene {
+
+class AnimatedRotation : public ITransform {
 private:
-    camera::Camera &camera;
-    bool showAxes, showBoundingSpheres, showCatmullRomMotionLines;
-    int entityCount;
+    float time;
+    glm::vec3 rotationAxis;
+    float direction;
 
 public:
-    UI(Window &window, camera::Camera &_camera, int _entityCount);
-    ~UI();
-
-    void render(int renderedEntities);
-
-    bool isShowAxesEnabled() const;
-    bool isShowBoundingSpheresEnabled() const;
-    bool isShowCatmullRomMotionLinesEnabled() const;
+    explicit AnimatedRotation(const tinyxml2::XMLElement *rotateElement);
+    glm::mat4 getMatrix() const override;
 };
 
 }

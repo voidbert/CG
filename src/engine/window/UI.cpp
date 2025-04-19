@@ -25,7 +25,11 @@
 namespace engine::window {
 
 UI::UI(Window &window, camera::Camera &_camera, int _entityCount) :
-    camera(_camera), showAxes(true), showBoundingSpheres(false), entityCount(_entityCount) {
+    camera(_camera),
+    showAxes(true),
+    showBoundingSpheres(false),
+    showCatmullRomMotionLines(true),
+    entityCount(_entityCount) {
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -80,6 +84,7 @@ void UI::render(int renderedEntities) {
 
     if (ImGui::Checkbox("Show Axes", &this->showAxes)) {}
     if (ImGui::Checkbox("Show Bounding Spheres", &this->showBoundingSpheres)) {}
+    if (ImGui::Checkbox("Show Catmull-Rom Motion Lines", &this->showCatmullRomMotionLines)) {}
 
     ImGui::Separator();
     ImGui::Text("Camera Options");
@@ -101,6 +106,10 @@ bool UI::isShowAxesEnabled() const {
 
 bool UI::isShowBoundingSpheresEnabled() const {
     return this->showBoundingSpheres;
+}
+
+bool UI::isShowCatmullRomMotionLinesEnabled() const {
+    return this->showCatmullRomMotionLines;
 }
 
 }

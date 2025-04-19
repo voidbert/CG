@@ -19,6 +19,7 @@
 #include <memory>
 #include <tinyxml2.h>
 
+#include "engine/render/RenderPipeline.hpp"
 #include "engine/scene/ITransform.hpp"
 
 namespace engine::scene {
@@ -26,11 +27,13 @@ namespace engine::scene {
 class TRSTransform : public ITransform {
 private:
     std::array<std::unique_ptr<ITransform>, 3> transformations;
+    int iAnimatedTranslation = -1;
 
 public:
     TRSTransform();
     explicit TRSTransform(const tinyxml2::XMLElement *transformElement);
     glm::mat4 getMatrix() const override;
+    int draw(const render::RenderPipeline &pipeline, const glm::mat4 &_transform) const;
 };
 
 }
