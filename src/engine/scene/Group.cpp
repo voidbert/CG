@@ -121,10 +121,16 @@ void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
 int Group::draw(const render::RenderPipeline &pipeline,
                 const camera::Camera &camera,
                 const glm::mat4 &_transform,
-                bool drawBoundingSpheres) const {
+                bool drawBoundingSpheres,
+                bool drawCatmullRomMotionLines) const {
+
+    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
+
+    if (drawCatmullRomMotionLines == true) {
+        this->transform.draw(pipeline, _transform);
+    }
 
     const glm::mat4 subTransform = _transform * this->transform.getMatrix();
-    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
     int renderedEntities = 0;
 
     if (!camera.isInFrustum(this->boundingSphere))
@@ -144,7 +150,11 @@ int Group::draw(const render::RenderPipeline &pipeline,
 
     for (const std::unique_ptr<Group> &group : this->groups) {
         // cppcheck-suppress useStlAlgorithm
-        renderedEntities += group->draw(pipeline, camera, subTransform, drawBoundingSpheres);
+        renderedEntities += group->draw(pipeline,
+                                        camera,
+                                        subTransform,
+                                        drawBoundingSpheres,
+                                        drawCatmullRomMotionLines);
     }
 
     if (drawBoundingSpheres)

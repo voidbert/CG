@@ -45,7 +45,9 @@ public:
     void setWindowSize(int width, int height);
     camera::Camera &getCamera();
 
-    int draw(const render::RenderPipeline &pipeline, bool drawBoundingSpheres) const;
+    int draw(const render::RenderPipeline &pipeline,
+             bool drawBoundingSpheres,
+             bool drawCatmullRomMotionLines) const;
 };
 
 }
