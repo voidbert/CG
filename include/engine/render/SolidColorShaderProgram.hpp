@@ -16,35 +16,25 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
-#include <vector>
+#include <string>
 
-#include "engine/render/RenderPipelineManager.hpp"
-#include "utils/Vertex.hpp"
+#include "engine/render/ShaderProgram.hpp"
 
 namespace engine::render {
 
-class Model; // Importing model would lead to a recursive inclusion
-
-class BoundingSphere {
+class SolidColorShaderProgram : public ShaderProgram {
 private:
-    glm::vec4 center;
-    float radius;
-
-    static Model *sphereModel;
-    static bool initializingSphereModel;
+    static const std::string vertexShaderSource, fragmentShaderSource;
 
 public:
-    BoundingSphere();
-    BoundingSphere(const glm::vec4 &_center, float _radius);
-    BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform);
-    explicit BoundingSphere(const std::vector<utils::Vertex> &vertices);
+    SolidColorShaderProgram();
+    SolidColorShaderProgram(const SolidColorShaderProgram &program) = delete;
+    SolidColorShaderProgram(SolidColorShaderProgram &&program) = delete;
 
-    const glm::vec4 &getCenter() const;
-    float getRadius() const;
+    void use() const;
 
-    void draw(RenderPipelineManager &pipelineManager,
-              const glm::mat4 &cameraMatrix,
-              const glm::vec4 &color) const;
+    void setMatrix(const glm::mat4 &matrix) const;
+    void setColor(const glm::vec4 &color) const;
 };
 
 }

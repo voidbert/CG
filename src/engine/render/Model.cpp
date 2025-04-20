@@ -16,8 +16,14 @@
 
 namespace engine::render {
 
+Model::Model(const utils::WavefrontOBJ &objectFile) : Model(objectFile.getIndexedVertices()) {}
+
+Model::Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices) :
+    Model(vertices.first, vertices.second) {}
+
 Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices) :
     boundingSphere(vertices) {
+
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
 
@@ -41,11 +47,6 @@ Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint3
     this->vertexCount = indices.size();
 }
 
-Model::Model(const utils::WavefrontOBJ &objectFile) : Model(objectFile.getIndexedVertices()) {}
-
-Model::Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices) :
-    Model(vertices.first, vertices.second) {}
-
 Model::~Model() {
     glDeleteBuffers(1, &this->vbo);
     glDeleteBuffers(1, &this->ibo);
@@ -56,7 +57,16 @@ const BoundingSphere &Model::getBoundingSphere() const {
     return this->boundingSphere;
 }
 
-void Model::draw() const {
+void Model::draw(RenderPipelineManager &pipelineManager,
+                 const glm::mat4 &transformMatrix,
+                 const glm::vec4 &color,
+                 bool fillPolygons) const {
+
+    const SolidColorShaderProgram &shader = pipelineManager.getSolidColorShaderProgram();
+    pipelineManager.setFillPolygons(fillPolygons);
+    shader.setMatrix(transformMatrix);
+    shader.setColor(color);
+
     glBindVertexArray(this->vao);
     glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
 }

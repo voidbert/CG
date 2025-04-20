@@ -12,40 +12,42 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/render/Axis.hpp"
+#include "engine/render/LineLoop.hpp"
 
 namespace engine::render {
 
-Axis::Axis(const glm::vec3 &direction) {
-    const glm::vec3 normalized = glm::normalize(direction);
-    const glm::vec4 vertices[] = { glm::vec4(normalized * 100'000.0f, 1.0f),
-                                   glm::vec4(normalized * -100'000.0f, 1.0f) };
-
+LineLoop::LineLoop(const std::vector<utils::Vertex> &points) {
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
 
     glGenBuffers(1, &this->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-    glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(glm::vec4), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,
+                 points.size() * sizeof(utils::Vertex),
+                 points.data(),
+                 GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 4, GL_FLOAT, false, 4 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    this->color = glm::vec4(normalized, 1.0f);
+    this->pointCount = points.size();
 }
 
-Axis::~Axis() {
+LineLoop::~LineLoop() {
     glDeleteBuffers(1, &this->vbo);
     glDeleteVertexArrays(1, &this->vao);
 }
 
-void Axis::draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const {
+void LineLoop::draw(RenderPipelineManager &pipelineManager,
+                    const glm::mat4 &transformMatrix,
+                    const glm::vec4 &color) const {
+
     const SolidColorShaderProgram &shader = pipelineManager.getSolidColorShaderProgram();
-    shader.setMatrix(cameraMatrix);
-    shader.setColor(this->color);
+    shader.setMatrix(transformMatrix);
+    shader.setColor(color);
 
     glBindVertexArray(this->vao);
-    glDrawArrays(GL_LINES, 0, 2);
+    glDrawArrays(GL_LINE_LOOP, 0, this->pointCount);
 }
 
 }

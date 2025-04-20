@@ -12,7 +12,6 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <execution>
 #include <numeric>
 #include <stdexcept>
 
@@ -50,13 +49,12 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
     // Parse transform
     const tinyxml2::XMLElement *transformElement = groupElement->FirstChildElement("transform");
     if (transformElement) {
-        transform = TRSTransform(transformElement);
+        transform = transform::TRSTransform(transformElement);
     }
 }
 
 int Group::getEntityCount() const {
     return std::transform_reduce(
-        std::execution::par,
         this->groups.cbegin(),
         this->groups.cend(),
         this->entities.size(),
@@ -69,65 +67,36 @@ void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
 
     // Calculate center of group (approximation for objects around the same size)
     glm::vec4 groupCenter(0.0f);
-
-    groupCenter += std::transform_reduce(std::execution::par,
-                                         this->entities.cbegin(),
-                                         this->entities.cend(),
-                                         glm::vec4(0.0f),
-                                         std::plus<>(),
-                                         [subTransform](const std::unique_ptr<Entity> &entity) {
-                                             entity->updateBoundingSphere(subTransform);
-                                             return entity->getBoundingSphere().getCenter();
-                                         });
-
-    groupCenter += std::transform_reduce(std::execution::par,
-                                         this->groups.cbegin(),
-                                         this->groups.cend(),
-                                         glm::vec4(0.0f),
-                                         std::plus<>(),
-                                         [subTransform](const std::unique_ptr<Group> &group) {
-                                             group->updateBoundingSphere(subTransform);
-                                             return group->boundingSphere.getCenter();
-                                         });
-
+    groupCenter += this->sumBoundingSphereCenters(this->entities, subTransform);
+    groupCenter += this->sumBoundingSphereCenters(this->groups, subTransform);
     groupCenter /= this->entities.size() + this->groups.size();
 
-    const float entitiesRadius = std::transform_reduce(
-        std::execution::par,
-        this->entities.cbegin(),
-        this->entities.cend(),
-        0.0f,
-        [](float d1, float d2) { return std::max(d1, d2); },
-        [groupCenter](const std::unique_ptr<Entity> &entity) {
-            const render::BoundingSphere &entitySphere = entity->getBoundingSphere();
-            return glm::distance(entitySphere.getCenter(), groupCenter) + entitySphere.getRadius();
-        });
-
-    const float groupsRadius = std::transform_reduce(
-        std::execution::par,
-        this->groups.cbegin(),
-        this->groups.cend(),
-        0.0f,
-        [](float d1, float d2) { return std::max(d1, d2); },
-        [groupCenter](const std::unique_ptr<Group> &group) {
-            const render::BoundingSphere &groupSphere = group->boundingSphere;
-            return glm::distance(groupSphere.getCenter(), groupCenter) + groupSphere.getRadius();
-        });
-
+    // Calculate radius of the sphere
+    const float entitiesRadius = this->calculateBoundingSphereRadius(this->entities, groupCenter);
+    const float groupsRadius = this->calculateBoundingSphereRadius(this->groups, groupCenter);
     const float radius = std::max(entitiesRadius, groupsRadius);
+
     this->boundingSphere = render::BoundingSphere(groupCenter, radius);
 }
 
-int Group::draw(const render::RenderPipeline &pipeline,
+void Group::update(float time) {
+    this->transform.update(time);
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        group->update(time);
+    }
+}
+
+int Group::draw(render::RenderPipelineManager &pipelineManager,
                 const camera::Camera &camera,
                 const glm::mat4 &_transform,
-                bool drawBoundingSpheres,
-                bool drawCatmullRomMotionLines) const {
+                bool fillPolygons,
+                bool showBoundingSpheres,
+                bool showAnimationLines) const {
 
     const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
 
-    if (drawCatmullRomMotionLines == true) {
-        this->transform.draw(pipeline, _transform);
+    if (showAnimationLines) {
+        this->transform.draw(pipelineManager, _transform);
     }
 
     const glm::mat4 subTransform = _transform * this->transform.getMatrix();
@@ -140,27 +109,65 @@ int Group::draw(const render::RenderPipeline &pipeline,
         const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
 
         if (camera.isInFrustum(entityBoundingSphere)) {
-            entity->draw(pipeline, subTransform);
+            entity->draw(pipelineManager, subTransform, fillPolygons);
             renderedEntities++; // cppcheck-suppress useStlAlgorithm
 
-            if (drawBoundingSpheres)
-                entityBoundingSphere.draw(pipeline, cameraMatrix);
+            if (showBoundingSpheres) {
+                entityBoundingSphere.draw(pipelineManager,
+                                          cameraMatrix,
+                                          glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            }
         }
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
         // cppcheck-suppress useStlAlgorithm
-        renderedEntities += group->draw(pipeline,
+        renderedEntities += group->draw(pipelineManager,
                                         camera,
                                         subTransform,
-                                        drawBoundingSpheres,
-                                        drawCatmullRomMotionLines);
+                                        fillPolygons,
+                                        showBoundingSpheres,
+                                        showAnimationLines);
     }
 
-    if (drawBoundingSpheres)
-        this->boundingSphere.draw(pipeline, cameraMatrix);
+    if (showBoundingSpheres) {
+        this->boundingSphere.draw(pipelineManager, cameraMatrix, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    }
 
     return renderedEntities;
+}
+
+const render::BoundingSphere &Group::getBoundingSphere() const {
+    return this->boundingSphere;
+}
+
+template<class T>
+glm::vec4 Group::sumBoundingSphereCenters(const std::vector<std::unique_ptr<T>> &ts,
+                                          const glm::mat4 &subTransform) {
+
+    return std::transform_reduce(ts.cbegin(),
+                                 ts.cend(),
+                                 glm::vec4(0.0f),
+                                 std::plus<>(),
+                                 [subTransform](const std::unique_ptr<T> &t) {
+                                     t->updateBoundingSphere(subTransform);
+                                     return t->getBoundingSphere().getCenter();
+                                 });
+}
+
+template<class T>
+float Group::calculateBoundingSphereRadius(const std::vector<std::unique_ptr<T>> &ts,
+                                           const glm::vec4 &groupCenter) {
+
+    return std::transform_reduce(
+        ts.cbegin(),
+        ts.cend(),
+        0.0f,
+        [](float d1, float d2) { return std::max(d1, d2); },
+        [groupCenter](const std::unique_ptr<T> &t) {
+            const render::BoundingSphere &sphere = t->getBoundingSphere();
+            return glm::distance(sphere.getCenter(), groupCenter) + sphere.getRadius();
+        });
 }
 
 }

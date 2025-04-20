@@ -15,36 +15,36 @@
 #pragma once
 
 #include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
+#include <memory>
+#include <tinyxml2.h>
+#include <utility>
 #include <vector>
 
+#include "engine/render/LineLoop.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
-#include "utils/Vertex.hpp"
+#include "engine/scene/transform/BaseTransform.hpp"
 
-namespace engine::render {
+namespace engine::scene::transform {
 
-class Model; // Importing model would lead to a recursive inclusion
-
-class BoundingSphere {
+class AnimatedTranslation : public BaseTransform {
 private:
-    glm::vec4 center;
-    float radius;
+    std::vector<glm::vec3> points;
+    glm::vec3 lastUp;
+    float translationTime;
+    bool align;
 
-    static Model *sphereModel;
-    static bool initializingSphereModel;
+    std::unique_ptr<render::LineLoop> line;
 
 public:
-    BoundingSphere();
-    BoundingSphere(const glm::vec4 &_center, float _radius);
-    BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform);
-    explicit BoundingSphere(const std::vector<utils::Vertex> &vertices);
+    explicit AnimatedTranslation(const tinyxml2::XMLElement *translateElement);
 
-    const glm::vec4 &getCenter() const;
-    float getRadius() const;
+    void update(float time) override;
+    void draw(render::RenderPipelineManager &pipelineManager,
+              const glm::mat4 &transformMatrix) const override;
 
-    void draw(RenderPipelineManager &pipelineManager,
-              const glm::mat4 &cameraMatrix,
-              const glm::vec4 &color) const;
+private:
+    std::pair<glm::vec3, glm::vec3> interpolate(float time);
 };
 
 }

@@ -12,29 +12,17 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
-
-#include <glad/glad.h>
+#include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 
-#include "engine/render/RenderPipelineManager.hpp"
+#include "engine/scene/transform/Scale.hpp"
+#include "utils/XMLUtils.hpp"
 
-namespace engine::render {
+namespace engine::scene::transform {
 
-class Axis {
-private:
-    GLuint vao, vbo;
-    glm::vec4 color;
-
-public:
-    explicit Axis(const glm::vec3 &direction);
-    Axis(const Axis &model) = delete;
-    Axis(Axis &&) = delete;
-    ~Axis();
-
-    void draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const;
-};
+Scale::Scale(const tinyxml2::XMLElement *scaleElement) {
+    this->matrix = glm::scale(utils::XMLUtils::getXYZ(scaleElement));
+}
 
 }

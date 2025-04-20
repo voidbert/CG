@@ -14,10 +14,8 @@
 
 #pragma once
 
-#include <memory>
-
-#include "engine/render/Axis.hpp"
-#include "engine/render/RenderPipeline.hpp"
+#include "engine/render/RenderPipelineManager.hpp"
+#include "engine/scene/camera/CameraController.hpp"
 #include "engine/scene/Scene.hpp"
 #include "engine/window/UI.hpp"
 #include "engine/window/Window.hpp"
@@ -26,18 +24,23 @@ namespace engine::window {
 
 class SceneWindow : public Window {
 private:
-    render::RenderPipeline pipeline;
+    render::RenderPipelineManager pipelineManager;
     scene::Scene scene;
-    render::Axis xAxis, yAxis, zAxis;
+    scene::camera::CameraController cameraController;
+
     UI ui;
+    bool showUI;
 
 public:
     explicit SceneWindow(const std::string &sceneFile);
+    SceneWindow(const SceneWindow &window) = delete;
+    SceneWindow(SceneWindow &&window) = delete;
 
 protected:
     void onUpdate(float time, float timeElapsed) override;
     void onRender() override;
     void onResize(int _width, int _height) override;
+    void onKeyEvent(int key, int action) override;
 };
 
 }

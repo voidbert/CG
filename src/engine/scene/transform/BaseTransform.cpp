@@ -12,29 +12,26 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
+#include "engine/scene/transform/BaseTransform.hpp"
 
-#include <glad/glad.h>
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+namespace engine::scene::transform {
 
-#include "engine/render/RenderPipelineManager.hpp"
+BaseTransform::BaseTransform() : matrix(glm::mat4(1.0f)) {}
+BaseTransform::BaseTransform(const glm::mat4 &_matrix) : matrix(_matrix) {}
 
-namespace engine::render {
+void BaseTransform::update(float time) {
+    static_cast<void>(time);
+}
 
-class Axis {
-private:
-    GLuint vao, vbo;
-    glm::vec4 color;
+const glm::mat4 &BaseTransform::getMatrix() const {
+    return this->matrix;
+}
 
-public:
-    explicit Axis(const glm::vec3 &direction);
-    Axis(const Axis &model) = delete;
-    Axis(Axis &&) = delete;
-    ~Axis();
+void BaseTransform::draw(render::RenderPipelineManager &pipelineManager,
+                         const glm::mat4 &transformMatrix) const {
 
-    void draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const;
-};
+    static_cast<void>(pipelineManager);
+    static_cast<void>(transformMatrix);
+}
 
 }

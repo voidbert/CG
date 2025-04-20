@@ -15,9 +15,12 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/mat4x4.hpp>
+#include <glm/vec4.hpp>
 #include <vector>
 
 #include "engine/render/BoundingSphere.hpp"
+#include "engine/render/RenderPipelineManager.hpp"
 #include "utils/Vertex.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
@@ -26,11 +29,10 @@ namespace engine::render {
 class Model {
 private:
     GLuint vao, vbo, ibo;
-    unsigned int vertexCount;
+    int vertexCount;
     BoundingSphere boundingSphere;
 
 public:
-    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
     explicit Model(const utils::WavefrontOBJ &objectFile);
     Model(const Model &model) = delete;
     Model(Model &&) = delete;
@@ -38,11 +40,14 @@ public:
 
     const BoundingSphere &getBoundingSphere() const;
 
-    void draw() const;
+    void draw(RenderPipelineManager &pipelineManager,
+              const glm::mat4 &transformMatrix,
+              const glm::vec4 &color,
+              bool fillPolygons) const;
 
 private:
     explicit Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices);
-    void calculateBoundingSphere();
+    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
 };
 
 }

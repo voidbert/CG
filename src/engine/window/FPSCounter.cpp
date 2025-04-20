@@ -12,33 +12,27 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
+#include <GLFW/glfw3.h>
 
-#include "engine/scene/camera/Camera.hpp"
 #include "engine/window/FPSCounter.hpp"
-#include "engine/window/Window.hpp"
 
 namespace engine::window {
 
-class UI {
-private:
-    scene::camera::Camera &camera;
-    FPSCounter fpsCounter;
-    int entityCount;
-    bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines;
+FPSCounter::FPSCounter() : lastSecond(glfwGetTime()), fps(0), frameCount(0) {}
 
-public:
-    UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
-    ~UI();
+void FPSCounter::countFrame() {
+    const float currentTime = glfwGetTime();
+    this->frameCount++;
 
-    bool isCapturingKeyboard() const;
-    void draw(int renderedEntities);
+    if (currentTime - lastSecond >= 1.0f) {
+        lastSecond = currentTime;
+        fps = frameCount;
+        frameCount = 0;
+    }
+}
 
-    bool shouldFillPolygons() const;
-    bool shouldCullBackFaces() const;
-    bool shouldShowAxes() const;
-    bool shouldShowBoundingSpheres() const;
-    bool shouldShowAnimationLines() const;
-};
+int FPSCounter::getFPS() {
+    return this->fps;
+}
 
 }

@@ -14,31 +14,23 @@
 
 #pragma once
 
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <tinyxml2.h>
+#include <unordered_map>
+
+#include "engine/render/Model.hpp"
 #include "engine/scene/camera/Camera.hpp"
-#include "engine/window/FPSCounter.hpp"
-#include "engine/window/Window.hpp"
 
-namespace engine::window {
+namespace engine::scene::camera {
 
-class UI {
-private:
-    scene::camera::Camera &camera;
-    FPSCounter fpsCounter;
-    int entityCount;
-    bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines;
-
+class CameraFactory {
 public:
-    UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
-    ~UI();
-
-    bool isCapturingKeyboard() const;
-    void draw(int renderedEntities);
-
-    bool shouldFillPolygons() const;
-    bool shouldCullBackFaces() const;
-    bool shouldShowAxes() const;
-    bool shouldShowBoundingSpheres() const;
-    bool shouldShowAnimationLines() const;
+    static std::unique_ptr<Camera> createFromXML(
+        const tinyxml2::XMLElement *cameraElement,
+        const std::filesystem::path &sceneDirectory,
+        std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
 };
 
 }

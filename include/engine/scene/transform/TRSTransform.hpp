@@ -14,27 +14,26 @@
 
 #pragma once
 
-#include <glad/glad.h>
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+#include <array>
+#include <memory>
+#include <tinyxml2.h>
 
 #include "engine/render/RenderPipelineManager.hpp"
+#include "engine/scene/transform/BaseTransform.hpp"
 
-namespace engine::render {
+namespace engine::scene::transform {
 
-class Axis {
+class TRSTransform : public BaseTransform {
 private:
-    GLuint vao, vbo;
-    glm::vec4 color;
+    std::array<std::unique_ptr<BaseTransform>, 3> transforms;
 
 public:
-    explicit Axis(const glm::vec3 &direction);
-    Axis(const Axis &model) = delete;
-    Axis(Axis &&) = delete;
-    ~Axis();
+    TRSTransform();
+    explicit TRSTransform(const tinyxml2::XMLElement *transformElement);
 
-    void draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const;
+    void update(float time) override;
+    void draw(render::RenderPipelineManager &pipelineManager,
+              const glm::mat4 &transformMatrix) const override;
 };
 
 }

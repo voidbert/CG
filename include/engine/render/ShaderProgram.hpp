@@ -15,26 +15,24 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-
-#include "engine/render/RenderPipelineManager.hpp"
+#include <string>
 
 namespace engine::render {
 
-class Axis {
+class ShaderProgram {
 private:
-    GLuint vao, vbo;
-    glm::vec4 color;
+    GLuint vertexShader, fragmentShader, program;
 
 public:
-    explicit Axis(const glm::vec3 &direction);
-    Axis(const Axis &model) = delete;
-    Axis(Axis &&) = delete;
-    ~Axis();
+    ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource);
+    ShaderProgram(const ShaderProgram &program) = delete;
+    ShaderProgram(ShaderProgram &&program) = delete;
+    ~ShaderProgram();
 
-    void draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const;
+    virtual void use() const;
+
+private:
+    GLuint compileShader(GLenum type, const std::string &source);
 };
 
 }

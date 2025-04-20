@@ -22,11 +22,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "engine/camera/Camera.hpp"
 #include "engine/render/BoundingSphere.hpp"
-#include "engine/render/RenderPipeline.hpp"
+#include "engine/render/RenderPipelineManager.hpp"
+#include "engine/scene/camera/Camera.hpp"
 #include "engine/scene/Entity.hpp"
-#include "engine/scene/TRSTransform.hpp"
+#include "engine/scene/transform/TRSTransform.hpp"
 
 namespace engine::scene {
 
@@ -35,23 +35,37 @@ private:
     std::vector<std::unique_ptr<Entity>> entities;
     std::vector<std::unique_ptr<Group>> groups;
     render::BoundingSphere boundingSphere;
-    TRSTransform transform;
+    transform::TRSTransform transform;
 
 public:
     Group(const tinyxml2::XMLElement *groupElement,
           const std::filesystem::path &sceneDirectory,
           std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
-    Group(const Group &entity) = delete;
-    Group(Group &&entity) = delete;
+    Group(const Group &group) = delete;
+    Group(Group &&group) = delete;
 
     int getEntityCount() const;
     void updateBoundingSphere(const glm::mat4 &worldTransform);
 
-    int draw(const render::RenderPipeline &pipeline,
+    void update(float time);
+
+    int draw(render::RenderPipelineManager &pipelineManager,
              const camera::Camera &camera,
              const glm::mat4 &_transform,
-             bool drawBoundingSpheres,
-             bool drawCatmullRomMotionLines) const;
+             bool fillPolygons,
+             bool showBoundingSpheres,
+             bool showAnimationLines) const;
+
+private:
+    const render::BoundingSphere &getBoundingSphere() const;
+
+    template<class T>
+    glm::vec4 sumBoundingSphereCenters(const std::vector<std::unique_ptr<T>> &ts,
+                                       const glm::mat4 &subTransform);
+
+    template<class T>
+    float calculateBoundingSphereRadius(const std::vector<std::unique_ptr<T>> &ts,
+                                        const glm::vec4 &groupCenter);
 };
 
 }

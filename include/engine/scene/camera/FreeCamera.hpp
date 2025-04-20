@@ -14,31 +14,32 @@
 
 #pragma once
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 #include "engine/scene/camera/Camera.hpp"
-#include "engine/window/FPSCounter.hpp"
-#include "engine/window/Window.hpp"
 
-namespace engine::window {
+namespace engine::scene::camera {
 
-class UI {
+class FreeCamera : public Camera {
 private:
-    scene::camera::Camera &camera;
-    FPSCounter fpsCounter;
-    int entityCount;
-    bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines;
+    float yaw, pitch;
 
 public:
-    UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
-    ~UI();
+    FreeCamera(const glm::vec3 &_position,
+               const glm::vec3 &_lookAt,
+               const glm::vec3 &_up,
+               float _fov,
+               float _near,
+               float _far);
 
-    bool isCapturingKeyboard() const;
-    void draw(int renderedEntities);
+    void setPosition(const glm::vec3 &pos) override;
 
-    bool shouldFillPolygons() const;
-    bool shouldCullBackFaces() const;
-    bool shouldShowAxes() const;
-    bool shouldShowBoundingSpheres() const;
-    bool shouldShowAnimationLines() const;
+    void move(const glm::vec3 &v) override;
+    void pan(const glm::vec2 &v) override;
+
+private:
+    void update() override;
 };
 
 }

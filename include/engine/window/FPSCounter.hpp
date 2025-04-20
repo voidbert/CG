@@ -14,31 +14,18 @@
 
 #pragma once
 
-#include "engine/scene/camera/Camera.hpp"
-#include "engine/window/FPSCounter.hpp"
-#include "engine/window/Window.hpp"
-
 namespace engine::window {
 
-class UI {
+class FPSCounter {
 private:
-    scene::camera::Camera &camera;
-    FPSCounter fpsCounter;
-    int entityCount;
-    bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines;
+    float lastSecond;
+    int fps, frameCount;
 
 public:
-    UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
-    ~UI();
+    FPSCounter();
 
-    bool isCapturingKeyboard() const;
-    void draw(int renderedEntities);
-
-    bool shouldFillPolygons() const;
-    bool shouldCullBackFaces() const;
-    bool shouldShowAxes() const;
-    bool shouldShowBoundingSpheres() const;
-    bool shouldShowAnimationLines() const;
+    void countFrame();
+    int getFPS();
 };
 
 }

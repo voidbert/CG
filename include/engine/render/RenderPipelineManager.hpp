@@ -14,27 +14,28 @@
 
 #pragma once
 
-#include <glad/glad.h>
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-
-#include "engine/render/RenderPipelineManager.hpp"
+#include "engine/render/ShaderProgram.hpp"
+#include "engine/render/SolidColorShaderProgram.hpp"
 
 namespace engine::render {
 
-class Axis {
+class RenderPipelineManager {
 private:
-    GLuint vao, vbo;
-    glm::vec4 color;
+    SolidColorShaderProgram solidColorShaderProgram;
+    ShaderProgram *currentProgram;
+    bool currentfillPolygons;
 
 public:
-    explicit Axis(const glm::vec3 &direction);
-    Axis(const Axis &model) = delete;
-    Axis(Axis &&) = delete;
-    ~Axis();
+    RenderPipelineManager();
+    RenderPipelineManager(const RenderPipelineManager &model) = delete;
+    RenderPipelineManager(RenderPipelineManager &&) = delete;
 
-    void draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const;
+    void setFillPolygons(bool fillPolygons);
+
+    const SolidColorShaderProgram &getSolidColorShaderProgram();
+
+private:
+    void useProgram(ShaderProgram *program);
 };
 
 }

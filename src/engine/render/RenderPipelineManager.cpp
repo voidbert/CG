@@ -12,29 +12,32 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
-
 #include <glad/glad.h>
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 
 #include "engine/render/RenderPipelineManager.hpp"
 
 namespace engine::render {
 
-class Axis {
-private:
-    GLuint vao, vbo;
-    glm::vec4 color;
+RenderPipelineManager::RenderPipelineManager() :
+    solidColorShaderProgram(), currentProgram(nullptr), currentfillPolygons(true) {}
 
-public:
-    explicit Axis(const glm::vec3 &direction);
-    Axis(const Axis &model) = delete;
-    Axis(Axis &&) = delete;
-    ~Axis();
+void RenderPipelineManager::setFillPolygons(bool fillPolygons) {
+    if (this->currentfillPolygons != fillPolygons) {
+        glPolygonMode(GL_FRONT_AND_BACK, fillPolygons ? GL_FILL : GL_LINE);
+        this->currentfillPolygons = fillPolygons;
+    }
+}
 
-    void draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const;
-};
+const SolidColorShaderProgram &RenderPipelineManager::getSolidColorShaderProgram() {
+    this->useProgram(&this->solidColorShaderProgram);
+    return this->solidColorShaderProgram;
+}
+
+void RenderPipelineManager::useProgram(ShaderProgram *program) {
+    if (this->currentProgram != program) {
+        program->use();
+        this->currentProgram = program;
+    }
+}
 
 }

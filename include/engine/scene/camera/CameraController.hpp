@@ -14,31 +14,24 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include "engine/scene/camera/Camera.hpp"
-#include "engine/window/FPSCounter.hpp"
-#include "engine/window/Window.hpp"
 
-namespace engine::window {
+namespace engine::scene::camera {
 
-class UI {
+class CameraController {
 private:
-    scene::camera::Camera &camera;
-    FPSCounter fpsCounter;
-    int entityCount;
-    bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines;
+    Camera &camera;
+    std::unordered_map<int, float> pressedKeys;
 
 public:
-    UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
-    ~UI();
+    explicit CameraController(Camera &_camera);
+    CameraController(const CameraController &controller) = delete;
+    CameraController(CameraController &&controller) = delete;
 
-    bool isCapturingKeyboard() const;
-    void draw(int renderedEntities);
-
-    bool shouldFillPolygons() const;
-    bool shouldCullBackFaces() const;
-    bool shouldShowAxes() const;
-    bool shouldShowBoundingSpheres() const;
-    bool shouldShowAnimationLines() const;
+    void onUpdate(float time);
+    void onKeyEvent(int key, int action);
 };
 
 }

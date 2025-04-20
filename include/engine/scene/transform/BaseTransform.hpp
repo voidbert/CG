@@ -14,27 +14,24 @@
 
 #pragma once
 
-#include <glad/glad.h>
 #include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 
 #include "engine/render/RenderPipelineManager.hpp"
 
-namespace engine::render {
+namespace engine::scene::transform {
 
-class Axis {
-private:
-    GLuint vao, vbo;
-    glm::vec4 color;
+class BaseTransform {
+protected:
+    glm::mat4 matrix;
 
 public:
-    explicit Axis(const glm::vec3 &direction);
-    Axis(const Axis &model) = delete;
-    Axis(Axis &&) = delete;
-    ~Axis();
+    BaseTransform();
+    BaseTransform(const glm::mat4 &_matrix);
 
-    void draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const;
+    virtual void update(float time);
+    virtual const glm::mat4 &getMatrix() const;
+    virtual void draw(render::RenderPipelineManager &pipelineManager,
+                      const glm::mat4 &transformMatrix) const;
 };
 
 }
