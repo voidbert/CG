@@ -312,6 +312,119 @@ por \emph{patch}.
 
 \subsection{Animação dos Objetos}
 
+Um dos principais objetivos desta fase consistiu na introdução de animações, nomeadamente
+translações e rotações dependentes da passagem do tempo. Na fase anterior, foram implementadas
+apenas transformações estáticas, ou seja, transformações que não variam com a passagem do tempo.
+Na fase atual, passou a ser possível aplicar translações e rotações em função do tempo,
+ou seja, de forma dinâmica. Assim, as translações e rotações podem agora evoluir ao longo do tempo,
+permitindo criar animações. Importa salientar que continua a ser possível utilizá-las de forma
+estática, sem qualquer dependência temporal, conforme os requisitos do projeto.
+
+Estas novas tranformações são dependentes do tempo, ou seja, a sua execução do ínicio ao fim decorre
+num determinado tempo definido e volta a repetir-se continuamente até ao final do programa.
+Por exemplo, numa rotação uma volta completa demora um determinado tempo definido e numa translação
+percorrer todos os pontos também demora um determinado tempo definido. Assim, era necessário guardar
+este tempo de execução. As classes Rotation e Translation, usadas para a rotação estática e
+translação estática respetivamente, não possuem este atributo. Assim, foi necessário criar duas
+novas classes: AnimatedRotation e AnimatedTranslation, para a rotação dinâmica e para a translação
+dinâmica respetivamente, ambas com o atributo do tempo de execução.
+
+\subsubsection{Rotação}
+
+A rotação dinâmica é bastante parecida com a rotação estática. A primeira diferença é que enquanto a
+rotação estática recebe um ângulo, a rotação dinâmica recebe o tempo passado desde o ínicio. Na
+rotação estática, usavamos este ângulo para calcular a matriz de rotação. Na rotação dinâmica, para
+calcular a matriz de rotação usamos o seguinte ângulo, calculado em função do tempo passado e em
+função do tempo de uma volta completa (o tempo de execução que é dado no XML):
+
+$$
+\alpha = \frac{\text{tempo passado}}{\text{tempo de uma volta completa}} \times 2\pi
+$$
+$$
+$$
+$$
+\text{tempo passado} \geq 0
+$$
+$$
+\text{tempo de uma volta completa} > 0
+$$
+
+Como o tempo que passou é sempre positivo (ou nulo), então a rotação sofrida tinha sempre o
+mesmo sentido, no caso, o sentido anti-horário. Para rodar os objetos no sentido
+horário, basta multiplicar o ângulo calculado anteriormente por (-1):
+$$
+\alpha = (-1) \times \frac{\text{tempo passado}}{\text{tempo de uma volta completa}} \times 2\pi
+$$
+Para existir a possibilidade de rodar os objetos no sentido horário, acrescentei no XML nas
+rotações, um atributo opcional chamado clockwise.
+
+Se o atributo clockwise for "true", como no exemplo em baixo, então iremos rodar o objeto no
+sentido horário (clockwise).
+\lstset{language=xml}
+\begin{lstlisting}
+
+    <rotate time= "10" x="0" y="1" z="0" clockwise="true"/>
+
+\end{lstlisting}
+Se o atributo clockwise for "false", como na primeira linha do exemplo em baixo, ou se o
+atributo nem sequer for indicado, como na segunda linha do exemplo em baixo, então iremos
+rodar o objeto no sentido anti-horário. Assim, o sentido anti-horário é o sentido default.
+\lstset{language=xml}
+\begin{lstlisting}
+
+    <rotate time= "10" x="0" y="1" z="0" clockwise="false"/>
+    <rotate time= "10" x="0" y="1" z="0"/>
+
+\end{lstlisting}
+
+\subsubsection{Translação}
+
+$$
+T = \begin{bmatrix} t^3 \\ t^2 \\ t \\ 1.0 \end{bmatrix}
+$$
+$$
+dT = \begin{bmatrix} 3 \cdot t^2 \\ 2 \cdot t \\ 1.0 \\ 0.0 \end{bmatrix}
+$$
+
+$$
+M_{\text{Catmull Rom}} =
+\begin{bmatrix}
+    -0.5 & 1   & -0.5 & 0 \\
+    1.5  & -2.5 & 0    & 1 \\
+    -1.5 & 2   & 0.5  & 0 \\
+    0.5  & -0.5 & 0    & 0
+\end{bmatrix}
+$$
+
+\[
+\mathbf{p}_x = \begin{pmatrix} p_0^x \\ p_1^x \\ p_2^x \\ p_3^x \end{pmatrix}, \quad
+\mathbf{p}_y = \begin{pmatrix} p_0^y \\ p_1^y \\ p_2^y \\ p_3^y \end{pmatrix}, \quad
+\mathbf{p}_z = \begin{pmatrix} p_0^z \\ p_1^z \\ p_2^z \\ p_3^z \end{pmatrix}
+\]
+
+\[
+x = \mathbf{T} \cdot (\mathbf{M} \cdot \mathbf{p}_x), \quad
+y = \mathbf{T} \cdot (\mathbf{M} \cdot \mathbf{p}_y), \quad
+z = \mathbf{T} \cdot (\mathbf{M} \cdot \mathbf{p}_z)
+\]
+
+\[
+\mathbf{pos} = \begin{pmatrix} x \\ y \\ z \end{pmatrix}
+\]
+
+\[
+\frac{d\mathbf{T}}{dt} = \mathbf{dT}, \quad
+dx = \mathbf{dT} \cdot (\mathbf{M} \cdot \mathbf{p}_x), \quad
+dy = \mathbf{dT} \cdot (\mathbf{M} \cdot \mathbf{p}_y), \quad
+dz = \mathbf{dT} \cdot (\mathbf{M} \cdot \mathbf{p}_z)
+\]
+
+\[
+\mathbf{deriv} = \begin{pmatrix} dx \\ dy \\ dz \end{pmatrix}
+\]
+
+
+
 \subsection{\emph{Vertex Buffer Objects} (VBOs)}
 
 Um dos objetivos do nosso grupo foi utilizar uma versão atual do OpenGL devido ao maior número de
