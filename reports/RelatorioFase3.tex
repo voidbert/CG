@@ -320,7 +320,7 @@ ou seja, de forma dinâmica. Assim, as translações e rotações podem agora ev
 permitindo criar animações. Importa salientar que continua a ser possível utilizá-las de forma
 estática, sem qualquer dependência temporal, conforme os requisitos do projeto.
 
-Estas novas tranformações são dependentes do tempo, ou seja, a sua execução do ínicio ao fim decorre
+Estas novas tranformações são dependentes do tempo e a sua execução do ínicio ao fim decorre
 num determinado tempo definido e volta a repetir-se continuamente até ao final do programa.
 Por exemplo, numa rotação uma volta completa demora um determinado tempo definido e numa translação
 percorrer todos os pontos também demora um determinado tempo definido. Assim, era necessário guardar
@@ -333,8 +333,8 @@ dinâmica respetivamente, ambas com o atributo do tempo de execução.
 
 A rotação dinâmica é bastante parecida com a rotação estática. A primeira diferença é que enquanto a
 rotação estática recebe um ângulo, a rotação dinâmica recebe o tempo passado desde o ínicio. Na
-rotação estática, usavamos este ângulo para calcular a matriz de rotação. Na rotação dinâmica, para
-calcular a matriz de rotação usamos o seguinte ângulo, calculado em função do tempo passado e em
+rotação estática, era usado o ângulo para calcular a matriz de rotação. Na rotação dinâmica, para
+calcular a matriz de rotação é usado o ângulo $\alpha$, calculado em função do tempo passado e em
 função do tempo de uma volta completa (o tempo de execução que é dado no XML):
 
 $$
@@ -356,7 +356,7 @@ $$
 \alpha = (-1) \times \frac{\text{tempo passado}}{\text{tempo de uma volta completa}} \times 2\pi
 $$
 Para existir a possibilidade de rodar os objetos no sentido horário, acrescentei no XML nas
-rotações, um atributo opcional chamado clockwise.
+rotações um atributo opcional chamado clockwise.
 
 Se o atributo clockwise for "true", como no exemplo em baixo, então iremos rodar o objeto no
 sentido horário (clockwise).
@@ -376,8 +376,34 @@ rodar o objeto no sentido anti-horário. Assim, o sentido anti-horário é o sen
     <rotate time= "10" x="0" y="1" z="0"/>
 
 \end{lstlisting}
+Para guardar o sentido da rotação, a rotação dinâmica tem um atributo chamado direction
+que é 1 se o sentido for anti-horário e (-1) se o sentido for horário. Este atributo é
+então usado para obtermos o angulo $\alpha$ (considera o atributo direction como sendo
+o sentido):
+$$
+\alpha = \text{sentido} \times \frac{\text{tempo passado}}{\text{tempo de uma volta completa}}
+\times 2\pi
+$$
+$$
+$$
+$$
+\text{tempo passado} \geq 0
+$$
+$$
+\text{tempo de uma volta completa} > 0
+$$
+$$
+\text{sentido} \in \{ 1, -1 \}
+$$
 
 \subsubsection{Translação}
+
+A translação dinâmica é muito diferente da translação estática. Nesta translação
+dinâmica guardamos o tempo de execução como já referido anteriormente, um booleano
+chamado align que nos indica se o objeto está alinhado com a curva, os pontos da
+curva e um Line.
+
+O Line é usado para desenharmos a linha de movimento Catmull-Rom.
 
 $$
 T = \begin{bmatrix} t^3 \\ t^2 \\ t \\ 1.0 \end{bmatrix}
@@ -423,7 +449,24 @@ dz = \mathbf{dT} \cdot (\mathbf{M} \cdot \mathbf{p}_z)
 \mathbf{deriv} = \begin{pmatrix} dx \\ dy \\ dz \end{pmatrix}
 \]
 
+\subsubsection{Linhas Catmull-Rom}
 
+No nosso programa, podemos tanto visualizar as linhas de movimento Catmull-Rom (default)
+como escondê-las. Basta manipular a opção \textbf{Show Catmull-Rom Motion Lines} do Menu.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{res/phase3/ShowCatmullRomMotionLines.png}
+    \caption{Mostrar as linhas de movimento Catmull-Rom na cena de
+    uma esfera com trajetória em forma de coração.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{res/phase3/HideCatmullRomMotionLines.png}
+    \caption{Esconder as linhas de movimento Catmull-Rom na cena de
+    uma esfera com trajetória em forma de coração.}
+\end{figure}
 
 \subsection{\emph{Vertex Buffer Objects} (VBOs)}
 
