@@ -114,7 +114,8 @@ void ThirdPersonCamera::draw(const render::RenderPipeline &pipeline, bool drawBo
     this->player->draw(pipeline,
                        *this,
                        this->getCameraMatrix() * worldTransform,
-                       drawBoundingSpheres, false);
+                       drawBoundingSpheres,
+                       false);
 }
 
 }
