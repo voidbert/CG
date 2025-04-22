@@ -332,7 +332,7 @@ dinâmica respetivamente, ambas com o atributo do tempo de execução.
 \subsubsection{Rotação}
 
 A rotação dinâmica é bastante parecida com a rotação estática. A primeira diferença é que enquanto a
-rotação estática recebe um ângulo, a rotação dinâmica recebe o tempo passado desde o ínicio. Na
+rotação estática recebe um ângulo, a rotação dinâmica calcula o tempo passado desde o ínicio. Na
 rotação estática, era usado o ângulo para calcular a matriz de rotação. Na rotação dinâmica, para
 calcular a matriz de rotação é usado o ângulo $\alpha$, calculado em função do tempo passado e em
 função do tempo de uma volta completa (o tempo de execução que é dado no XML):
@@ -379,7 +379,7 @@ rodar o objeto no sentido anti-horário. Assim, o sentido anti-horário é o sen
 Para guardar o sentido da rotação, a rotação dinâmica tem um atributo chamado direction
 que é 1 se o sentido for anti-horário e (-1) se o sentido for horário. Este atributo é
 então usado para obtermos o angulo $\alpha$ (considera o atributo direction como sendo
-o sentido):
+o sentido nesta fórmula):
 $$
 \alpha = \text{sentido} \times \frac{\text{tempo passado}}{\text{tempo de uma volta completa}}
 \times 2\pi
@@ -398,19 +398,54 @@ $$
 
 \subsubsection{Translação}
 
-A translação dinâmica é muito diferente da translação estática. Nesta translação
-dinâmica guardamos o tempo de execução como já referido anteriormente, um booleano
-chamado align que nos indica se o objeto está alinhado com a curva, os pontos da
-curva e um Line.
+Para a implementação da translação animada de objetos na cena, foi utilizada
+uma curva de interpolação suave conhecida como \textbf{Catmull-Rom}.
+Essa curva permite gerar trajetórias que passam por um conjunto de pontos de
+controle, criando um movimento contínuo e suave ao longo do tempo.
 
-O Line é usado para desenharmos a linha de movimento Catmull-Rom.
+Numa translação dinâmica, o ficheiro XML fornece três elementos principais:
+o tempo de execução, previamente referido; um valor booleano designado por
+align, que indica se o objeto deve manter-se alinhado com a orientação da
+curva de Catmull-Rom; e os pontos de controlo que definem essa mesma curva.
+Para além de armazenar estes dados, também foi guardado um objeto Line,
+cuja função é representar graficamente a trajetória descrita pela curva de
+Catmull-Rom ao longo do tempo.
+
+Para obter a matriz de translação num determinado tempo,
+a primeira etapa consiste em calcular o tempo decorrido desde o início da execução
+do programa, utilizando a função glfwGetTime().
+Esse valor é então normalizado utilizando o tempo total definido no XML, da seguinte forma:
+
+\[
+t_{\text{normalizado}} = \frac{t_{\text{passado}} \bmod t_{\text{total}}}{t_{\text{total}}}
+\]
+
+Multiplicando esse valor pelo número total de segmentos (ou seja, pelo número de
+pontos de controlo), obtém-se o parâmetro de tempo global ao longo da curva:
+
+\[
+t_{\text{global}} = t_{\text{normalizado}} \cdot N
+\]
+
+Com este valor, é possível identificar os quatro pontos de controlo mais próximos.
+Depois volta-se a normalizar o tempo e calcula-se a posição do objeto.
+
+Para calcular a posição do objeto, em primeiro lugar, define-se os vetores T e dT.
+
+T é o vetor que representa os termos de uma equação cúbica para calcular a posição no tempo t.
 
 $$
 T = \begin{bmatrix} t^3 \\ t^2 \\ t \\ 1.0 \end{bmatrix}
 $$
+
+dT é o vetor da derivada de T em relação a t, usado para calcular a orientação.
+
 $$
 dT = \begin{bmatrix} 3 \cdot t^2 \\ 2 \cdot t \\ 1.0 \\ 0.0 \end{bmatrix}
 $$
+
+Em segundo lugar, definiu-se a Matriz de Catmull Rom, que define a forma da curva,
+com base nos quatro pontos de controlo.
 
 $$
 M_{\text{Catmull Rom}} =
@@ -422,36 +457,77 @@ M_{\text{Catmull Rom}} =
 \end{bmatrix}
 $$
 
-\[
-\mathbf{p}_x = \begin{pmatrix} p_0^x \\ p_1^x \\ p_2^x \\ p_3^x \end{pmatrix}, \quad
-\mathbf{p}_y = \begin{pmatrix} p_0^y \\ p_1^y \\ p_2^y \\ p_3^y \end{pmatrix}, \quad
-\mathbf{p}_z = \begin{pmatrix} p_0^z \\ p_1^z \\ p_2^z \\ p_3^z \end{pmatrix}
-\]
+Em terceiro lugar, calcula-se os vetores das coordenadas x, y e z correspondentes
+aos quatro pontos de controlo mais próximos. Estes vetores representam, respetivamente,
+os valores de cada coordenada para os pontos p0, p1, p2 e p3 que envolvem o
+segmento atual da curva:
+
+$$
+{p}_x = \begin{bmatrix} p_0^x \\ p_1^x \\ p_2^x \\ p_3^x \end{bmatrix}, \quad
+{p}_y = \begin{bmatrix} p_0^y \\ p_1^y \\ p_2^y \\ p_3^y \end{bmatrix}, \quad
+{p}_z = \begin{bmatrix} p_0^z \\ p_1^z \\ p_2^z \\ p_3^z \end{bmatrix}
+$$
+
+Estes vetores são utilizados em conjunto com a matriz de Catmull-Rom e com o vetor TT,
+permitindo calcular a posição interpolada do objeto ao longo da curva. Para cada coordenada,
+efetua-se a seguinte operação:
+
+$$
+x = {T} \cdot ({M} \cdot {p}_x), \quad
+y = {T} \cdot ({M} \cdot {p}_y), \quad
+z = {T} \cdot ({M} \cdot {p}_z)
+$$
+
+O resultado é a posição tridimensional do objeto sobre a curva no instante atual da animação.
+
+$$
+{pos} = \begin{bmatrix} x \\ y \\ z \end{bmatrix}
+$$
+
+Depois é calculado a derivada da curva no ponto atual para obter a direção do movimento
+(vetor tangente), que pode ser usada para gerar uma matriz de rotação que alinha o objeto
+com a trajetória, isto se o parâmetro align estiver ativado.
+
+Para calcular a derivada faz-se os seguintes cálculos:
+
+$$
+dx = {dT} \cdot ({M} \cdot {p}_x), \quad
+dy = {dT} \cdot ({M} \cdot {p}_y), \quad
+dz = {dT} \cdot ({M} \cdot {p}_z)
+$$
 
 \[
-x = \mathbf{T} \cdot (\mathbf{M} \cdot \mathbf{p}_x), \quad
-y = \mathbf{T} \cdot (\mathbf{M} \cdot \mathbf{p}_y), \quad
-z = \mathbf{T} \cdot (\mathbf{M} \cdot \mathbf{p}_z)
+{deriv} = \begin{bmatrix} dx \\ dy \\ dz \end{bmatrix}
 \]
 
-\[
-\mathbf{pos} = \begin{pmatrix} x \\ y \\ z \end{pmatrix}
-\]
+Caso o parâmetro align esteja ativo, é necessário garantir que o objeto mantenha a sua
+orientação ao longo da curva de Catmull-Rom, ou seja, que "aponte" sempre na direção do
+movimento.
 
-\[
-\frac{d\mathbf{T}}{dt} = \mathbf{dT}, \quad
-dx = \mathbf{dT} \cdot (\mathbf{M} \cdot \mathbf{p}_x), \quad
-dy = \mathbf{dT} \cdot (\mathbf{M} \cdot \mathbf{p}_y), \quad
-dz = \mathbf{dT} \cdot (\mathbf{M} \cdot \mathbf{p}_z)
-\]
+TODO
 
-\[
-\mathbf{deriv} = \begin{pmatrix} dx \\ dy \\ dz \end{pmatrix}
-\]
+$$
+M_{\text{rotação}} =
+\begin{bmatrix}
+    -0.5 & 1   & -0.5 & 0 \\
+    1.5  & -2.5 & 0    & 1 \\
+    -1.5 & 2   & 0.5  & 0 \\
+    0  & 0 & 0    & 1
+\end{bmatrix}
+$$
 
-\subsubsection{Linhas Catmull-Rom}
+Por fim, a matriz
+final de transformação resulta da multiplicação da matriz de translação pela matriz de
+rotação (se o alinhamento estiver ativado).
 
-No nosso programa, podemos tanto visualizar as linhas de movimento Catmull-Rom (default)
+$$
+M_{\text{transformação}} = M_{\text{translação}} \cdot M_{\text{rotação}}
+$$
+
+Para representar a trajétoria naquele momento, calcula-se todos os pontos da curva e
+traça-se uma linha na cena com esses pontos, através do objeto Line.
+
+No programa desenvolvido, tanto é possível visualizar as linhas de movimento Catmull-Rom (default)
 como escondê-las. Basta manipular a opção \textbf{Show Catmull-Rom Motion Lines} do Menu.
 
 \begin{figure}[H]
