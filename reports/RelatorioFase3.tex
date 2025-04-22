@@ -468,7 +468,7 @@ $$
 {p}_z = \begin{bmatrix} p_0^z \\ p_1^z \\ p_2^z \\ p_3^z \end{bmatrix}
 $$
 
-Estes vetores são utilizados em conjunto com a matriz de Catmull-Rom e com o vetor TT,
+Estes vetores são utilizados em conjunto com a matriz de Catmull-Rom e com o vetor T,
 permitindo calcular a posição interpolada do objeto ao longo da curva. Para cada coordenada,
 efetua-se a seguinte operação:
 
@@ -482,6 +482,18 @@ O resultado é a posição tridimensional do objeto sobre a curva no instante at
 
 $$
 {pos} = \begin{bmatrix} x \\ y \\ z \end{bmatrix}
+$$
+
+Assim, já é possível calcular a matriz de translação:
+
+$$
+M_{\text{translação}} =
+\begin{bmatrix}
+    1 & 0   & 0  & pos_x \\
+    0  & 1 & 0 & pos_y \\
+    0 & 0  & 1  & pos_z \\
+    0  & 0 & 0    & 1
+\end{bmatrix}
 $$
 
 Depois é calculado a derivada da curva no ponto atual para obter a direção do movimento
@@ -502,16 +514,47 @@ $$
 
 Caso o parâmetro align esteja ativo, é necessário garantir que o objeto mantenha a sua
 orientação ao longo da curva de Catmull-Rom, ou seja, que "aponte" sempre na direção do
-movimento.
+movimento. Para isso, é usada a derivada.
 
-TODO
+Primeiramente, o vetor forward é calculado como a normalização da derivada da curva no
+ponto atual, indicando a direção da curva naquele ponto:
+$$
+f = normalizar(deriv) \\
+$$
+
+O vetor right é obtido como o produto vetorial entre o vetor lastUp e o vetor forward:
+
+$$
+r = normalizar(lastUp \times f)
+$$
+
+O vetor lastUp é o último valor do vetor up e é inicializado da seguinte maneira:
+
+$$
+lastUp=(0,1,0)
+$$
+
+Para garantir a ortogonalidade entre os vetores, o novo vetor up é calculado a
+partir do produto vetorial entre forward e right:
+
+$$
+u = normalizar(f \times r)
+$$
+
+Depois disso, atualizamos o vetor lastUp:
+
+$$
+lastUp = u
+$$
+
+A matriz de rotação é construída usando os vetores ortogonais como colunas:
 
 $$
 M_{\text{rotação}} =
 \begin{bmatrix}
-    -0.5 & 1   & -0.5 & 0 \\
-    1.5  & -2.5 & 0    & 1 \\
-    -1.5 & 2   & 0.5  & 0 \\
+    r_x & u_x   & f_x & 0 \\
+    r_y  & u_y & f_y & 0 \\
+    r_z & u_z  & f_z  & 0 \\
     0  & 0 & 0    & 1
 \end{bmatrix}
 $$
@@ -522,6 +565,12 @@ rotação (se o alinhamento estiver ativado).
 
 $$
 M_{\text{transformação}} = M_{\text{translação}} \cdot M_{\text{rotação}}
+$$
+
+Se não tivermos alinhamento ativado, a transformação limita-se à translação.
+
+$$
+M_{\text{transformação}} = M_{\text{translação}}
 $$
 
 Para representar a trajétoria naquele momento, calcula-se todos os pontos da curva e
