@@ -29,6 +29,7 @@
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
 #include "generator/SolarSystem.hpp"
+#include "generator/SolarSystemDynamic.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace generator {
@@ -215,6 +216,21 @@ int main(int argc, char **argv) {
 
             BezierPatch patch(patchFile, tessellation);
             patch.writeToFile(file);
+        } else if (args.at(1) == "solarSystemD") {
+            if (argc == 3) {
+                SolarSystemDynamic solarSystemDynamic;
+                solarSystemDynamic.writeToFile(file);
+            } else if (argc == 7) {
+                const float sunScale = stringToFloat(args.at(2));
+                const float rockyScale = stringToFloat(args.at(3));
+                const float gasScale = stringToFloat(args.at(4));
+                const float timeScale = stringToFloat(args.at(5));
+
+                SolarSystemDynamic SolarSystemDynamic(sunScale, rockyScale, gasScale, timeScale);
+                SolarSystemDynamic.writeToFile(file);
+            } else {
+                throw std::invalid_argument("Wrong number of command-line arguments");
+            }
         } else {
             printUsage(args[0]);
             return 1;
