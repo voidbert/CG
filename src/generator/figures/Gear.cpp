@@ -31,7 +31,7 @@ Gear::Gear(float majorRadius,
         std::to_string(teeth) + " " + std::to_string(stacks);
 
     const int slices = 4 * teeth;
-    const float sliceStep = 2.0 * glm::pi<float>() / slices;
+    const float sliceStep = glm::two_pi<float>() / slices;
     const float stackStep = height / stacks;
 
     // Outer cylindrical base
