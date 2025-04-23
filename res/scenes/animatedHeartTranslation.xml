@@ -113,7 +113,7 @@
 				</translate>
 			</transform>
 			<models> 
-				<model file="../models/sphere.3d" />
+				<model file="../models/teapot.3d" />
 			</models>
 		</group>
  	</group>
