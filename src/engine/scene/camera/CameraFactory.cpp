@@ -38,7 +38,7 @@ std::unique_ptr<Camera> CameraFactory::createFromXML(
     glm::vec3 up(0.0f, 1.0f, 0.0f);
     try {
         up = utils::XMLUtils::getXYZ(utils::XMLUtils::getSingleChild(cameraElement, "up"));
-    } catch (std::runtime_error &e) {}
+    } catch (std::runtime_error &) {}
 
     // Projection matrix
     float fov = glm::radians(60.0f), near = 1.0f, far = 1000.0f;

@@ -26,7 +26,7 @@ protected:
 
 public:
     BaseTransform();
-    BaseTransform(const glm::mat4 &_matrix);
+    explicit BaseTransform(const glm::mat4 &_matrix);
 
     virtual void update(float time);
     virtual const glm::mat4 &getMatrix() const;
