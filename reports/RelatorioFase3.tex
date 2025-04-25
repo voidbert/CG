@@ -154,11 +154,15 @@ Ademais, a parametrização da geração do Sistema Solar também foi alterada. 
 utilizador menos argumentos, que permitem um controlo semelhante da aparência da cena gerada:
 
 \begin{center}
-\texttt{generator solarSystem [<sunScale> <rockyScale> <gasScale>] <directory>}
+\texttt{generator solarSystem [<sunScale> <rockyScale> <gasScale> <timeScale>] <directory>}
 \end{center}
 
 O utilizador agora pode, opcionalmente, definir a escala aplicada ao Sol (\texttt{sunScale}), aos
-planetas rochosos e asteroides (\texttt{rockyScale}) e aos planetas gasosos (\texttt{gasScale}).
+planetas rochosos e asteroides (\texttt{rockyScale}), aos planetas gasosos (\texttt{gasScale}) e à
+velocidade do sistema solar (\texttt{timeScale}). Este último parâmetro controla a velocidade
+das animações no sistema solar. Se o \texttt{timeScale} for igual a \texttt{0}, o sistema solar será
+estático, ou seja, os corpos celestes não terão movimento.
+
 Também se observa que o \texttt{generator} passa a criar uma diretoria com vários ficheiros, em vez
 de apenas um ficheiro com a cena. Os novos ficheiros criados são os modelos de uma esfera e de um
 \emph{torus}, utilizados nos corpos celestes e nos seus anéis, respetivamente. Isto é uma melhoria
@@ -235,13 +239,22 @@ uma cintura de asteroides são visíveis na figura abaixo.
     \caption{Esferas encapsuladoras dos grupos da cintura de asteroides interna.}
 \end{figure}
 
-{\color{red} TODO - falar de animações}
+Para transformar o sistema solar dinâmico, os corpos celestes passaram a mover-se a partir de
+trajetórias definidas com o \texttt{translate} com o atributo \texttt{time}, onde utilizam
+pontos de controlo distribuídos na circunferência. A rotação foi implementada com o \texttt{rotate},
+também com o tempo, de modo a criar um movimento contínuo em torno do próprio eixo.
+
+Os tempos de translação e rotação foram adaptados com base num fator de escala definido pelo
+utilizador, permitindo ajustar a velocidade geral da simulação. Para o cometa, que é um objeto com
+órbita não circular, os pontos de controlo foram definidos manualmente, de maneira a criar uma
+trajetória mais realista. O modelo do cometa foi realizado com uma \textit{patch} própria,
+conferindo-lhe uma forma mais definida e visualmente distinta.
 
 Por último, tal como foi feito com os modelos 3D, uma cena do Sistema Solar começa com um comentário
 XML como o que pode ser visto abaixo, a enunciar os parâmetros com que foi gerada:
 
 \begin{center}
-    \texttt{<!-- solarSystem 1.000000 10.000000 10.000000 -->}
+    \texttt{<!-- solarSystem 1.000000 10.000000 10.000000 1.000000 -->}
 \end{center}
 
 \subsection{Geração de modelos com base em \emph{patches} de Bézier}
