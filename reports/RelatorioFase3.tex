@@ -373,9 +373,8 @@ uma posição relativa e ajustável.
 
 Tal como a câmara orbital, a câmara em terceira pessoa utiliza coordenadas esféricas para definir a
 posição da câmara em relação ao ponto de interesse, neste caso o jogador. A posição é recalculada
-com base no raio (distância à personagem), ângulo azimutal (rotação horizontal) e ângulo polar
-(inclinação vertical), isto permite ao utilizador ajustar a orientação e distância da câmara de
-forma fluida.
+com base no raio $r$ (distância à personagem), no ângulo azimutal $\phi$ (rotação horizontal) e no
+ângulo polar $\theta$ (inclinação vertical).
 
 As coordenadas cartesianas da posição da câmara, a partir dos valores esféricos, são calculadas da
 seguinte forma:
@@ -384,21 +383,33 @@ $$x = r \sin \theta \cos \phi$$
 $$y = r \cos \theta$$
 $$z = r \sin \theta \sin \phi$$
 
-onde $r$ representa a distância da câmara à personagem, $\theta$ é o ângulo polar (elevação),
-$\phi$ é o ângulo azimutal (rotação em torno da personagem).
+Estes valores são somados às coordenadas da personagem, de forma a posicionar a câmara em relação
+a esta. Isto garante que a câmara está sempre centrada no jogador, independentemente da sua
+posição.
 
-Para garantir um comportamento estável, estes parâmetros são limitados a intervalos específicos, o
-raio é limitado entre $0.5$ e $100$ para evitar que a câmara se aproxime demasiado ou se afaste
-demasiado do jogador. O ângulo azimutal é mantido entre $0$ e $2\pi$ (por modularização), impedir
-que este valor fique demasiado alto ou demasiado baixo faz com que não sejam causados erros de
-precisão de vírgula flutuante caso se deem milhões de voltas à câmara. O ângulo polar está
-restringido ao intervalo $[0.01, \pi - 0.01]$ para evitar problemas de inversão no vetor $\vec{up}$
-da câmara.
+Para garantir um comportamento estável, o raio é limitado de forma a que seja sempre superior a $0$,
+evitando que a câmara se sobreponha ao jogador. O ângulo azimutal é mantido entre $0$ e $2\pi$ por
+modularização, o que previne problemas de precisão de vírgula flutuante em rotações prolongadas.
+O ângulo polar está restringido ao intervalo $[0.01, \pi - 0.01]$ para evitar problemas de inversão
+no vetor $\vec{up}$ da câmara.
 
-Ao movimentar a personagem, a posição da câmara é atualizada de modo a manter uma distância e
-orientação consistentes, para que esta continue a seguir o jogador de forma natural. A câmara
-pode ainda ser rodada ou ajustada em termos de \textit{zoom}, logo o utilizador pode controlar a
-perspetiva com maior flexibilidade.
+Ao movimentar a personagem, a câmara atualiza automaticamente a sua posição para manter uma
+orientação e distância constantes relativamente ao jogador. Esta atualização baseia-se num vetor
+de direção horizontal entre a câmara e o jogador, ignorando a componente vertical ($y$), de modo a
+manter uma orientação consistente enquanto o jogador se desloca num plano horizontal (terreno
+plano). O vetor de movimento é calculado com base nos vetores $\vec{front}$ e $\vec{right}$, tal
+como numa câmara livre, mas com o vetor $\vec{up}$ fixo e sem inclinação vertical:
+
+\begin{itemize}
+    \item $\vec{front} = \text{normalize}( \text{lookAt} - \text{position} )$ projetado no plano
+    $XZ$;
+    \item $\vec{right} = \text{normalize}( \vec{up} \times \vec{front} )$;
+    \item A matriz de orientação local é composta por $\vec{right}$, $\vec{up}$ e $\vec{front}$;
+\end{itemize}
+
+Este modelo apresenta uma limitação: como o movimento é projetado apenas no plano $XZ$, a
+câmara assume que o jogador se move sobre terreno plano. Para jogos com terrenos irregulares ou
+variação de elevação, este comportamento deverá ser adaptado.
 
 O utilizador pode controlar a câmara de terceira pessoa utilizando as seguintes teclas:
 
@@ -407,8 +418,7 @@ O utilizador pode controlar a câmara de terceira pessoa utilizando as seguintes
     \item \texttt{A/D}: Mover a personagem para a esquerda ou para a direita, respetivamente;
     \item Setas Cima / Baixo: Inclinar a câmara para cima ou para baixo, respetivamente;
     \item Setas Esquerda / Direita: Rodar a câmara à volta da personagem;
-    \item \texttt{F}: Aproximar a câmara (\textit{zoom in});
-    \item \texttt{B}: Afastar a câmara (\textit{zoom out}).
+    \item \texttt{+/-}: Aproximar e afastar a câmara do jogador, respetivamente.
 \end{itemize}
 
 \section{Resultados Obtidos}
