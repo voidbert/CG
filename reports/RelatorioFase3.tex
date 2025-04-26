@@ -312,6 +312,287 @@ por \emph{patch}.
 
 \subsection{Animação dos Objetos}
 
+Um dos principais objetivos desta fase consistiu na introdução de animações, nomeadamente
+translações e rotações dependentes da passagem do tempo. Na fase anterior, foram implementadas
+apenas transformações estáticas, ou seja, transformações que não variam com a passagem do tempo.
+Na fase atual, passou a ser possível aplicar translações e rotações em função do tempo,
+ou seja, de forma dinâmica. Assim, as translações e rotações podem agora evoluir ao longo do tempo,
+permitindo criar animações. Importa salientar que continua a ser possível utilizá-las de forma
+estática, sem qualquer dependência temporal, conforme os requisitos do projeto.
+
+Estas novas tranformações são dependentes do tempo e a sua execução do ínicio ao fim decorre
+num determinado tempo definido e volta a repetir-se continuamente até ao final do programa.
+Por exemplo, numa rotação uma volta completa demora um determinado tempo definido e numa translação
+percorrer todos os pontos também demora um determinado tempo definido. Assim, era necessário guardar
+este tempo de execução. As classes Rotation e Translation, usadas para a rotação estática e
+translação estática respetivamente, não possuem este atributo. Assim, foi necessário criar duas
+novas classes: AnimatedRotation e AnimatedTranslation, para a rotação dinâmica e para a translação
+dinâmica respetivamente, ambas com o atributo do tempo de execução.
+
+\subsubsection{Rotação}
+
+A rotação dinâmica é bastante parecida com a rotação estática. A primeira diferença é que enquanto a
+rotação estática recebe um ângulo, a rotação dinâmica calcula o tempo passado desde o ínicio. Na
+rotação estática, era usado o ângulo para calcular a matriz de rotação. Na rotação dinâmica, para
+calcular a matriz de rotação é usado o ângulo $\alpha$, calculado em função do tempo passado e em
+função do tempo de uma volta completa (o tempo de execução que é dado no XML):
+
+$$
+\alpha = \frac{\text{tempo passado}}{\text{tempo de uma volta completa}} \times 2\pi
+$$
+$$
+$$
+$$
+\text{tempo passado} \geq 0
+$$
+$$
+\text{tempo de uma volta completa} > 0
+$$
+
+Como o tempo que passou é sempre positivo (ou nulo), então a rotação sofrida tinha sempre o
+mesmo sentido, no caso, o sentido anti-horário. Para rodar os objetos no sentido
+horário, basta multiplicar o ângulo calculado anteriormente por (-1):
+$$
+\alpha = (-1) \times \frac{\text{tempo passado}}{\text{tempo de uma volta completa}} \times 2\pi
+$$
+Para existir a possibilidade de rodar os objetos no sentido horário, acrescentei no XML nas
+rotações um atributo opcional chamado clockwise.
+
+Se o atributo clockwise for "true", como no exemplo em baixo, então iremos rodar o objeto no
+sentido horário (clockwise).
+\lstset{language=xml}
+\begin{lstlisting}
+
+    <rotate time= "10" x="0" y="1" z="0" clockwise="true"/>
+
+\end{lstlisting}
+Se o atributo clockwise for "false", como na primeira linha do exemplo em baixo, ou se o
+atributo nem sequer for indicado, como na segunda linha do exemplo em baixo, então iremos
+rodar o objeto no sentido anti-horário. Assim, o sentido anti-horário é o sentido default.
+\lstset{language=xml}
+\begin{lstlisting}
+
+    <rotate time= "10" x="0" y="1" z="0" clockwise="false"/>
+    <rotate time= "10" x="0" y="1" z="0"/>
+
+\end{lstlisting}
+Para guardar o sentido da rotação, a rotação dinâmica tem um atributo chamado direction
+que é 1 se o sentido for anti-horário e (-1) se o sentido for horário. Este atributo é
+então usado para obtermos o angulo $\alpha$ (considera o atributo direction como sendo
+o sentido nesta fórmula):
+$$
+\alpha = \text{sentido} \times \frac{\text{tempo passado}}{\text{tempo de uma volta completa}}
+\times 2\pi
+$$
+$$
+$$
+$$
+\text{tempo passado} \geq 0
+$$
+$$
+\text{tempo de uma volta completa} > 0
+$$
+$$
+\text{sentido} \in \{ 1, -1 \}
+$$
+
+\subsubsection{Translação}
+
+Para a implementação da translação animada de objetos na cena, foi utilizada
+uma curva de interpolação suave conhecida como \textbf{Catmull-Rom}.
+Essa curva permite gerar trajetórias que passam por um conjunto de pontos de
+controle, criando um movimento contínuo e suave ao longo do tempo.
+
+Numa translação dinâmica, o ficheiro XML fornece três elementos principais:
+o tempo de execução, previamente referido; um valor booleano designado por
+align, que indica se o objeto deve manter-se alinhado com a orientação da
+curva de Catmull-Rom; e os pontos de controlo que definem essa mesma curva.
+Para além de armazenar estes dados, também foi guardado um objeto Line,
+cuja função é representar graficamente a trajetória descrita pela curva de
+Catmull-Rom ao longo do tempo.
+
+Para obter a matriz de translação num determinado tempo,
+a primeira etapa consiste em calcular o tempo decorrido desde o início da execução
+do programa, utilizando a função glfwGetTime().
+Esse valor é então normalizado utilizando o tempo total definido no XML, da seguinte forma:
+
+\[
+t_{\text{normalizado}} = \frac{t_{\text{passado}} \bmod t_{\text{total}}}{t_{\text{total}}}
+\]
+
+Multiplicando esse valor pelo número total de segmentos (ou seja, pelo número de
+pontos de controlo), obtém-se o parâmetro de tempo global ao longo da curva:
+
+\[
+t_{\text{global}} = t_{\text{normalizado}} \cdot N
+\]
+
+Com este valor, é possível identificar os quatro pontos de controlo mais próximos.
+Depois volta-se a normalizar o tempo e calcula-se a posição do objeto.
+
+Para calcular a posição do objeto, em primeiro lugar, define-se os vetores T e dT.
+
+T é o vetor que representa os termos de uma equação cúbica para calcular a posição no tempo t.
+
+$$
+T = \begin{bmatrix} t^3 \\ t^2 \\ t \\ 1.0 \end{bmatrix}
+$$
+
+dT é o vetor da derivada de T em relação a t, usado para calcular a orientação.
+
+$$
+dT = \begin{bmatrix} 3 \cdot t^2 \\ 2 \cdot t \\ 1.0 \\ 0.0 \end{bmatrix}
+$$
+
+Em segundo lugar, definiu-se a Matriz de Catmull Rom, que define a forma da curva,
+com base nos quatro pontos de controlo.
+
+$$
+M_{\text{Catmull Rom}} =
+\begin{bmatrix}
+    -0.5 & 1   & -0.5 & 0 \\
+    1.5  & -2.5 & 0    & 1 \\
+    -1.5 & 2   & 0.5  & 0 \\
+    0.5  & -0.5 & 0    & 0
+\end{bmatrix}
+$$
+
+Em terceiro lugar, calcula-se os vetores das coordenadas x, y e z correspondentes
+aos quatro pontos de controlo mais próximos. Estes vetores representam, respetivamente,
+os valores de cada coordenada para os pontos p0, p1, p2 e p3 que envolvem o
+segmento atual da curva:
+
+$$
+{p}_x = \begin{bmatrix} p_0^x \\ p_1^x \\ p_2^x \\ p_3^x \end{bmatrix}, \quad
+{p}_y = \begin{bmatrix} p_0^y \\ p_1^y \\ p_2^y \\ p_3^y \end{bmatrix}, \quad
+{p}_z = \begin{bmatrix} p_0^z \\ p_1^z \\ p_2^z \\ p_3^z \end{bmatrix}
+$$
+
+Estes vetores são utilizados em conjunto com a matriz de Catmull-Rom e com o vetor T,
+permitindo calcular a posição interpolada do objeto ao longo da curva. Para cada coordenada,
+efetua-se a seguinte operação:
+
+$$
+x = {T} \cdot ({M} \cdot {p}_x), \quad
+y = {T} \cdot ({M} \cdot {p}_y), \quad
+z = {T} \cdot ({M} \cdot {p}_z)
+$$
+
+O resultado é a posição tridimensional do objeto sobre a curva no instante atual da animação.
+
+$$
+{pos} = \begin{bmatrix} x \\ y \\ z \end{bmatrix}
+$$
+
+Assim, já é possível calcular a matriz de translação:
+
+$$
+M_{\text{translação}} =
+\begin{bmatrix}
+    1 & 0   & 0  & pos_x \\
+    0  & 1 & 0 & pos_y \\
+    0 & 0  & 1  & pos_z \\
+    0  & 0 & 0    & 1
+\end{bmatrix}
+$$
+
+Depois é calculado a derivada da curva no ponto atual para obter a direção do movimento
+(vetor tangente), que pode ser usada para gerar uma matriz de rotação que alinha o objeto
+com a trajetória, isto se o parâmetro align estiver ativado.
+
+Para calcular a derivada faz-se os seguintes cálculos:
+
+$$
+dx = {dT} \cdot ({M} \cdot {p}_x), \quad
+dy = {dT} \cdot ({M} \cdot {p}_y), \quad
+dz = {dT} \cdot ({M} \cdot {p}_z)
+$$
+
+\[
+{deriv} = \begin{bmatrix} dx \\ dy \\ dz \end{bmatrix}
+\]
+
+Caso o parâmetro align esteja ativo, é necessário garantir que o objeto mantenha a sua
+orientação ao longo da curva de Catmull-Rom, ou seja, que "aponte" sempre na direção do
+movimento. Para isso, é usada a derivada.
+
+Primeiramente, o vetor forward é calculado como a normalização da derivada da curva no
+ponto atual, indicando a direção da curva naquele ponto:
+$$
+f = normalizar(deriv) \\
+$$
+
+O vetor right é obtido como o produto vetorial entre o vetor lastUp e o vetor forward:
+
+$$
+r = normalizar(lastUp \times f)
+$$
+
+O vetor lastUp é o último valor do vetor up e é inicializado da seguinte maneira:
+
+$$
+lastUp=(0,1,0)
+$$
+
+Para garantir a ortogonalidade entre os vetores, o novo vetor up é calculado a
+partir do produto vetorial entre forward e right:
+
+$$
+u = normalizar(f \times r)
+$$
+
+Depois disso, atualizamos o vetor lastUp:
+
+$$
+lastUp = u
+$$
+
+A matriz de rotação é construída usando os vetores ortogonais como colunas:
+
+$$
+M_{\text{rotação}} =
+\begin{bmatrix}
+    r_x & u_x   & f_x & 0 \\
+    r_y  & u_y & f_y & 0 \\
+    r_z & u_z  & f_z  & 0 \\
+    0  & 0 & 0    & 1
+\end{bmatrix}
+$$
+
+Por fim, a matriz
+final de transformação resulta da multiplicação da matriz de translação pela matriz de
+rotação (se o alinhamento estiver ativado).
+
+$$
+M_{\text{transformação}} = M_{\text{translação}} \cdot M_{\text{rotação}}
+$$
+
+Se não tivermos alinhamento ativado, a transformação limita-se à translação.
+
+$$
+M_{\text{transformação}} = M_{\text{translação}}
+$$
+
+Para representar a trajétoria naquele momento, calcula-se todos os pontos da curva e
+traça-se uma linha na cena com esses pontos, através do objeto Line.
+
+No programa desenvolvido, tanto é possível visualizar as linhas de movimento Catmull-Rom (default)
+como escondê-las. Basta manipular a opção \textbf{Show Catmull-Rom Motion Lines} do Menu.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{res/phase3/ShowCatmullRomMotionLines.png}
+    \caption{Mostrar as linhas de movimento Catmull-Rom na cena de
+    uma esfera com trajetória em forma de coração.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{res/phase3/HideCatmullRomMotionLines.png}
+    \caption{Esconder as linhas de movimento Catmull-Rom na cena de
+    uma esfera com trajetória em forma de coração.}
+\end{figure}
+
 \subsection{\emph{Vertex Buffer Objects} (VBOs)}
 
 Um dos objetivos do nosso grupo foi utilizar uma versão atual do OpenGL devido ao maior número de
