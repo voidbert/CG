@@ -366,6 +366,61 @@ pela ordem em que surgem no mesmo.
 
 \subsection{Câmara em Terceira Pessoa}
 
+A câmara em terceira pessoa permite acompanhar um objeto enquanto mantém uma
+perspetiva ligeiramente afastada, algo comum em diversos videojogos. Nesta implementação, a câmara
+encontra-se constantemente orientada para o jogador, onde acompanha os seus movimentos a partir de
+uma posição relativa e ajustável.
+
+Tal como a câmara orbital, a câmara em terceira pessoa utiliza coordenadas esféricas para definir a
+posição da câmara em relação ao ponto de interesse, neste caso o jogador. A posição é recalculada
+com base no raio $r$ (distância à personagem), no ângulo azimutal $\phi$ (rotação horizontal) e no
+ângulo polar $\theta$ (inclinação vertical).
+
+As coordenadas cartesianas da posição da câmara, a partir dos valores esféricos, são calculadas da
+seguinte forma:
+
+$$x = r \sin \theta \cos \phi$$
+$$y = r \cos \theta$$
+$$z = r \sin \theta \sin \phi$$
+
+Estes valores são somados às coordenadas da personagem, de forma a posicionar a câmara em relação
+a esta. Isto garante que a câmara está sempre centrada no jogador, independentemente da sua
+posição.
+
+Para garantir um comportamento estável, o raio é limitado de forma a que seja sempre superior a $0$,
+evitando que a câmara se sobreponha ao jogador. O ângulo azimutal é mantido entre $0$ e $2\pi$ por
+modularização, o que previne problemas de precisão de vírgula flutuante em rotações prolongadas.
+O ângulo polar está restringido ao intervalo $[0.01, \pi - 0.01]$ para evitar problemas de inversão
+no vetor $\vec{up}$ da câmara.
+
+Ao movimentar a personagem, a câmara atualiza automaticamente a sua posição para manter uma
+orientação e distância constantes relativamente ao jogador. Esta atualização baseia-se num vetor
+de direção horizontal entre a câmara e o jogador, ignorando a componente vertical ($y$), de modo a
+manter uma orientação consistente enquanto o jogador se desloca num plano horizontal (terreno
+plano). O vetor de movimento é calculado com base nos vetores $\vec{front}$ e $\vec{right}$, tal
+como numa câmara livre, mas com o vetor $\vec{up}$ fixo e sem inclinação vertical:
+
+\begin{itemize}
+    \item $\vec{front} = \text{normalize}( \text{lookAt} - \text{position} )$ projetado no plano
+    $XZ$;
+    \item $\vec{right} = \text{normalize}( \vec{up} \times \vec{front} )$;
+    \item A matriz de orientação local é composta por $\vec{right}$, $\vec{up}$ e $\vec{front}$;
+\end{itemize}
+
+Este modelo apresenta uma limitação: como o movimento é projetado apenas no plano $XZ$, a
+câmara assume que o jogador se move sobre terreno plano. Para jogos com terrenos irregulares ou
+variação de elevação, este comportamento deverá ser adaptado.
+
+O utilizador pode controlar a câmara de terceira pessoa utilizando as seguintes teclas:
+
+\begin{itemize}
+    \item \texttt{W/S}: Avançar ou recuar a personagem, respetivamente;
+    \item \texttt{A/D}: Mover a personagem para a esquerda ou para a direita, respetivamente;
+    \item Setas Cima / Baixo: Inclinar a câmara para cima ou para baixo, respetivamente;
+    \item Setas Esquerda / Direita: Rodar a câmara à volta da personagem;
+    \item \texttt{+/-}: Aproximar e afastar a câmara do jogador, respetivamente.
+\end{itemize}
+
 \section{Resultados Obtidos}
 
 \section{Conclusão e Trabalho Futuro}
