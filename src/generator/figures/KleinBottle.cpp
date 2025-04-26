@@ -24,7 +24,7 @@ KleinBottle::KleinBottle(float radius, int slices, int stacks) {
         std::to_string(stacks);
 
     const float stackStep = glm::pi<float>() / stacks;
-    const float sliceStep = 2 * glm::pi<float>() / slices;
+    const float sliceStep = glm::two_pi<float>() / slices;
 
     for (int iStack = 0; iStack <= stacks; iStack++) {
         const float theta = iStack * stackStep;

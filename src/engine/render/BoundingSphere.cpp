@@ -12,7 +12,6 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <execution>
 #include <glm/geometric.hpp>
 #include <glm/gtx/transform.hpp>
 #include <numeric>
@@ -27,8 +26,8 @@ BoundingSphere::BoundingSphere() : center(0.0f, 0.0f, 0.0f, 1.0f), radius(0.0f) 
     if (!BoundingSphere::sphereModel && !BoundingSphere::initializingSphereModel) {
         BoundingSphere::initializingSphereModel = true;
 
+        // This is only freed when the OpenGL context is destroyed
         generator::figures::Sphere sphere(1.0f, 16, 16);
-        // Free this only with the destruction of the OpenGL context
         BoundingSphere::sphereModel = new Model(sphere);
     }
 }
@@ -38,11 +37,19 @@ BoundingSphere::BoundingSphere(const glm::vec4 &_center, float _radius) : Boundi
     this->radius = _radius;
 }
 
+BoundingSphere::BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform) {
+    const float scalex = glm::length(transform[0]);
+    const float scaley = glm::length(transform[1]);
+    const float scalez = glm::length(transform[2]);
+
+    this->radius = sphere.radius * std::max(scalex, std::max(scaley, scalez));
+    this->center = transform * sphere.center;
+}
+
 BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) : BoundingSphere() {
     // Calculate center of mass
     this->center =
-        std::transform_reduce(std::execution::par,
-                              vertices.cbegin(),
+        std::transform_reduce(vertices.cbegin(),
                               vertices.cend(),
                               glm::vec4(0.0f),
                               std::plus<>(),
@@ -51,7 +58,6 @@ BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) : Bou
 
     // Calculate radius
     this->radius = std::transform_reduce(
-        std::execution::par,
         vertices.cbegin(),
         vertices.cend(),
         -1.0,
@@ -61,17 +67,7 @@ BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) : Bou
         });
 }
 
-BoundingSphere::BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform) {
-    // https://math.stackexchange.com/questions/237369
-    const float scalex = glm::length(transform[0]);
-    const float scaley = glm::length(transform[1]);
-    const float scalez = glm::length(transform[2]);
-
-    this->radius = sphere.radius * std::max(scalex, std::max(scaley, scalez));
-    this->center = transform * sphere.center;
-}
-
-glm::vec4 BoundingSphere::getCenter() const {
+const glm::vec4 &BoundingSphere::getCenter() const {
     return this->center;
 }
 
@@ -79,13 +75,14 @@ float BoundingSphere::getRadius() const {
     return this->radius;
 }
 
-void BoundingSphere::draw(const RenderPipeline &pipeline, const glm::mat4 &cameraMatrix) const {
-    const glm::vec3 translationVector(this->center);
-    const glm::vec3 scaleVector(this->radius);
-    pipeline.setMatrix(cameraMatrix * glm::translate(translationVector) * glm::scale(scaleVector));
+void BoundingSphere::draw(RenderPipelineManager &pipelineManager,
+                          const glm::mat4 &cameraMatrix,
+                          const glm::vec4 &color) const {
 
-    pipeline.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    BoundingSphere::sphereModel->draw();
+    const glm::mat4 transformMatrix = cameraMatrix * glm::translate(glm::vec3(this->center)) *
+        glm::scale(glm::vec3(this->radius));
+
+    BoundingSphere::sphereModel->draw(pipelineManager, transformMatrix, color, false);
 }
 
 Model *BoundingSphere::sphereModel = nullptr;

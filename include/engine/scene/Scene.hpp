@@ -14,16 +14,13 @@
 
 #pragma once
 
-#include <filesystem>
 #include <memory>
 #include <string>
-#include <tinyxml2.h>
-#include <unordered_map>
 #include <vector>
 
-#include "engine/camera/Camera.hpp"
-#include "engine/render/RenderPipeline.hpp"
-#include "engine/scene/Entity.hpp"
+#include "engine/render/Axis.hpp"
+#include "engine/render/RenderPipelineManager.hpp"
+#include "engine/scene/camera/Camera.hpp"
 #include "engine/scene/Group.hpp"
 
 namespace engine::scene {
@@ -33,6 +30,7 @@ private:
     int windowWidth, windowHeight;
     std::unique_ptr<camera::Camera> camera;
     std::vector<std::unique_ptr<Group>> groups;
+    render::Axis xAxis, yAxis, zAxis;
 
 public:
     explicit Scene(const std::string &file);
@@ -42,12 +40,18 @@ public:
     int getWindowWidth() const;
     int getWindowHeight() const;
     int getEntityCount() const;
-    void setWindowSize(int width, int height);
     camera::Camera &getCamera();
 
-    int draw(const render::RenderPipeline &pipeline,
-             bool drawBoundingSpheres,
-             bool drawCatmullRomMotionLines) const;
+    void setWindowSize(int width, int height);
+
+    void update(float time);
+
+    int draw(render::RenderPipelineManager &pipelineManager,
+             bool fillPolygons,
+             bool backFaceCulling,
+             bool showAxes,
+             bool showBoundingSpheres,
+             bool showAnimationLines) const;
 };
 
 }

@@ -13,7 +13,6 @@
 /// limitations under the License.
 
 #include <cmath>
-#include <execution>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
@@ -47,7 +46,6 @@ const std::vector<std::vector<std::string>> FIGURE_USAGES = {
 
 size_t getLengthOfUsageColumn(size_t column) {
     return std::transform_reduce(
-        std::execution::par,
         FIGURE_USAGES.cbegin(),
         FIGURE_USAGES.cend(),
         0,
@@ -79,7 +77,7 @@ void printUsage(const std::string &programName) {
               << std::endl;
 
     std::cerr << std::endl << "Model conversion:" << std::endl;
-    std::cerr << "  " << programName << " bezier <patchFile> <tessellation> <file>" << std::endl;
+    std::cerr << "  " << programName << " patch <patchFile> <tessellation> <file>" << std::endl;
 }
 
 float stringToFloat(const std::string &str) {
@@ -208,7 +206,7 @@ int main(int argc, char **argv) {
             } else {
                 throw std::invalid_argument("Wrong number of command-line arguments");
             }
-        } else if (args.at(1) == "bezier") {
+        } else if (args.at(1) == "patch") {
             validateArgumentCount(argc, 5);
             const std::string &patchFile = args.at(2);
             const int tessellation = stringToInt(args.at(3));

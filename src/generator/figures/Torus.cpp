@@ -24,8 +24,8 @@ Torus::Torus(float majorRadius, float minorRadius, int slices, int sides) {
     this->comment = "torus " + std::to_string(majorRadius) + " " + std::to_string(minorRadius) +
         " " + std::to_string(slices) + " " + std::to_string(sides);
 
-    const float sliceStep = 2 * glm::pi<float>() / slices;
-    const float sideStep = 2 * glm::pi<float>() / sides;
+    const float sliceStep = glm::two_pi<float>() / slices;
+    const float sideStep = glm::two_pi<float>() / sides;
 
     for (int iSlice = 0; iSlice <= slices; iSlice++) {
         const float theta = iSlice * sliceStep;

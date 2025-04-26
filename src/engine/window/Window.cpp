@@ -19,9 +19,8 @@
 
 namespace engine {
 
-Window::Window(const std::string &title, int argWidth, int argHeight) :
-    width(argWidth), height(argHeight) {
-
+Window::Window(const std::string &title, int _width, int _height) : width(_width), height(_height) {
+    // Create window
     if (!glfwInit()) {
         throw std::runtime_error("Failed to initialize GLFW");
     }
@@ -30,22 +29,42 @@ Window::Window(const std::string &title, int argWidth, int argHeight) :
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    this->handle = glfwCreateWindow(argWidth, argHeight, title.c_str(), NULL, NULL);
+
+    this->handle = glfwCreateWindow(_width, _height, title.c_str(), NULL, NULL);
     if (!this->handle) {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW's window");
     }
 
     glfwMakeContextCurrent(this->handle);
+    glfwSetWindowUserPointer(this->handle, this);
 
-    int version = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+    // Set callbacks
+    glfwSetWindowSizeCallback(this->handle,
+                              [](GLFWwindow *_handle, int resizeWidth, int resizeHeight) {
+                                  Window *window =
+                                      reinterpret_cast<Window *>(glfwGetWindowUserPointer(_handle));
+                                  window->width = resizeWidth;
+                                  window->height = resizeHeight;
+                                  window->onResize(resizeWidth, resizeHeight);
+                              });
+
+    glfwSetKeyCallback(this->handle,
+                       [](GLFWwindow *_handle, int key, int scancode, int action, int mods) {
+                           static_cast<void>(scancode);
+                           static_cast<void>(mods);
+
+                           Window *window =
+                               reinterpret_cast<Window *>(glfwGetWindowUserPointer(_handle));
+                           window->onKeyEvent(key, action);
+                       });
+
+    // Load OpenGL
+    const int version = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
     if (version == 0) {
         glfwTerminate();
         throw std::runtime_error("Failed to load OpenGL");
     }
-
-    glfwSetWindowUserPointer(this->handle, this);
-    glfwSetInputMode(this->handle, GLFW_STICKY_KEYS, GLFW_TRUE);
 }
 
 Window::~Window() {
@@ -57,22 +76,16 @@ void Window::runLoop() {
     glfwShowWindow(this->handle);
     this->onResize(this->width, this->height);
 
-    double time = glfwGetTime();
+    double oldTime = glfwGetTime();
     while (!glfwWindowShouldClose(this->handle)) {
-        glfwSetWindowSizeCallback(this->handle, [](GLFWwindow *_handle, int _width, int _height) {
-            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(_handle));
-            window->width = _width;
-            window->height = _height;
-            window->onResize(_width, _height);
-        });
-
-        glfwPollEvents();
-        double newTime = glfwGetTime();
-        this->onUpdate(newTime, newTime - time);
-        time = newTime;
+        const double newTime = glfwGetTime();
+        this->onUpdate(newTime, newTime - oldTime);
+        oldTime = newTime;
 
         this->onRender();
         glfwSwapBuffers(this->handle);
+
+        glfwPollEvents();
     }
 }
 

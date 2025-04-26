@@ -23,8 +23,8 @@ MobiusStrip::MobiusStrip(float radius, float width, int twists, int slices, int 
     this->comment = "mobiusStrip " + std::to_string(radius) + " " + std::to_string(width) + " " +
         std::to_string(twists) + " " + std::to_string(slices) + " " + std::to_string(stacks);
 
-    const float sliceStep = 2.0f * glm::pi<float>() / slices;
-    const float stackStep = 2.0f * glm::pi<float>() / stacks;
+    const float sliceStep = glm::two_pi<float>() / slices;
+    const float stackStep = glm::two_pi<float>() / stacks;
     const float halfWidth = width / 2.0f;
 
     twists *= 2;

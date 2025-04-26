@@ -24,7 +24,7 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
         std::to_string(slices) + " " + std::to_string(stacks);
 
     const float stackStep = height / stacks;
-    const float sliceStep = 2 * glm::pi<float>() / slices;
+    const float sliceStep = glm::two_pi<float>() / slices;
 
     this->positions.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 

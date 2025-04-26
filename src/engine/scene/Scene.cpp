@@ -12,22 +12,28 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <execution>
+#include <filesystem>
 #include <numeric>
+#include <tinyxml2.h>
+#include <unordered_map>
 
-#include "engine/camera/CameraFactory.hpp"
+#include "engine/scene/camera/CameraFactory.hpp"
 #include "engine/scene/Scene.hpp"
 #include "utils/XMLUtils.hpp"
 
 namespace engine::scene {
 
-Scene::Scene(const std::string &file) {
+Scene::Scene(const std::string &file) :
+    xAxis(glm::vec3(1.0f, 0.0f, 0.0f)),
+    yAxis(glm::vec3(0.0f, 1.0f, 0.0f)),
+    zAxis(glm::vec3(0.0f, 0.0f, 1.0f)) {
+
     const std::filesystem::path sceneDirectory = std::filesystem::path(file).parent_path();
     std::unordered_map<std::string, std::shared_ptr<render::Model>> loadedModels;
 
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS) {
-        throw std::runtime_error("Failed to load scene XML file");
+        throw std::runtime_error("Failed to open / parse scene XML file");
     }
 
     const tinyxml2::XMLElement *worldElement = utils::XMLUtils::getSingleChild(&doc, "world");
@@ -66,12 +72,16 @@ int Scene::getWindowHeight() const {
 
 int Scene::getEntityCount() const {
     return std::transform_reduce(
-        std::execution::par,
-        this->groups.cbegin(),
-        this->groups.cend(),
-        0,
-        std::plus<>(),
-        [](const std::unique_ptr<Group> &group) { return group->getEntityCount(); });
+               this->groups.cbegin(),
+               this->groups.cend(),
+               0,
+               std::plus<>(),
+               [](const std::unique_ptr<Group> &group) { return group->getEntityCount(); }) +
+        this->camera->getEntityCount();
+}
+
+camera::Camera &Scene::getCamera() {
+    return *camera;
 }
 
 void Scene::setWindowSize(int width, int height) {
@@ -80,28 +90,47 @@ void Scene::setWindowSize(int width, int height) {
     this->camera->setWindowSize(width, height);
 }
 
-camera::Camera &Scene::getCamera() {
-    return *camera;
+void Scene::update(float time) {
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        group->update(time);
+    }
 }
 
-int Scene::draw(const render::RenderPipeline &pipeline,
-                bool drawBoundingSpheres,
-                bool drawCatmullRomMotionLines) const {
-    const glm::mat4 &cameraMatrix = this->camera->getCameraMatrix();
+int Scene::draw(render::RenderPipelineManager &pipelineManager,
+                bool fillPolygons,
+                bool backFaceCulling,
+                bool showAxes,
+                bool showBoundingSpheres,
+                bool showAnimationLines) const {
 
-    int entityCount = 0;
-    this->camera->draw(pipeline, drawBoundingSpheres);
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        group->updateBoundingSphere(glm::mat4(1.0f));
-        entityCount += group->draw(pipeline,
-                                   *this->camera,
-                                   cameraMatrix,
-                                   drawBoundingSpheres,
-                                   drawCatmullRomMotionLines);
+    if (backFaceCulling) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    } else {
+        glDisable(GL_CULL_FACE);
     }
 
-    // Reset camera after transforms
-    pipeline.setMatrix(cameraMatrix);
+    // Draw scene contents
+    int entityCount = 0;
+    entityCount += this->camera->draw(pipelineManager, fillPolygons, showBoundingSpheres);
+
+    const glm::mat4 &cameraMatrix = this->camera->getCameraMatrix();
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        group->updateBoundingSphere(glm::mat4(1.0f));
+        entityCount += group->draw(pipelineManager,
+                                   *this->camera,
+                                   cameraMatrix,
+                                   fillPolygons,
+                                   showBoundingSpheres,
+                                   showAnimationLines);
+    }
+
+    // Draw axes
+    if (showAxes) {
+        this->xAxis.draw(pipelineManager, cameraMatrix);
+        this->yAxis.draw(pipelineManager, cameraMatrix);
+        this->zAxis.draw(pipelineManager, cameraMatrix);
+    }
 
     return entityCount;
 }

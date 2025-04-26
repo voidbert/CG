@@ -13,28 +13,32 @@
 /// limitations under the License.
 
 #pragma once
-#include <engine/render/RenderPipeline.hpp>
-#include <engine/scene/Scene.hpp>
-#include <engine/window/Window.hpp>
-#include <functional>
+
+#include "engine/scene/camera/Camera.hpp"
+#include "engine/window/FPSCounter.hpp"
+#include "engine/window/Window.hpp"
 
 namespace engine::window {
 
 class UI {
 private:
-    camera::Camera &camera;
-    bool showAxes, showBoundingSpheres, showCatmullRomMotionLines;
+    scene::camera::Camera &camera;
+    FPSCounter fpsCounter;
     int entityCount;
+    bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines;
 
 public:
-    UI(Window &window, camera::Camera &_camera, int _entityCount);
+    UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
     ~UI();
 
-    void render(int renderedEntities);
+    bool isCapturingKeyboard() const;
+    void draw(int renderedEntities);
 
-    bool isShowAxesEnabled() const;
-    bool isShowBoundingSpheresEnabled() const;
-    bool isShowCatmullRomMotionLinesEnabled() const;
+    bool shouldFillPolygons() const;
+    bool shouldCullBackFaces() const;
+    bool shouldShowAxes() const;
+    bool shouldShowBoundingSpheres() const;
+    bool shouldShowAnimationLines() const;
 };
 
 }

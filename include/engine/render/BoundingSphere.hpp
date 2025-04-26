@@ -14,11 +14,11 @@
 
 #pragma once
 
+#include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 #include <vector>
 
-#include "engine/render/BoundingSphere.hpp"
-#include "engine/render/RenderPipeline.hpp"
+#include "engine/render/RenderPipelineManager.hpp"
 #include "utils/Vertex.hpp"
 
 namespace engine::render {
@@ -36,13 +36,15 @@ private:
 public:
     BoundingSphere();
     BoundingSphere(const glm::vec4 &_center, float _radius);
-    explicit BoundingSphere(const std::vector<utils::Vertex> &vertices);
     BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform);
+    explicit BoundingSphere(const std::vector<utils::Vertex> &vertices);
 
-    glm::vec4 getCenter() const;
+    const glm::vec4 &getCenter() const;
     float getRadius() const;
 
-    void draw(const RenderPipeline &pipeline, const glm::mat4 &cameraMatrix) const;
+    void draw(RenderPipelineManager &pipelineManager,
+              const glm::mat4 &cameraMatrix,
+              const glm::vec4 &color) const;
 };
 
 }

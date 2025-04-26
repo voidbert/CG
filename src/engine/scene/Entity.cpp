@@ -14,6 +14,8 @@
 
 #include "engine/scene/Entity.hpp"
 
+#include "utils/WavefrontOBJ.hpp"
+
 namespace engine::scene {
 
 Entity::Entity(const tinyxml2::XMLElement *modelElement,
@@ -22,7 +24,7 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
 
     const char *file = modelElement->Attribute("file");
     if (!file) {
-        throw std::runtime_error("Invalid <model> in scene XML file");
+        throw std::runtime_error("<rotate> missing file attribute in scene XML file");
     }
 
     const std::string modelPath = std::filesystem::canonical(sceneDirectory / file);
@@ -44,10 +46,11 @@ const render::BoundingSphere &Entity::getBoundingSphere() const {
     return this->boundingSphere;
 }
 
-void Entity::draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const {
-    pipeline.setColor(glm::vec4(1.0f));
-    pipeline.setMatrix(transform);
-    this->model->draw();
+void Entity::draw(render::RenderPipelineManager &pipelineManager,
+                  const glm::mat4 &transformMatrix,
+                  bool fillPolygons) const {
+
+    this->model->draw(pipelineManager, transformMatrix, glm::vec4(1.0f), fillPolygons);
 }
 
 }

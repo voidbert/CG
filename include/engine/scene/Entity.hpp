@@ -21,8 +21,9 @@
 #include <tinyxml2.h>
 #include <unordered_map>
 
+#include "engine/render/BoundingSphere.hpp"
 #include "engine/render/Model.hpp"
-#include "engine/render/RenderPipeline.hpp"
+#include "engine/render/RenderPipelineManager.hpp"
 
 namespace engine::scene {
 
@@ -41,7 +42,9 @@ public:
     void updateBoundingSphere(const glm::mat4 &worldTransform);
     const render::BoundingSphere &getBoundingSphere() const;
 
-    void draw(const render::RenderPipeline &pipeline, const glm::mat4 &transform) const;
+    void draw(render::RenderPipelineManager &pipelineManager,
+              const glm::mat4 &transformMatrix,
+              bool fillPolygons) const;
 };
 
 }

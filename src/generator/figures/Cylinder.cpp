@@ -23,7 +23,7 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks) {
     this->comment = "cylinder " + std::to_string(radius) + " " + std::to_string(height) + " " +
         std::to_string(slices) + " " + std::to_string(stacks);
 
-    const float sliceStep = 2 * glm::pi<float>() / slices;
+    const float sliceStep = glm::two_pi<float>() / slices;
     const float stackStep = height / stacks;
 
     this->positions.push_back(glm::vec4(0, 0, 0, 1.0f));

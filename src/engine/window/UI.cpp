@@ -12,24 +12,23 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/window/UI.hpp"
-#include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 
-#include "engine/camera/Camera.hpp"
-#include "engine/render/RenderPipeline.hpp"
-#include "engine/window/Window.hpp"
+#include "engine/window/UI.hpp"
 
 namespace engine::window {
 
-UI::UI(Window &window, camera::Camera &_camera, int _entityCount) :
+UI::UI(Window &window, scene::camera::Camera &_camera, int _entityCount) :
     camera(_camera),
+    fpsCounter(),
+    entityCount(_entityCount),
+    fillPolygons(false),
+    backFaceCulling(true),
     showAxes(true),
     showBoundingSpheres(false),
-    showCatmullRomMotionLines(true),
-    entityCount(_entityCount) {
+    showAnimationLines(true) {
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -45,71 +44,71 @@ UI::~UI() {
     ImGui::DestroyContext();
 }
 
-void UI::render(int renderedEntities) {
+bool UI::isCapturingKeyboard() const {
+    const ImGuiIO &io = ImGui::GetIO();
+    return io.WantCaptureKeyboard || io.WantTextInput;
+}
+
+void UI::draw(int renderedEntities) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
     ImGui::Begin("Menu");
 
-    static float lastTime = 0.0f;
-    static int fps = 0;
-    float currentTime = glfwGetTime();
-    if (currentTime - lastTime >= 1.0f) {
-        fps = static_cast<int>(1.0f / ImGui::GetIO().DeltaTime);
-        lastTime = currentTime;
-    }
-    ImGui::Text("FPS: %d", fps);
+    this->fpsCounter.countFrame();
+    ImGui::Text("FPS: %d", this->fpsCounter.getFPS());
 
-    std::string entityText = std::to_string(renderedEntities) + " / " +
+    const std::string entityText = std::to_string(renderedEntities) + " / " +
         std::to_string(this->entityCount) + " entities rendered";
     ImGui::Text(entityText.c_str());
 
+    ImGui::Spacing();
     ImGui::Separator();
+    ImGui::Spacing();
     ImGui::Text("Render Options");
+    ImGui::Spacing();
 
-    static bool wireframe = false;
-    if (ImGui::Checkbox("Fill Polygons", &wireframe)) {
-        glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_FILL : GL_LINE);
-    }
+    ImGui::Checkbox("Fill Polygons", &this->fillPolygons);
+    ImGui::Checkbox("Back-face Culling", &this->backFaceCulling);
+    ImGui::Checkbox("Show Axes", &this->showAxes);
+    ImGui::Checkbox("Show Bounding Spheres", &this->showBoundingSpheres);
+    ImGui::Checkbox("Show Animation Lines", &this->showAnimationLines);
 
-    static bool culling = true;
-    if (ImGui::Checkbox("Back-face Culling", &culling)) {
-        if (culling) {
-            glEnable(GL_CULL_FACE);
-        } else {
-            glDisable(GL_CULL_FACE);
-        }
-    }
-
-    if (ImGui::Checkbox("Show Axes", &this->showAxes)) {}
-    if (ImGui::Checkbox("Show Bounding Spheres", &this->showBoundingSpheres)) {}
-    if (ImGui::Checkbox("Show Catmull-Rom Motion Lines", &this->showCatmullRomMotionLines)) {}
-
+    ImGui::Spacing();
     ImGui::Separator();
+    ImGui::Spacing();
     ImGui::Text("Camera Options");
+    ImGui::Spacing();
 
-    glm::vec3 currentPos = camera.getPosition();
-    if (ImGui::InputFloat3("Position", glm::value_ptr(currentPos), "%.2f")) {
-        camera.setPosition(currentPos);
+    glm::vec3 cameraPosition = this->camera.getPosition();
+    if (ImGui::InputFloat3("Position", glm::value_ptr(cameraPosition), "%.1f")) {
+        camera.setPosition(cameraPosition);
     }
 
     ImGui::End();
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-bool UI::isShowAxesEnabled() const {
+bool UI::shouldFillPolygons() const {
+    return this->fillPolygons;
+}
+
+bool UI::shouldCullBackFaces() const {
+    return this->backFaceCulling;
+}
+
+bool UI::shouldShowAxes() const {
     return this->showAxes;
 }
 
-bool UI::isShowBoundingSpheresEnabled() const {
+bool UI::shouldShowBoundingSpheres() const {
     return this->showBoundingSpheres;
 }
 
-bool UI::isShowCatmullRomMotionLinesEnabled() const {
-    return this->showCatmullRomMotionLines;
+bool UI::shouldShowAnimationLines() const {
+    return this->showAnimationLines;
 }
 
 }

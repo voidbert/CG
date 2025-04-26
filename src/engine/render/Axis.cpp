@@ -12,16 +12,14 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <glm/vec4.hpp>
-
 #include "engine/render/Axis.hpp"
 
 namespace engine::render {
 
 Axis::Axis(const glm::vec3 &direction) {
     const glm::vec3 normalized = glm::normalize(direction);
-    glm::vec4 vertices[] = { glm::vec4(normalized * 1000.0f, 1.0f),
-                             glm::vec4(normalized * -1000.0f, 1.0f) };
+    const glm::vec4 vertices[] = { glm::vec4(normalized * 100'000.0f, 1.0f),
+                                   glm::vec4(normalized * -100'000.0f, 1.0f) };
 
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
@@ -41,8 +39,11 @@ Axis::~Axis() {
     glDeleteVertexArrays(1, &this->vao);
 }
 
-void Axis::draw(const RenderPipeline &pipeline) const {
-    pipeline.setColor(this->color);
+void Axis::draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const {
+    const SolidColorShaderProgram &shader = pipelineManager.getSolidColorShaderProgram();
+    shader.setMatrix(cameraMatrix);
+    shader.setColor(this->color);
+
     glBindVertexArray(this->vao);
     glDrawArrays(GL_LINES, 0, 2);
 }
