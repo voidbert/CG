@@ -73,7 +73,8 @@ void printUsage(const std::string &programName) {
 
     std::cerr << std::endl << "Scene generation:" << std::endl;
     std::cerr << "  " << programName
-              << " solarSystem [<sunScale> <rockyScale> <gasScale>] <directory>" << std::endl;
+              << " solarSystem [<sunScale> <rockyScale> <gasScale> <timeScale>] <directory>"
+              << std::endl;
 
     std::cerr << std::endl << "Model conversion:" << std::endl;
     std::cerr << "  " << programName << " patch <patchFile> <tessellation> <file>" << std::endl;
@@ -84,8 +85,6 @@ float stringToFloat(const std::string &str) {
     float ret = std::stof(str, &charactersParsed);
     if (charactersParsed != str.length())
         throw std::invalid_argument("str is not a float");
-    if (ret <= 0)
-        throw std::invalid_argument("str is not positive");
     return ret;
 }
 
@@ -196,12 +195,13 @@ int main(int argc, char **argv) {
             if (argc == 3) {
                 SolarSystem solarSystem;
                 solarSystem.writeToFile(file);
-            } else if (argc == 6) {
+            } else if (argc == 7) {
                 const float sunScale = stringToFloat(args.at(2));
                 const float rockyScale = stringToFloat(args.at(3));
                 const float gasScale = stringToFloat(args.at(4));
+                const float timeScale = stringToFloat(args.at(5));
 
-                SolarSystem solarSystem(sunScale, rockyScale, gasScale);
+                SolarSystem solarSystem(sunScale, rockyScale, gasScale, timeScale);
                 solarSystem.writeToFile(file);
             } else {
                 throw std::invalid_argument("Wrong number of command-line arguments");

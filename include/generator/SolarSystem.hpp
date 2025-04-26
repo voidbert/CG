@@ -28,20 +28,28 @@ private:
     std::default_random_engine rng;
     tinyxml2::XMLDocument document;
     tinyxml2::XMLElement *world;
-    float bodyScale, lastTranslationAngle;
+    float bodyScale, timeScale, lastTranslationAngle;
 
 public:
-    explicit SolarSystem(float sunScale = 1.0f, float rockyScale = 10.0f, float gasScale = 10.0f);
+    explicit SolarSystem(float sunScale = 1.0f,
+                         float rockyScale = 1.0f,
+                         float gasScale = 1.0f,
+                         float _timeScale = 1.0f);
 
     void writeToFile(const std::string &dirname);
 
 private:
     tinyxml2::XMLElement *createVector(const std::string &name, const glm::vec3 &vec);
-    tinyxml2::XMLElement *
-        createBody(float radius, float distance, bool hasOrbiters = false, float y = 0.0f);
+    tinyxml2::XMLElement *createBody(float radius,
+                                     float distance,
+                                     float orbitTime,
+                                     float rotationTime,
+                                     float y = 0.0f,
+                                     bool hasOrbiters = false);
     tinyxml2::XMLElement *createRings(float radius);
     tinyxml2::XMLElement *
-        createAsteroidBelt(float minDistance, float maxDistance, int numAsteroids);
+        createAsteroidBelt(float minDistance, float maxDistance, float orbitTime, int numAsteroids);
+    tinyxml2::XMLElement *createComet();
 
     void createPreamble(float sunScale, float rockyScale, float gasScale);
     void createCamera();

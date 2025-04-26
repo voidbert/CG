@@ -18,14 +18,15 @@
 #include <glm/gtc/constants.hpp>
 #include <vector>
 
+#include "generator/BezierPatch.hpp"
 #include "generator/figures/Sphere.hpp"
 #include "generator/figures/Torus.hpp"
 #include "generator/SolarSystem.hpp"
 
 namespace generator {
 
-SolarSystem::SolarSystem(float sunScale, float rockyScale, float gasScale) :
-    rng(10), bodyScale(1.0f) {
+SolarSystem::SolarSystem(float sunScale, float rockyScale, float gasScale, float _timeScale) :
+    rng(10), bodyScale(1.0f), timeScale(_timeScale) {
 
     this->createPreamble(sunScale, rockyScale, gasScale);
     this->createCamera();
@@ -47,6 +48,9 @@ void SolarSystem::writeToFile(const std::string &dirname) {
 
     figures::Torus torus(1.0f, 0.2f, 32, 8);
     torus.writeToFile(directoryPath / "torus.3d");
+
+    BezierPatch bezierPatch("res/patches/comet.patch", 10);
+    bezierPatch.writeToFile(directoryPath / "comet.3d");
 }
 
 tinyxml2::XMLElement *SolarSystem::createVector(const std::string &name, const glm::vec3 &vec) {
@@ -57,9 +61,12 @@ tinyxml2::XMLElement *SolarSystem::createVector(const std::string &name, const g
     return translate;
 }
 
-tinyxml2::XMLElement *
-    SolarSystem::createBody(float radius, float distance, bool hasOrbiters, float y) {
-
+tinyxml2::XMLElement *SolarSystem::createBody(float radius,
+                                              float distance,
+                                              float orbitTime,
+                                              float rotationTime,
+                                              float y,
+                                              bool hasOrbiters) {
     // Setup hierarchy
     tinyxml2::XMLElement *group = this->document.NewElement("group");
     tinyxml2::XMLElement *transform = group->InsertNewChildElement("transform");
@@ -76,33 +83,51 @@ tinyxml2::XMLElement *
     model->SetAttribute("file", "sphere.3d");
 
     // Distributions for transforms
-    std::uniform_real_distribution fullAngleDistribution(0.0f, 2.0f * glm::pi<float>());
+    std::uniform_real_distribution fullAngleDistribution(0.0f, glm::two_pi<float>());
     std::uniform_real_distribution axisOffsetDistribution(-0.2f, 0.2f);
 
     // Translation
     const float translationAngle = fullAngleDistribution(this->rng);
     this->lastTranslationAngle = translationAngle;
 
-    const glm::vec3 position(distance * cosf(translationAngle),
-                             y,
-                             distance * sinf(translationAngle));
+    if (orbitTime > 0.0f && this->timeScale > 0.0f) {
+        tinyxml2::XMLElement *translate = this->document.NewElement("translate");
+        translate->SetAttribute("time", orbitTime * this->timeScale);
+        translate->SetAttribute("align", "true");
 
-    transform->InsertEndChild(this->createVector("translate", position));
+        const int numPoints = 16;
+        const float angleIncrement = glm::two_pi<float>() / numPoints;
+        for (int i = 0; i < numPoints; ++i) {
+            const float angle = translationAngle + i * angleIncrement;
+            glm::vec3 point(distance * cosf(angle), y, distance * sinf(angle));
+            translate->InsertEndChild(this->createVector("point", point));
+        }
+
+        transform->InsertEndChild(translate);
+    } else {
+        const glm::vec3 position(distance * cosf(translationAngle),
+                                 0.0f,
+                                 distance * sinf(translationAngle));
+
+        transform->InsertEndChild(this->createVector("translate", position));
+    }
+
+    // Rotation
+    if (rotationTime > 0.0f && this->timeScale > 0.0f) {
+        const float rotationAngle = fullAngleDistribution(this->rng);
+        const float axisOffset = axisOffsetDistribution(this->rng);
+        const glm::vec3 rotationAxis(axisOffset * cosf(rotationAngle),
+                                     1.0f,
+                                     axisOffset * sinf(rotationAngle));
+
+        tinyxml2::XMLElement *rotate = this->createVector("rotate", glm::normalize(rotationAxis));
+        rotate->SetAttribute("time", rotationTime * this->timeScale);
+        innerTransform->InsertEndChild(rotate);
+    }
 
     // Scale
     innerTransform->InsertEndChild(
         this->createVector("scale", glm::vec3(radius * this->bodyScale)));
-
-    // Rotation
-    const float rotationAngle = fullAngleDistribution(this->rng);
-    const float axisOffset = distance == 0.0f ? 0.0f : axisOffsetDistribution(this->rng);
-    const glm::vec3 rotationAxis(axisOffset * cosf(rotationAngle),
-                                 1.0f,
-                                 axisOffset * sinf(rotationAngle));
-
-    tinyxml2::XMLElement *rotate = this->createVector("rotate", glm::normalize(rotationAxis));
-    rotate->SetAttribute("angle", rotationAngle * 180.0 / glm::pi<float>());
-    innerTransform->InsertEndChild(rotate);
 
     return group;
 }
@@ -123,16 +148,17 @@ tinyxml2::XMLElement *SolarSystem::createRings(float radius) {
     return group;
 }
 
-tinyxml2::XMLElement *
-    SolarSystem::createAsteroidBelt(float minDistance, float maxDistance, int numAsteroids) {
-
+tinyxml2::XMLElement *SolarSystem::createAsteroidBelt(float minDistance,
+                                                      float maxDistance,
+                                                      float orbitTime,
+                                                      int numAsteroids) {
     // Initialize hierarchy
     tinyxml2::XMLElement *parentGroup = this->document.NewElement("group");
 
     const float averageRadius = (minDistance + maxDistance) / 2.0f;
     const float beltWidth = maxDistance - minDistance;
-    const int numGroups = ceilf(2 * glm::pi<float>() * averageRadius / beltWidth);
-    const float groupArc = 2 * glm::pi<float>() / numGroups;
+    const int numGroups = ceilf(glm::two_pi<float>() * averageRadius / beltWidth);
+    const float groupArc = glm::two_pi<float>() / numGroups;
 
     std::vector<tinyxml2::XMLElement *> subGroups;
     subGroups.reserve(numGroups);
@@ -143,14 +169,14 @@ tinyxml2::XMLElement *
     // Create asteroids
     for (int i = 0; i < numAsteroids; i++) {
         std::uniform_real_distribution distanceDistribution(minDistance, maxDistance);
-        std::uniform_real_distribution radiusDistribution(0.02f, 0.10f);
-        std::uniform_real_distribution yDistribution(-10.0f, 10.0f);
+        std::uniform_real_distribution radiusDistribution(1.0f, 2.0f);
+        std::uniform_real_distribution yDistribution(-20.0f, 20.0f);
 
         const float distance = distanceDistribution(this->rng);
         const float radius = radiusDistribution(this->rng);
         const float y = yDistribution(this->rng);
 
-        tinyxml2::XMLElement *asteroid = this->createBody(radius, distance, false, y);
+        tinyxml2::XMLElement *asteroid = this->createBody(radius, distance, orbitTime, 0.0f, y);
         const int group = floorf(this->lastTranslationAngle / groupArc);
         subGroups[group]->InsertEndChild(asteroid);
     }
@@ -158,9 +184,42 @@ tinyxml2::XMLElement *
     return parentGroup;
 }
 
+tinyxml2::XMLElement *SolarSystem::createComet() {
+    tinyxml2::XMLElement *group = this->document.NewElement("group");
+    tinyxml2::XMLElement *transform = group->InsertNewChildElement("transform");
+
+    tinyxml2::XMLElement *translate = transform->InsertNewChildElement("translate");
+    translate->SetAttribute("time", 100.0f);
+    translate->SetAttribute("align", true);
+
+    const std::vector<glm::vec3> points = {
+        { -800.0f, 50.0f,  -400.0f },
+        { -400.0f, 100.0f, 0.0f    },
+        { 0.0f,    150.0f, 400.0f  },
+        { 400.0f,  100.0f, 0.0f    },
+        { 800.0f,  50.0f,  -400.0f }
+    };
+
+    for (const glm::vec3 &point : points) {
+        translate->InsertEndChild(this->createVector("point", point));
+    }
+
+    tinyxml2::XMLElement *rotate = this->createVector("rotate", glm::vec3(0.0f, 1.0f, 0.0f));
+    rotate->SetAttribute("angle", -90.0f);
+    transform->InsertEndChild(rotate);
+
+    transform->InsertEndChild(this->createVector("scale", glm::vec3(this->bodyScale)));
+
+    tinyxml2::XMLElement *models = group->InsertNewChildElement("models");
+    tinyxml2::XMLElement *model = models->InsertNewChildElement("model");
+    model->SetAttribute("file", "comet.3d");
+    return group;
+}
+
 void SolarSystem::createPreamble(float sunScale, float rockyScale, float gasScale) {
     const std::string description = " solarSystem " + std::to_string(sunScale) + " " +
-        std::to_string(rockyScale) + " " + std::to_string(gasScale) + " ";
+        std::to_string(rockyScale) + " " + std::to_string(gasScale) + " " +
+        std::to_string(this->timeScale);
     tinyxml2::XMLComment *comment = this->document.NewComment(description.c_str());
     this->document.InsertEndChild(comment);
 
@@ -191,45 +250,46 @@ void SolarSystem::createObjects(float sunScale, float rockyScale, float gasScale
 
     // Sun
     this->bodyScale = sunScale;
-    group->InsertEndChild(this->createBody(30.0f, 0.0f));
+    group->InsertEndChild(this->createBody(80.0f, 0.0f, 0.0f, 10.0f));
 
     // Rocky planets
     this->bodyScale = rockyScale;
 
-    group->InsertEndChild(this->createBody(0.2f, 50.0f)); // Mercury
-    group->InsertEndChild(this->createBody(0.4f, 100.0f)); // Venus
+    group->InsertEndChild(this->createBody(5.0f, 200.0f, 25.0f, 15.0f)); // Mercury
+    group->InsertEndChild(this->createBody(6.5f, 370.0f, 35.0f, 18.0f)); // Venus
 
-    tinyxml2::XMLElement *earth = this->createBody(0.4f, 150.0f, true);
-    earth->InsertEndChild(this->createBody(0.15f, rockyScale)); // Moon
+    tinyxml2::XMLElement *earth = this->createBody(7.0f, 550.0f, 50.0f, 20.0f, 0.0f, true);
+    earth->InsertEndChild(this->createBody(1.0f, rockyScale * 12.0f, 10.0f, 10.0f)); // Moon
     group->InsertEndChild(earth);
 
-    group->InsertEndChild(this->createBody(0.25f, 250.0f)); // Mars
+    group->InsertEndChild(this->createBody(6.5f, 730.0f, 65.0f, 22.0f)); // Mars
 
     // Gas giants
     this->bodyScale = gasScale;
 
-    tinyxml2::XMLElement *jupiter = this->createBody(3.0f, 500.0f, true);
+    tinyxml2::XMLElement *jupiter = this->createBody(35.0f, 1900.0f, 90.0f, 25.0f, 0.0f, true);
 
     this->bodyScale = rockyScale;
-    jupiter->InsertEndChild(this->createBody(0.1f, 4.0f * gasScale)); // Io
-    jupiter->InsertEndChild(this->createBody(0.1f, 4.5f * gasScale)); // Europa
-    jupiter->InsertEndChild(this->createBody(0.2f, 5.0f * gasScale)); // Ganymede
-    jupiter->InsertEndChild(this->createBody(0.2f, 5.0f * gasScale)); // Callisto
+    jupiter->InsertEndChild(this->createBody(0.5f, 40.0f * gasScale, 3.0f, 5.0f)); // Io
+    jupiter->InsertEndChild(this->createBody(0.5f, 45.0f * gasScale, 4.0f, 6.0f)); // Europa
+    jupiter->InsertEndChild(this->createBody(0.7f, 50.0f * gasScale, 5.0f, 7.0f)); // Ganymede
+    jupiter->InsertEndChild(this->createBody(0.7f, 55.0f * gasScale, 6.0f, 8.0f)); // Callisto
     group->InsertEndChild(jupiter);
 
     this->bodyScale = gasScale;
 
-    tinyxml2::XMLElement *saturn = this->createBody(2.5f, 750.0f);
-    saturn->InsertEndChild(this->createRings(1.5f));
+    tinyxml2::XMLElement *saturn = this->createBody(30.0f, 2400.0f, 100.0f, 30.0f);
+    saturn->InsertEndChild(this->createRings(3.0f));
     group->InsertEndChild(saturn);
 
-    group->InsertEndChild(this->createBody(1.0f, 1000.0f)); // Uranus
-    group->InsertEndChild(this->createBody(1.0f, 1250.0f)); // Neptune
+    group->InsertEndChild(this->createBody(24.0f, 2850.0f, 130.0f, 32.0f)); // Uranus
+    group->InsertEndChild(this->createBody(23.0f, 3330.0f, 150.0f, 35.0f)); // Neptune
 
     // Asteroid belts
     this->bodyScale = rockyScale;
-    group->InsertEndChild(this->createAsteroidBelt(300.0f, 450.0f, 600));
-    group->InsertEndChild(this->createAsteroidBelt(1400.0, 1800.0, 2000));
+    group->InsertEndChild(this->createAsteroidBelt(1000.0f, 1600.0f, 80.0f, 2000));
+    group->InsertEndChild(this->createAsteroidBelt(3500.0, 3800.0, 4000.0f, 2000));
+    group->InsertEndChild(this->createComet());
 }
 
 }
