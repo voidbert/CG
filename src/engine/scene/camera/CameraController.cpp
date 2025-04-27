@@ -56,10 +56,10 @@ void CameraController::onUpdate(float time) {
                 move -= glm::vec3(0.0f, 0.0f, 1.0f) * deltaTime;
                 break;
             case GLFW_KEY_A:
-                move += glm::vec3(1.0f, 0.0f, 0.0f) * deltaTime;
+                move -= glm::vec3(1.0f, 0.0f, 0.0f) * deltaTime;
                 break;
             case GLFW_KEY_D:
-                move -= glm::vec3(1.0f, 0.0f, 0.0f) * deltaTime;
+                move += glm::vec3(1.0f, 0.0f, 0.0f) * deltaTime;
                 break;
             case GLFW_KEY_SPACE:
                 move += glm::vec3(0.0f, 1.0f, 0.0f) * deltaTime;

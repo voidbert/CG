@@ -76,7 +76,15 @@
 \pagebreak
 
 \begin{abstract}
-{\color{red} TODO }
+    \noindent
+    Nesta fase do trabalho prático, construiu-se sobre os programas \texttt{generator} e
+    \texttt{engine} previamente desenvolvidos. No \texttt{generator}, a geração do Sistema Solar
+    foi simplificada e modificada para suportar animação dos corpos celestes: rotações de velocidade
+    constante e translações segundo curvas Catmull-Rom. Ademais, foi adicionada geração de modelos
+    com base em \emph{patches} de Bézier. Na \texttt{engine}, foi adicionado suporte para a animação
+    de objetos em cena e uma câmara em terceira pessoa. Na próxima fase, pretende-se desenvolver
+    sobre o trabalho desta fase com a implementação de iluminação e aplicação de texturas aos
+    objetos da cena.
 \end{abstract}
 
 \section{\emph{Generator}}
@@ -86,7 +94,7 @@ mais consistente, melhorar a sua legibilidade, e corrigir algumas falhas nas qua
 reparado em fases anteriores. Ademais, nesta fase, foi implementada a geração de modelos 3D com base
 em \emph{patches} de Bézier.
 
-\subsection{Alterações à geração de figuras geométricas}
+\subsection{Alterações à Geração de Figuras Geométricas}
 
 Em primeiro lugar, comece-se por mencionar o que não precisou de ser alterado. O \texttt{generator}
 exporta os modelos 3D que gera no formato Wavefront OBJ \cite{wavefront-obj}, que foi descrito em
@@ -97,31 +105,12 @@ proveito desta indexação no formato Wavefront OBJ para indexar os vértices do
 para a GPU, não tendo sido necessária qualquer alteração ao \texttt{generator} para gerar modelos
 mais pequenos e que tiram proveito da \emph{cache} de vértices da GPU.
 
-% TODO - Ver se adicionar os vértices tem algum benefício. Eu desliguei o V-Sync, a UI, aumentei o
-%        número de slices e de stacks, e não observei nenhuma diferença entre entre o generator
-%        antigo e o novo. É melhor falar na aula e, se não houver qualquer diferença teórica / for
-%        negligenciável, nem falamos disto no relatório, já que foi só mudar uns <=.
-
-% No entanto, anteriormente, em alguns modelos gerados, a ordem dos vértices não originava padrões
-% de acesso à memória ideais, o que se procurou resolver nesta fase do trabalho.
-
-% Alguns sólidos de revolução, em específico, a esfera, o cone, e o cilindro, são desenhados
-% \emph{stack} a \emph{stack}, ou seja, com base em cada duas \emph{stacks}, desenha-se uma fita de
-% quadriláteros, cada um dividido em dois triângulos. Anteriormente, os últimos triângulos destas
-% fitas reutilizavam os pontos da primeira \emph{slice}, levando a padrões de acesso a memória
-% indesejáveis. A alteração que foi feita ao \texttt{generator} para mitigar este problema foi a
-% duplicação dos vértices da primeira \emph{slice}. Deste modo, apesar dos modelos gerados ocuparem
-% ligeiramente mais memória, apresentam melhores padrões de acesso a memória que podem conduzir a um
-% melhor desempenho.
-
-% {\color{red} TODO - figuras caso se coloque isto no relatório }
-
 No entanto, é de notar que a geração de grelhas, presente em todas as figuras geradas, ainda podia
 ser melhor otimizada para a \emph{cache} de vértices. Alguns métodos de indexação
 \cite{optimal-grid} dão origem a modelos que são capazes de tirar um maior proveito da \emph{cache}
-de vértices. No entanto, estes são um pouco mais complexos e envolvem a geração de triângulos
-degenerados, pelo que se optou por não os utilizar, optando-se então por uma solução simples e fácil
-de compreender.
+de vértices. No entanto, estes são mais complexos e envolvem a geração de triângulos degenerados,
+pelo que se optou por não os utilizar, optando-se então por uma solução simples e fácil de
+compreender (em \emph{scanline}).
 
 Uma alteração ao processo de geração de modelos 3D foi a adição, a cada modelo, de um comentário que
 enuncia os parâmetros utilizados na sua geração. Um exemplo de um destes comentários seria:
@@ -136,9 +125,9 @@ funcional em relação à fase anterior foi o suporte para comentários. No enta
 será necessário adicionar suporte para coordenadas de textura e vetores normais, e espera-se que o
 uso de expressões regulares torne este processo mais fácil.
 
-\subsection{Alterações à geração do Sistema Solar}
+\subsection{Alterações à Geração do Sistema Solar}
 
-A geração do sistema solar também sofreu alterações. Em primeiro lugar, para simplificar o seu
+A geração do Sistema Solar também sofreu alterações. Em primeiro lugar, para simplificar o seu
 código, as posições dos corpos celestes já não são especificadas manualmente, mas sim geradas de um
 modo pseudo-aleatório: no código apenas se especifica a distância de um corpo ao seu pai, $d$, um
 ângulo $\theta \in \left [ 0, 2\pi \right [$ é gerado aleatoriamente, e a posição do corpo é
@@ -154,19 +143,21 @@ Ademais, a parametrização da geração do Sistema Solar também foi alterada. 
 utilizador menos argumentos, que permitem um controlo semelhante da aparência da cena gerada:
 
 \begin{center}
+\small
 \texttt{generator solarSystem [<sunScale> <rockyScale> <gasScale> <timeScale>] <directory>}
 \end{center}
 
 O utilizador agora pode, opcionalmente, definir a escala aplicada ao Sol (\texttt{sunScale}), aos
-planetas rochosos e asteroides (\texttt{rockyScale}), aos planetas gasosos (\texttt{gasScale}) e à
-velocidade do sistema solar (\texttt{timeScale}). Este último parâmetro controla a velocidade
-das animações no sistema solar. Se o \texttt{timeScale} for igual a \texttt{0}, o sistema solar será
-estático, ou seja, os corpos celestes não terão movimento.
+planetas rochosos e asteroides (\texttt{rockyScale}), e aos planetas gasosos (\texttt{gasScale}).
+Ademais, nesta fase também foi adicionada animação à geração do Sistema Solar, que deu origem ao
+parâmetro \texttt{timeScale}, que controla o quão rápidas as animações dos corpos celestes são. Num
+caso extremo, é possível definir este parâmetro como zero para se obter uma cena estática.
 
 Também se observa que o \texttt{generator} passa a criar uma diretoria com vários ficheiros, em vez
-de apenas um ficheiro com a cena. Os novos ficheiros criados são os modelos de uma esfera e de um
-\emph{torus}, utilizados nos corpos celestes e nos seus anéis, respetivamente. Isto é uma melhoria
-em relação à fase anterior, onde era esperado que o utilizador gerasse estes modelos manualmente.
+de apenas um ficheiro com a cena. Os novos ficheiros criados são os modelos de uma esfera, de um
+\emph{torus}, e de um cometa, utilizados nos corpos celestes, nos seus anéis, e no cometa,
+respetivamente. Isto é uma melhoria em relação à fase anterior, onde era esperado que o utilizador
+gerasse estes modelos manualmente.
 
 De seguida, foi descoberto um problema com a estrutura hierárquica do Sistema Solar a ser gerada
 anteriormente. Os objetos eram agrupados em grupos conforme a sua atração gravítica: corpos a
@@ -191,7 +182,7 @@ rotação. Como exemplo, segue-se a estrutura da Terra e da Lua:
             <rotate ... />
         </transform>
         <models>
-            <model file="sphere.3d"/> <!-- Terra -->
+            <model file="sphere.3d" /> <!-- Terra -->
         </models>
     </group>
     <group>
@@ -201,7 +192,7 @@ rotação. Como exemplo, segue-se a estrutura da Terra e da Lua:
             <rotate ... />
         </transform>
         <models>
-            <model file="sphere.3d"/> <!-- Lua -->
+            <model file="sphere.3d" /> <!-- Lua -->
         </models>
     </group>
 </group>
@@ -239,16 +230,21 @@ uma cintura de asteroides são visíveis na figura abaixo.
     \caption{Esferas encapsuladoras dos grupos da cintura de asteroides interna.}
 \end{figure}
 
-Para transformar o sistema solar dinâmico, os corpos celestes passaram a mover-se a partir de
-trajetórias definidas com o \texttt{translate} com o atributo \texttt{time}, onde utilizam
-pontos de controlo distribuídos na circunferência. A rotação foi implementada com o \texttt{rotate},
-também com o tempo, de modo a criar um movimento contínuo em torno do próprio eixo.
+Para adicionar animações ao Sistema Solar, as transformações \texttt{translate} e \texttt{rotate}
+passam a ter um atributo \texttt{time}, que define a sua duração, ajustável pelo fator
+\texttt{timeScale}, como explicado anteriormente. Ademais, para as translações, é necessário definir
+os pontos de controlo de uma curva Catmull-Rom, que são uniformemente distribuídos por uma
+circunferência:
 
-Os tempos de translação e rotação foram adaptados com base num fator de escala definido pelo
-utilizador, permitindo ajustar a velocidade geral da simulação. Para o cometa, que é um objeto com
-órbita não circular, os pontos de controlo foram definidos manualmente, de maneira a criar uma
-trajetória mais realista. O modelo do cometa foi realizado com uma \textit{patch} própria,
-conferindo-lhe uma forma mais definida e visualmente distinta.
+$$
+P_i = (r \cos \theta_{i}, \; y, \; r \sin \theta_{i}),
+\hspace{1cm}
+\theta_{i} = \frac{2 \pi i}{16}, \;
+i \in \lbrace 0, 1, \ldots, 15 \rbrace
+$$
+
+Ademais, também se adicionou ao Sistema Solar um cometa, cujo modelo é gerado com base em
+\emph{patches} de Bézier, e cujo movimento é ditado por uma curva Catmull-Rom (\texttt{translate}).
 
 Por último, tal como foi feito com os modelos 3D, uma cena do Sistema Solar começa com um comentário
 XML como o que pode ser visto abaixo, a enunciar os parâmetros com que foi gerada:
@@ -318,293 +314,134 @@ calculando o valor de $p_c$ para as coordenadas $x$, $y$, e $z$. Em primeiro lug
 $v_j$ e só depois de $u_i$. Para a indexação destes vértices e para a geração das faces do
 \emph{patch} é usado o mesmo método que foi utilizado para a geração do plano (método
 \emph{scanline}, descrito em detalhe no relatório da primeira fase). Um detalhe de implementação é
-que, para um melhor desempenho, as matrizes da forma $M \, P_c \, M^T$ são calculadas apenas uma vez
-por \emph{patch}.
+que, para um melhor desempenho do \texttt{generator}, as matrizes da forma $M \, P_c \, M^T$ são
+calculadas apenas uma vez por \emph{patch}.
 
 \section{\emph{Engine}}
 
+A \texttt{engine}, tal como o \texttt{generator}, para além de ter sido modificada para suportar as
+funcionalidades apresentadas abaixo, sofreu uma rearquiteturação do seu código, para uma melhor
+legibilidade e extensibilidade. Destas melhorias ao código, destaca-se o suporte para vários
+\emph{shaders}, já em preparação para a 4ª fase do trabalho prático, a reimplementação da leitura de
+\emph{input} do utilizador, agora baseada em eventos, e a simplificação da lógica de movimento das
+câmaras, com a remoção de muito código duplicado utilizando conceitos de orientação aos objetos.
+
 \subsection{Animação dos Objetos}
 
-Um dos principais objetivos desta fase consistiu na introdução de animações, nomeadamente
-translações e rotações dependentes da passagem do tempo. Na fase anterior, foram implementadas
-apenas transformações estáticas, ou seja, transformações que não variam com a passagem do tempo.
-Na fase atual, passou a ser possível aplicar translações e rotações em função do tempo,
-ou seja, de forma dinâmica. Assim, as translações e rotações podem agora evoluir ao longo do tempo,
-permitindo criar animações. Importa salientar que continua a ser possível utilizá-las de forma
-estática, sem qualquer dependência temporal, conforme os requisitos do projeto.
-
-Estas novas tranformações são dependentes do tempo e a sua execução do ínicio ao fim decorre
-num determinado tempo definido e volta a repetir-se continuamente até ao final do programa.
-Por exemplo, numa rotação uma volta completa demora um determinado tempo definido e numa translação
-percorrer todos os pontos também demora um determinado tempo definido. Assim, era necessário guardar
-este tempo de execução. As classes Rotation e Translation, usadas para a rotação estática e
-translação estática respetivamente, não possuem este atributo. Assim, foi necessário criar duas
-novas classes: AnimatedRotation e AnimatedTranslation, para a rotação dinâmica e para a translação
-dinâmica respetivamente, ambas com o atributo do tempo de execução.
+Um dos objetivos desta fase do trabalho é a implementação de animações, nomeadamente translações e
+rotações dependentes da passagem do tempo, construindo sobre as transformações estáticas da fase
+anterior. Mesmo assim, o projeto desenvolvido continua a suportar cenas com transformações
+estáticas.
 
 \subsubsection{Rotação}
 
-A rotação dinâmica é bastante parecida com a rotação estática. A primeira diferença é que enquanto a
-rotação estática recebe um ângulo, a rotação dinâmica calcula o tempo passado desde o ínicio. Na
-rotação estática, era usado o ângulo para calcular a matriz de rotação. Na rotação dinâmica, para
-calcular a matriz de rotação é usado o ângulo $\alpha$, calculado em função do tempo passado e em
-função do tempo de uma volta completa (o tempo de execução que é dado no XML):
+A rotação dinâmica é muito semelhante à rotação estática, com a diferença de que o ângulo de rotação
+passado à função \texttt{glm::rotate} é definido em função do tempo. Sendo $t$ o instante atual e
+$T$ o período da animação (atributo \texttt{time} no ficheiro XML), tem-se:
 
 $$
-\alpha = \frac{\text{tempo passado}}{\text{tempo de uma volta completa}} \times 2\pi
-$$
-$$
-$$
-$$
-\text{tempo passado} \geq 0
-$$
-$$
-\text{tempo de uma volta completa} > 0
+\theta_{t} = \frac{2 \pi t}{T}
 $$
 
-Como o tempo que passou é sempre positivo (ou nulo), então a rotação sofrida tinha sempre o
-mesmo sentido, no caso, o sentido anti-horário. Para rodar os objetos no sentido
-horário, basta multiplicar o ângulo calculado anteriormente por (-1):
-$$
-\alpha = (-1) \times \frac{\text{tempo passado}}{\text{tempo de uma volta completa}} \times 2\pi
-$$
-Para existir a possibilidade de rodar os objetos no sentido horário, acrescentei no XML nas
-rotações um atributo opcional chamado clockwise.
+Opcionalmente, o atributo \texttt{clockwise="true"} pode ser definido no ficheiro XML, fazendo com
+que a rotação ocorra no sentido dos ponteiros do relógio, ou seja, o ângulo usado para o cálculo da
+matriz de rotação será o simétrico da expressão apresentada acima. Assim, com estes dois atributos,
+uma rotação no ficheiro XML pode ser definida do seguinte modo, lembrado que o atributo
+\texttt{clockise} é opcional:
 
-Se o atributo clockwise for "true", como no exemplo em baixo, então iremos rodar o objeto no
-sentido horário (clockwise).
-\lstset{language=xml}
-\begin{lstlisting}
-
-    <rotate time= "10" x="0" y="1" z="0" clockwise="true"/>
-
-\end{lstlisting}
-Se o atributo clockwise for "false", como na primeira linha do exemplo em baixo, ou se o
-atributo nem sequer for indicado, como na segunda linha do exemplo em baixo, então iremos
-rodar o objeto no sentido anti-horário. Assim, o sentido anti-horário é o sentido default.
-\lstset{language=xml}
-\begin{lstlisting}
-
-    <rotate time= "10" x="0" y="1" z="0" clockwise="false"/>
-    <rotate time= "10" x="0" y="1" z="0"/>
-
-\end{lstlisting}
-Para guardar o sentido da rotação, a rotação dinâmica tem um atributo chamado direction
-que é 1 se o sentido for anti-horário e (-1) se o sentido for horário. Este atributo é
-então usado para obtermos o angulo $\alpha$ (considera o atributo direction como sendo
-o sentido nesta fórmula):
-$$
-\alpha = \text{sentido} \times \frac{\text{tempo passado}}{\text{tempo de uma volta completa}}
-\times 2\pi
-$$
-$$
-$$
-$$
-\text{tempo passado} \geq 0
-$$
-$$
-\text{tempo de uma volta completa} > 0
-$$
-$$
-\text{sentido} \in \{ 1, -1 \}
-$$
+\begin{center}
+    \texttt{<rotate time="10"\ x="0"\ y="1"\ z="0"\ clockwise="true"\ />}
+\end{center}
 
 \subsubsection{Translação}
 
-Para a implementação da translação animada de objetos na cena, foi utilizada
-uma curva de interpolação suave conhecida como \textbf{Catmull-Rom}.
-Essa curva permite gerar trajetórias que passam por um conjunto de pontos de
-controle, criando um movimento contínuo e suave ao longo do tempo.
+Para a implementação de translações animadas de objetos na cena, foram utilizada curvas de
+Catmull-Rom. No ficheiro XML, é necessário especificar o período da animação e um conjunto de pelo
+menos quatro pontos de controlo. Opcionalmente, um atributo \texttt{align} pode ser definido caso se
+deseje rodar o objeto animado para acompanhar a curva:
 
-Numa translação dinâmica, o ficheiro XML fornece três elementos principais:
-o tempo de execução, previamente referido; um valor booleano designado por
-align, que indica se o objeto deve manter-se alinhado com a orientação da
-curva de Catmull-Rom; e os pontos de controlo que definem essa mesma curva.
-Para além de armazenar estes dados, também foi guardado um objeto Line,
-cuja função é representar graficamente a trajetória descrita pela curva de
-Catmull-Rom ao longo do tempo.
+\begin{lstlisting}
 
-Para obter a matriz de translação num determinado tempo,
-a primeira etapa consiste em calcular o tempo decorrido desde o início da execução
-do programa, utilizando a função glfwGetTime().
-Esse valor é então normalizado utilizando o tempo total definido no XML, da seguinte forma:
+<translate time="50" align="true">
+    <point x="0" y="0" z="0"/>
+    ...
+</translate>
+\end{lstlisting}
 
-\[
-t_{\text{normalizado}} = \frac{t_{\text{passado}} \bmod t_{\text{total}}}{t_{\text{total}}}
-\]
-
-Multiplicando esse valor pelo número total de segmentos (ou seja, pelo número de
-pontos de controlo), obtém-se o parâmetro de tempo global ao longo da curva:
-
-\[
-t_{\text{global}} = t_{\text{normalizado}} \cdot N
-\]
-
-Com este valor, é possível identificar os quatro pontos de controlo mais próximos.
-Depois volta-se a normalizar o tempo e calcula-se a posição do objeto.
-
-Para calcular a posição do objeto, em primeiro lugar, define-se os vetores T e dT.
-
-T é o vetor que representa os termos de uma equação cúbica para calcular a posição no tempo t.
+Para obter a posição de um objeto animado num dado instante de tempo, é necessário, em primeiro
+lugar, identificar o segmento da curva Catmull-Rom a interpolar e a posição temporal nesse segmento.
+Para tal, é necessário antes normalizar o instante atual:
 
 $$
-T = \begin{bmatrix} t^3 \\ t^2 \\ t \\ 1.0 \end{bmatrix}
+\hat{t} = \frac{t N}{T},
 $$
 
-dT é o vetor da derivada de T em relação a t, usado para calcular a orientação.
+onde $N$ é o número de pontos de controlo. Depois, o segmento $s$ é dado pela parte inteira de
+$\hat{t}$, e a parte fracionária de $\hat{t}$ é a posição desse segmento onde deve ser feita a
+interpolação. Com o valor de $s$, podem determinar-se os pontos do segmento: $s$ será um índice na
+lista de pontos de controlo, e desejam-se escolher os pontos $s - 1$, $s$, $s + 1$ e $s + 2$. Caso
+um destes pontos esteja fora da lista, "dá-se a volta"{} à mesma e escolhe-se o ponto seguinte. Por
+exemplo, caso se selecione o ponto $12$ numa lista de $10$ elementos, será escolhido o ponto de
+índice $2$ ($s \mod N$).
+
+Para calcular as coordenadas de um ponto, é preciso repetir o mesmo cálculo para $x$, $y$ e $z$. Por
+exemplo, para a coordenada $x$ de um ponto, tem-se:
 
 $$
-dT = \begin{bmatrix} 3 \cdot t^2 \\ 2 \cdot t \\ 1.0 \\ 0.0 \end{bmatrix}
-$$
-
-Em segundo lugar, definiu-se a Matriz de Catmull Rom, que define a forma da curva,
-com base nos quatro pontos de controlo.
-
-$$
-M_{\text{Catmull Rom}} =
+\def\arraystretch{1}
+P_x =
+\begin{bmatrix} t^3 & t^2 & t & 1 \end{bmatrix}
 \begin{bmatrix}
-    -0.5 & 1   & -0.5 & 0 \\
-    1.5  & -2.5 & 0    & 1 \\
-    -1.5 & 2   & 0.5  & 0 \\
-    0.5  & -0.5 & 0    & 0
+    -0.5 &  1.5 & -1.5 &  0.5 \\
+       1 & -2.5 &    2 & -0.5 \\
+    -0.5 &    0 &  0.5 &    0 \\
+       0 &    1 &    0 &    0
+\end{bmatrix}
+\begin{bmatrix} {P_{s - 1}}_x \\ {P_{s}}_x \\ {P_{s + 1}}_x \\ {P_{s + 2}}_x \end{bmatrix}
+$$
+
+Repetindo este processo para as coordenadas $y$ e $z$, constrói-se um vetor que pode ser passado à
+função \texttt{glm::translate} para a construção da matriz de translação. Depois, caso o atributo
+\texttt{align} esteja definido, é necessário gerar uma matriz de rotação para que o objeto animado
+acompanhe a curva. Para isso, é necessário, em primeiro lugar, calcular a derivada da curva:
+
+$$
+\def\arraystretch{1}
+d_x =
+\begin{bmatrix} 3 t^2 & 2 t & 1 & 0 \end{bmatrix}
+\begin{bmatrix}
+    -0.5 &  1.5 & -1.5 &  0.5 \\
+       1 & -2.5 &    2 & -0.5 \\
+    -0.5 &    0 &  0.5 &    0 \\
+       0 &    1 &    0 &    0
+\end{bmatrix}
+\begin{bmatrix} {P_{s - 1}}_x \\ {P_{s}}_x \\ {P_{s + 1}}_x \\ {P_{s + 2}}_x \end{bmatrix}
+$$
+
+De um modo semelhante ao que foi feito com a posição, este cálculo é feito três vezes, uma vez para
+cada coordenada, assim se obtendo um vetor $\vec{d}_n$. Depois, com base neste vetor, é possível
+calcular os vetores em cada direção do objeto:
+
+$$
+\vec{r}_n = \vec{d}_n \times \vec{up}_{n - 1}
+$$
+$$
+\vec{up}_n = \vec{r}_n \times \vec{d}_n
+$$
+
+Observando as expressões anteriores, repara-se que o vetor $\vec{up}$ deve ser armazenado de uma
+iteração para a seguinte. A matriz de rotação, a ser aplicada depois da translação, é calculada do
+seguinte modo, após normalizar os vetores apresentados:
+
+$$
+\def\arraystretch{1}
+R = \begin{bmatrix}
+                 &               &              & 0 \\
+    \bf\hat{d}_n & \bf\hat{up}_n & \bf\hat{r}_n & 0 \\
+                 &               &              & 0 \\
+               0 &             0 &            0 & 1
 \end{bmatrix}
 $$
-
-Em terceiro lugar, calcula-se os vetores das coordenadas x, y e z correspondentes
-aos quatro pontos de controlo mais próximos. Estes vetores representam, respetivamente,
-os valores de cada coordenada para os pontos p0, p1, p2 e p3 que envolvem o
-segmento atual da curva:
-
-$$
-{p}_x = \begin{bmatrix} p_0^x \\ p_1^x \\ p_2^x \\ p_3^x \end{bmatrix}, \quad
-{p}_y = \begin{bmatrix} p_0^y \\ p_1^y \\ p_2^y \\ p_3^y \end{bmatrix}, \quad
-{p}_z = \begin{bmatrix} p_0^z \\ p_1^z \\ p_2^z \\ p_3^z \end{bmatrix}
-$$
-
-Estes vetores são utilizados em conjunto com a matriz de Catmull-Rom e com o vetor T,
-permitindo calcular a posição interpolada do objeto ao longo da curva. Para cada coordenada,
-efetua-se a seguinte operação:
-
-$$
-x = {T} \cdot ({M} \cdot {p}_x), \quad
-y = {T} \cdot ({M} \cdot {p}_y), \quad
-z = {T} \cdot ({M} \cdot {p}_z)
-$$
-
-O resultado é a posição tridimensional do objeto sobre a curva no instante atual da animação.
-
-$$
-{pos} = \begin{bmatrix} x \\ y \\ z \end{bmatrix}
-$$
-
-Assim, já é possível calcular a matriz de translação:
-
-$$
-M_{\text{translação}} =
-\begin{bmatrix}
-    1 & 0   & 0  & pos_x \\
-    0  & 1 & 0 & pos_y \\
-    0 & 0  & 1  & pos_z \\
-    0  & 0 & 0    & 1
-\end{bmatrix}
-$$
-
-Depois é calculado a derivada da curva no ponto atual para obter a direção do movimento
-(vetor tangente), que pode ser usada para gerar uma matriz de rotação que alinha o objeto
-com a trajetória, isto se o parâmetro align estiver ativado.
-
-Para calcular a derivada faz-se os seguintes cálculos:
-
-$$
-dx = {dT} \cdot ({M} \cdot {p}_x), \quad
-dy = {dT} \cdot ({M} \cdot {p}_y), \quad
-dz = {dT} \cdot ({M} \cdot {p}_z)
-$$
-
-\[
-{deriv} = \begin{bmatrix} dx \\ dy \\ dz \end{bmatrix}
-\]
-
-Caso o parâmetro align esteja ativo, é necessário garantir que o objeto mantenha a sua
-orientação ao longo da curva de Catmull-Rom, ou seja, que "aponte" sempre na direção do
-movimento. Para isso, é usada a derivada.
-
-Primeiramente, o vetor forward é calculado como a normalização da derivada da curva no
-ponto atual, indicando a direção da curva naquele ponto:
-$$
-f = normalizar(deriv) \\
-$$
-
-O vetor right é obtido como o produto vetorial entre o vetor lastUp e o vetor forward:
-
-$$
-r = normalizar(lastUp \times f)
-$$
-
-O vetor lastUp é o último valor do vetor up e é inicializado da seguinte maneira:
-
-$$
-lastUp=(0,1,0)
-$$
-
-Para garantir a ortogonalidade entre os vetores, o novo vetor up é calculado a
-partir do produto vetorial entre forward e right:
-
-$$
-u = normalizar(f \times r)
-$$
-
-Depois disso, atualizamos o vetor lastUp:
-
-$$
-lastUp = u
-$$
-
-A matriz de rotação é construída usando os vetores ortogonais como colunas:
-
-$$
-M_{\text{rotação}} =
-\begin{bmatrix}
-    r_x & u_x   & f_x & 0 \\
-    r_y  & u_y & f_y & 0 \\
-    r_z & u_z  & f_z  & 0 \\
-    0  & 0 & 0    & 1
-\end{bmatrix}
-$$
-
-Por fim, a matriz
-final de transformação resulta da multiplicação da matriz de translação pela matriz de
-rotação (se o alinhamento estiver ativado).
-
-$$
-M_{\text{transformação}} = M_{\text{translação}} \cdot M_{\text{rotação}}
-$$
-
-Se não tivermos alinhamento ativado, a transformação limita-se à translação.
-
-$$
-M_{\text{transformação}} = M_{\text{translação}}
-$$
-
-Para representar a trajétoria naquele momento, calcula-se todos os pontos da curva e
-traça-se uma linha na cena com esses pontos, através do objeto Line.
-
-No programa desenvolvido, tanto é possível visualizar as linhas de movimento Catmull-Rom (default)
-como escondê-las. Basta manipular a opção \textbf{Show Catmull-Rom Motion Lines} do Menu.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{res/phase3/ShowCatmullRomMotionLines.png}
-    \caption{Mostrar as linhas de movimento Catmull-Rom na cena de
-    uma esfera com trajetória em forma de coração.}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{res/phase3/HideCatmullRomMotionLines.png}
-    \caption{Esconder as linhas de movimento Catmull-Rom na cena de
-    uma esfera com trajetória em forma de coração.}
-\end{figure}
 
 \subsection{\emph{Vertex Buffer Objects} (VBOs)}
 
@@ -660,64 +497,118 @@ pela ordem em que surgem no mesmo.
 
 \subsection{Câmara em Terceira Pessoa}
 
-A câmara em terceira pessoa permite acompanhar um objeto enquanto mantém uma
-perspetiva ligeiramente afastada, algo comum em diversos videojogos. Nesta implementação, a câmara
-encontra-se constantemente orientada para o jogador, onde acompanha os seus movimentos a partir de
-uma posição relativa e ajustável.
+Nesta fase, também foi implementada uma câmara em terceira pessoa, que  permite acompanhar um objeto
+enquanto mantém uma perspetiva ligeiramente afastada, algo comum em diversos videojogos. Nesta
+implementação, a câmara encontra-se constantemente orientada para o jogador, e acompanha os seus
+movimentos a partir de uma posição relativa e ajustável.
 
 Tal como a câmara orbital, a câmara em terceira pessoa utiliza coordenadas esféricas para definir a
-posição da câmara em relação ao ponto de interesse, neste caso o jogador. A posição é recalculada
-com base no raio $r$ (distância à personagem), no ângulo azimutal $\phi$ (rotação horizontal) e no
-ângulo polar $\theta$ (inclinação vertical).
+sua posição em relação ao ponto de interesse, neste caso, o jogador. Esta posição é calculada com
+base no raio $r$ (distância ao jogador), no ângulo azimutal $\phi$ (rotação horizontal), no
+ângulo polar $\theta$ (inclinação vertical), e na posição do jogador ($P$). As coordenadas
+cartesianas da posição da câmara são calculadas da seguinte forma:
 
-As coordenadas cartesianas da posição da câmara, a partir dos valores esféricos, são calculadas da
-seguinte forma:
+$$x = P_x + r \sin \theta \cos \phi$$
+$$y = P_y + r \cos \theta$$
+$$z = P_z + r \sin \theta \sin \phi$$
 
-$$x = r \sin \theta \cos \phi$$
-$$y = r \cos \theta$$
-$$z = r \sin \theta \sin \phi$$
+Para garantir um comportamento estável da câmara, o raio é limitado de forma a que seja sempre
+superior a $0$, evitando que a câmara se sobreponha ao jogador. O ângulo azimutal é mantido entre
+$0$ e $2\pi$ por modularização, o que previne problemas de precisão de vírgula flutuante em rotações
+prolongadas. O ângulo polar está restringido ao intervalo $[0.01, \pi - 0.01]$, para evitar os
+problemas de inversão no vetor $\vec{up}$ da câmara que ocorrem fora deste intervalo.
 
-Estes valores são somados às coordenadas da personagem, de forma a posicionar a câmara em relação
-a esta. Isto garante que a câmara está sempre centrada no jogador, independentemente da sua
-posição.
+Para movimentar o jogador, é necessário que tal seja feito na direção em que a câmara aponta,
+$\vec{d} = \texttt{lookAt} - \texttt{position}$. No entanto, para o jogador não ``voar'', este vetor
+é projetado no plano XZ:
 
-Para garantir um comportamento estável, o raio é limitado de forma a que seja sempre superior a $0$,
-evitando que a câmara se sobreponha ao jogador. O ângulo azimutal é mantido entre $0$ e $2\pi$ por
-modularização, o que previne problemas de precisão de vírgula flutuante em rotações prolongadas.
-O ângulo polar está restringido ao intervalo $[0.01, \pi - 0.01]$ para evitar problemas de inversão
-no vetor $\vec{up}$ da câmara.
+$$
+\vec{d'} = (d_x, 0, d_z)
+$$
 
-Ao movimentar a personagem, a câmara atualiza automaticamente a sua posição para manter uma
-orientação e distância constantes relativamente ao jogador. Esta atualização baseia-se num vetor
-de direção horizontal entre a câmara e o jogador, ignorando a componente vertical ($y$), de modo a
-manter uma orientação consistente enquanto o jogador se desloca num plano horizontal (terreno
-plano). O vetor de movimento é calculado com base nos vetores $\vec{front}$ e $\vec{right}$, tal
-como numa câmara livre, mas com o vetor $\vec{up}$ fixo e sem inclinação vertical:
+Para movimento lateral do jogador, é necessário calcular o vetor que o dirige. O vetor que aponta
+para a direita do jogador é calculado do seguinte modo:
 
-\begin{itemize}
-    \item $\vec{front} = \text{normalize}( \text{lookAt} - \text{position} )$ projetado no plano
-    $XZ$;
-    \item $\vec{right} = \text{normalize}( \vec{up} \times \vec{front} )$;
-    \item A matriz de orientação local é composta por $\vec{right}$, $\vec{up}$ e $\vec{front}$;
-\end{itemize}
+$$
+\vec{r} = \vec{d'} \times \vec{up}
+$$
 
-Este modelo apresenta uma limitação: como o movimento é projetado apenas no plano $XZ$, a
-câmara assume que o jogador se move sobre terreno plano. Para jogos com terrenos irregulares ou
-variação de elevação, este comportamento deverá ser adaptado.
+Depois, ambos estes vetores são normalizados e utilizados para mover o jogador (diferentes vetores
+são escolhidos conforme a tecla premida). A normalização destes vetores é importante para garantir
+que garantir que a velocidade do jogador é constante.
+
+Este modelo apresenta uma limitação: como $d$ é projetado no plano $XZ$, a câmara assume que o
+jogador se move sobre terreno plano. Para jogos com terreno irregular e variação de elevação, este
+comportamento deveria ser adaptado para ter em conta o mundo no movimento da câmara. Assim, seria
+possível que o jogador se movesse na coordenada $y$, e também impedir que a câmara ficasse por baixo
+do terreno.
 
 O utilizador pode controlar a câmara de terceira pessoa utilizando as seguintes teclas:
 
 \begin{itemize}
-    \item \texttt{W/S}: Avançar ou recuar a personagem, respetivamente;
-    \item \texttt{A/D}: Mover a personagem para a esquerda ou para a direita, respetivamente;
+    \item \texttt{W/S}: Avançar ou recuar o jogador, respetivamente;
+    \item \texttt{A/D}: Mover o jogador para a esquerda ou para a direita, respetivamente;
     \item Setas Cima / Baixo: Inclinar a câmara para cima ou para baixo, respetivamente;
-    \item Setas Esquerda / Direita: Rodar a câmara à volta da personagem;
+    \item Setas Esquerda / Direita: Rodar a câmara à volta do jogador;
     \item \texttt{+/-}: Aproximar e afastar a câmara do jogador, respetivamente.
 \end{itemize}
 
 \section{Resultados Obtidos}
 
+Nesta secção, procuram-se apresentar algumas capturas de ecrã da \texttt{engine} das novas cenas
+criadas e das cenas fornecidas pela docência da UC.
+
+\subsection{Novas Cenas e Cenas Modificadas}
+
+Nesta fase, começaram-se por se desenvolver cenas simples, para se testarem as novas transformações
+animadas:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.30\textwidth]{res/phase3/results/Translation.png}
+    \includegraphics[width=0.30\textwidth]{res/phase3/results/TranslationHeart.png}
+    \includegraphics[width=0.30\textwidth]{res/phase3/results/Rotation.png}
+    \caption{Novas cenas criadas nesta fase para teste das animações.}
+\end{figure}
+
+Depois, foram construídas cenas mais complexas, uma imitação do programa \texttt{glxgears} (com
+rotação) e o Sistema Solar (gerado automaticamente), que podem ser vistas abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.30\textwidth]{res/phase3/results/glxgears.png}
+    \includegraphics[height=0.30\textwidth]{res/phase3/results/SolarSystem.png}
+    \caption{Novas cenas criadas nesta fase para teste das animações.}
+\end{figure}
+
+\subsection{Cenas Fornecidas pela Docência da UC}
+
+A docência da UC forneceu, juntamente com o enunciado do trabalho, algumas cenas a serem testadas no
+trabalho. A \texttt{engine} renderizou-as como esperado:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/phase3/results/Test1.png}
+    \includegraphics[width=0.4\textwidth]{res/phase3/results/Test2.png}
+    \caption{Renderização das cenas de teste fornecidas pela docência da UC.}
+\end{figure}
+
 \section{Conclusão e Trabalho Futuro}
+
+Consideramos que esta terceira fase deste trabalho prático foi concluída com sucesso. Em primeiro
+lugar, não tivemos qualquer problema com a implementação das funcionalidades obrigatórias: as
+animações e o uso de VBOs. No caso, já desde a primeira fase que o projeto utilizava VBOs para
+armazenar os modelos 3D na memória da GPU. Além disso, foi implementada uma funcionalidade que tinha
+sido um objetivo da fase anterior, a câmara em terceira pessoa. No entanto, não tivemos tempo para
+implementar outras funcionalidades que tínhamos proposto na fase anterior: \emph{instanced
+rendering} e \emph{object picking}. A implementação destas funcionalidades requiria algumas
+melhorias à arquitetura da \texttt{engine}, como o suporte para vários \emph{shaders} previamente
+mencionado. Foi possível fazer estas melhorias à \texttt{engine}, mas não sobrou tempo para
+implementar as funcionalidades que tirariam proveito delas.
+
+Para a próxima fase, desejamos implementar as funcionalidades obrigatórias pedidas, a iluminação e
+aplicação de texturas aos objetos da cena, bem como tentar implementar as funcionalidades para as
+quais não tivemos tempo nesta fase, \emph{instanced rendering} e \emph{object picking}.
 
 \begingroup
 \section{Bibliografia}

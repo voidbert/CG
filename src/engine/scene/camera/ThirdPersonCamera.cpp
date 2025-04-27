@@ -35,7 +35,7 @@ void ThirdPersonCamera::move(const glm::vec3 &v) {
 
     const glm::vec3 d = this->lookAt - this->position;
     const glm::vec3 front = glm::normalize(glm::vec3(d.x, 0.0f, d.z));
-    const glm::vec3 right = glm::normalize(glm::cross(this->up, front));
+    const glm::vec3 right = glm::normalize(glm::cross(front, this->up));
 
     glm::vec3 motionVector = glm::vec3(0.5 * walkingSpeed);
     if (v.z > 0)
