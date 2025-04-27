@@ -203,11 +203,6 @@ tinyxml2::XMLElement *SolarSystem::createComet() {
     for (const glm::vec3 &point : points) {
         translate->InsertEndChild(this->createVector("point", point));
     }
-
-    tinyxml2::XMLElement *rotate = this->createVector("rotate", glm::vec3(0.0f, 1.0f, 0.0f));
-    rotate->SetAttribute("angle", -90.0f);
-    transform->InsertEndChild(rotate);
-
     transform->InsertEndChild(this->createVector("scale", glm::vec3(this->bodyScale)));
 
     tinyxml2::XMLElement *models = group->InsertNewChildElement("models");

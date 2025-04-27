@@ -54,7 +54,7 @@ AnimatedTranslation::AnimatedTranslation(const tinyxml2::XMLElement *translateEl
     // Create renderable line
     std::vector<utils::Vertex> lineVertices;
 
-    const int pointsPerSegment = 8;
+    const int pointsPerSegment = 16;
     const int totalPoints = (this->points.size() - 3) * pointsPerSegment;
     const float iterationIncrement = this->translationTime / totalPoints;
 
@@ -72,8 +72,8 @@ void AnimatedTranslation::update(float time) {
 
     if (align) {
         const glm::vec3 mx = glm::normalize(positionDerivative.second);
-        const glm::vec3 mz = glm::normalize(glm::cross(this->lastUp, mx));
-        const glm::vec3 my = glm::normalize(glm::cross(mx, mz));
+        const glm::vec3 mz = glm::normalize(glm::cross(mx, this->lastUp));
+        const glm::vec3 my = glm::normalize(glm::cross(mz, mx));
         const glm::mat4 rotation = { glm::vec4(mx, 0.0f),
                                      glm::vec4(my, 0.0f),
                                      glm::vec4(mz, 0.0f),

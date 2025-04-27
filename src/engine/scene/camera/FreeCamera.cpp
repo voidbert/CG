@@ -44,7 +44,7 @@ void FreeCamera::setPosition(const glm::vec3 &pos) {
 void FreeCamera::move(const glm::vec3 &v) {
     const float translationSpeed = 100.0f;
     const glm::vec3 d = glm::normalize(this->lookAt - this->position);
-    const glm::vec3 right = glm::normalize(glm::cross(this->up, d));
+    const glm::vec3 right = glm::normalize(glm::cross(d, this->up));
 
     this->position += glm::mat3(right, this->up, d) * (translationSpeed * v);
     this->update();
