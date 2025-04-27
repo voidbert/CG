@@ -54,7 +54,7 @@ AnimatedTranslation::AnimatedTranslation(const tinyxml2::XMLElement *translateEl
     // Create renderable line
     std::vector<utils::Vertex> lineVertices;
 
-    const int pointsPerSegment = 16;
+    const int pointsPerSegment = 32;
     const int totalPoints = (this->points.size() - 3) * pointsPerSegment;
     const float iterationIncrement = this->translationTime / totalPoints;
 
