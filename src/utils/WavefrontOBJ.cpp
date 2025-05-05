@@ -36,23 +36,48 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
         std::smatch match;
         if (std::regex_match(line, match, WavefrontOBJ::lineRegex)) {
             if (match.str(1).length() > 0) {
-                const float x = std::atof(match.str(1).c_str());
-                const float y = std::atof(match.str(2).c_str());
-                const float z = std::atof(match.str(3).c_str());
+                const float x = std::stof(match.str(1));
+                const float y = std::stof(match.str(2));
+                const float z = std::stof(match.str(3));
 
-                std::string wString = match.str(4).c_str();
+                std::string wString = match.str(4);
                 float w = 1.0f;
                 if (wString.length() > 0) {
-                    w = std::atof(wString.c_str());
+                    w = std::stof(wString);
                 }
 
                 this->positions.push_back(glm::vec4(x, y, z, w));
             } else if (match.str(5).length() > 0) {
-                const int p1 = std::atoi(match.str(5).c_str()) - 1;
-                const int p2 = std::atoi(match.str(6).c_str()) - 1;
-                const int p3 = std::atoi(match.str(7).c_str()) - 1;
+                const float u = std::stof(match.str(5));
+                const float v = std::stof(match.str(6));
+
+                this->textureCoordinates.push_back(glm::vec2(u, v));
+            } else if (match.str(7).length() > 0) {
+                const float x = std::stof(match.str(7));
+                const float y = std::stof(match.str(8));
+                const float z = std::stof(match.str(9));
+
+                this->normals.push_back(glm::vec3(x, y, z));
+            } else if (match.str(10).length() > 0) {
+                const int p1 = std::stoi(match.str(10)) - 1;
+                const int p2 = std::stoi(match.str(11)) - 1;
+                const int p3 = std::stoi(match.str(12)) - 1;
 
                 this->faces.push_back(TriangleFace(p1, p2, p3));
+            } else if (match.str(13).length() > 0) {
+                const int p1 = std::stoi(match.str(13)) - 1;
+                const int t1 = std::stoi(match.str(14)) - 1;
+                const int n1 = std::stoi(match.str(15)) - 1;
+
+                const int p2 = std::stoi(match.str(16)) - 1;
+                const int t2 = std::stoi(match.str(17)) - 1;
+                const int n2 = std::stoi(match.str(18)) - 1;
+
+                const int p3 = std::stoi(match.str(19)) - 1;
+                const int t3 = std::stoi(match.str(20)) - 1;
+                const int n3 = std::stoi(match.str(21)) - 1;
+
+                this->faces.push_back(TriangleFace(p1, t1, n1, p2, t2, n2, p3, t3, n3));
             }
         } else {
             throw std::runtime_error("Failed to parse OBJ file " + filename + ": line " +
@@ -93,12 +118,36 @@ void WavefrontOBJ::writeToFile(const std::string &filename) const {
         file << std::endl;
     }
 
+    for (const glm::vec2 &v : this->textureCoordinates) {
+        file << "vt " << v.x << " " << v.y << std::endl;
+    }
+
+    for (const glm::vec3 &v : this->normals) {
+        file << "vn " << v.x << " " << v.y << " " << v.z << std::endl;
+    }
+
     for (const TriangleFace &f : this->faces) {
         // 0-based index to 1-based index
-        file << "f ";
-        file << f.positions[0] + 1 << " ";
-        file << f.positions[1] + 1 << " ";
-        file << f.positions[2] + 1 << std::endl;
+        if (f.textureCoordinates[0] == -1) {
+            file << "f ";
+            file << f.positions[0] + 1 << " ";
+            file << f.positions[1] + 1 << " ";
+            file << f.positions[2] + 1 << std::endl;
+        } else {
+            file << "f ";
+
+            file << f.positions[0] + 1 << "/";
+            file << f.textureCoordinates[0] + 1 << "/";
+            file << f.normals[0] + 1 << " ";
+
+            file << f.positions[1] + 1 << "/";
+            file << f.textureCoordinates[1] + 1 << "/";
+            file << f.normals[1] + 1 << " ";
+
+            file << f.positions[2] + 1 << "/";
+            file << f.textureCoordinates[2] + 1 << "/";
+            file << f.normals[2] + 1 << std::endl;
+        }
     }
 }
 
@@ -140,7 +189,17 @@ std::regex WavefrontOBJ::lineRegex(
             "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)"
             "(\\s+(?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e[0-9]+)?)?\\s*"
     "|"
-    "f\\s+([0-9]+)\\s+([0-9]+)\\s+([0-9]+)\\s*", std::regex_constants::ECMAScript);
+    "vt\\s+" "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)\\s+"
+             "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)\\s*"
+    "|"
+    "vn\\s+" "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)\\s+"
+             "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)\\s+"
+             "((?:-|\\+)?[0-9]+(?:\\.[0-9]+)?(?:e(?:-|\\+)?[0-9]+)?)\\s*"
+    "|"
+    "f\\s+([0-9]+)\\s+([0-9]+)\\s+([0-9]+)\\s*"
+    "|"
+    "f\\s+([0-9]+)/([0-9]+)/([0-9]+)\\s+([0-9]+)/([0-9]+)/([0-9]+)\\s+([0-9]+)/([0-9]+)/([0-9]+)\\s*",
+    std::regex_constants::ECMAScript);
 // clang-format on
 
 }

@@ -14,6 +14,9 @@
 
 #pragma once
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <regex>
 #include <string>
 #include <vector>
@@ -30,6 +33,8 @@ private:
 protected:
     std::string comment;
     std::vector<glm::vec4> positions;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> textureCoordinates;
     std::vector<TriangleFace> faces;
 
     WavefrontOBJ();

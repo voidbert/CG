@@ -21,9 +21,20 @@ namespace utils {
 
 class TriangleFace {
 public:
-    std::array<uint32_t, 3> positions;
+    std::array<int32_t, 3> positions;
+    std::array<int32_t, 3> textureCoordinates;
+    std::array<int32_t, 3> normals;
 
-    TriangleFace(uint32_t p1, uint32_t p2, uint32_t p3);
+    TriangleFace(int32_t p1, int32_t p2, int32_t p3);
+    TriangleFace(int32_t p1,
+                 int32_t t1,
+                 int32_t n1,
+                 int32_t p2,
+                 int32_t t2,
+                 int32_t n2,
+                 int32_t p3,
+                 int32_t t3,
+                 int32_t n3);
 };
 
 }

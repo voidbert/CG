@@ -16,6 +16,18 @@
 
 namespace utils {
 
-TriangleFace::TriangleFace(uint32_t p1, uint32_t p2, uint32_t p3) : positions { p1, p2, p3 } {}
+TriangleFace::TriangleFace(int32_t p1, int32_t p2, int32_t p3) :
+    positions { p1, p2, p3 }, textureCoordinates { -1, -1, -1 }, normals { -1, -1, -1 } {}
+
+TriangleFace::TriangleFace(int32_t p1,
+                           int32_t t1,
+                           int32_t n1,
+                           int32_t p2,
+                           int32_t t2,
+                           int32_t n2,
+                           int32_t p3,
+                           int32_t t3,
+                           int32_t n3) :
+    positions { p1, p2, p3 }, textureCoordinates { t1, t2, t3 }, normals { n1, n2, n3 } {}
 
 }
