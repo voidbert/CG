@@ -22,6 +22,7 @@
 #include "engine/render/RenderPipelineManager.hpp"
 #include "engine/scene/camera/Camera.hpp"
 #include "engine/scene/Group.hpp"
+#include "engine/scene/light/Light.hpp"
 
 namespace engine::scene {
 
@@ -31,6 +32,7 @@ private:
     std::unique_ptr<camera::Camera> camera;
     std::vector<std::unique_ptr<Group>> groups;
     render::Axis xAxis, yAxis, zAxis;
+    std::unique_ptr<light::Light> light;
 
 public:
     explicit Scene(const std::string &file);
