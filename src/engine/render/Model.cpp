@@ -18,10 +18,10 @@ namespace engine::render {
 
 Model::Model(const utils::WavefrontOBJ &objectFile) : Model(objectFile.getIndexedVertices()) {}
 
-Model::Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices) :
+Model::Model(const std::pair<std::vector<glm::vec4>, std::vector<uint32_t>> &vertices) :
     Model(vertices.first, vertices.second) {}
 
-Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices) :
+Model::Model(const std::vector<glm::vec4> &vertices, const std::vector<uint32_t> &indices) :
     boundingSphere(vertices) {
 
     glGenVertexArrays(1, &this->vao);
@@ -30,11 +30,11 @@ Model::Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint3
     glGenBuffers(1, &this->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferData(GL_ARRAY_BUFFER,
-                 vertices.size() * sizeof(utils::Vertex),
+                 vertices.size() * sizeof(glm::vec4),
                  vertices.data(),
                  GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 4, GL_FLOAT, false, 4 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 4, GL_FLOAT, false, sizeof(glm::vec4), nullptr);
     glEnableVertexAttribArray(0);
 
     glGenBuffers(1, &this->ibo);

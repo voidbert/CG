@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "utils/TriangleFace.hpp"
-#include "utils/Vertex.hpp"
 
 namespace utils {
 
@@ -43,7 +42,7 @@ public:
     explicit WavefrontOBJ(const std::string &filename);
 
     void writeToFile(const std::string &filename) const;
-    std::pair<std::vector<Vertex>, std::vector<uint32_t>> getIndexedVertices() const;
+    std::pair<std::vector<glm::vec4>, std::vector<uint32_t>> getIndexedVertices() const;
 };
 
 }

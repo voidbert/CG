@@ -19,7 +19,6 @@
 #include <vector>
 
 #include "engine/render/RenderPipelineManager.hpp"
-#include "utils/Vertex.hpp"
 
 namespace engine::render {
 
@@ -37,7 +36,7 @@ public:
     BoundingSphere();
     BoundingSphere(const glm::vec4 &_center, float _radius);
     BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform);
-    explicit BoundingSphere(const std::vector<utils::Vertex> &vertices);
+    explicit BoundingSphere(const std::vector<glm::vec4> &vertices);
 
     const glm::vec4 &getCenter() const;
     float getRadius() const;

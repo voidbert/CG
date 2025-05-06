@@ -17,13 +17,14 @@
 #include <fstream>
 #include <unordered_map>
 
+#include "utils/Vertex.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace utils {
 
-WavefrontOBJ::WavefrontOBJ() : comment(), positions(), faces() {}
+WavefrontOBJ::WavefrontOBJ() {}
 
-WavefrontOBJ::WavefrontOBJ(const std::string &filename) : positions(), faces() {
+WavefrontOBJ::WavefrontOBJ(const std::string &filename) {
     std::ifstream file;
     file.open(filename);
     if (!file.is_open()) {
@@ -151,9 +152,9 @@ void WavefrontOBJ::writeToFile(const std::string &filename) const {
     }
 }
 
-std::pair<std::vector<Vertex>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVertices() const {
+std::pair<std::vector<glm::vec4>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVertices() const {
     std::unordered_map<Vertex, int32_t> addedVertices;
-    std::vector<Vertex> vertices;
+    std::vector<glm::vec4> bufferPositions;
     std::vector<uint32_t> indices;
 
     for (const TriangleFace &face : faces) {
@@ -164,8 +165,8 @@ std::pair<std::vector<Vertex>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVe
             uint32_t bufferIndex;
 
             if (it == addedVertices.end()) {
-                vertices.push_back(vertex);
-                bufferIndex = vertices.size() - 1;
+                bufferPositions.push_back(vertex.position);
+                bufferIndex = bufferPositions.size() - 1;
                 addedVertices[vertex] = bufferIndex;
             } else {
                 bufferIndex = it->second;
@@ -175,7 +176,7 @@ std::pair<std::vector<Vertex>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVe
         }
     }
 
-    return std::make_pair(vertices, indices);
+    return std::make_pair(bufferPositions, indices);
 }
 
 // clang-format off

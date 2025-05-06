@@ -21,7 +21,6 @@
 
 #include "engine/render/BoundingSphere.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
-#include "utils/Vertex.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace engine::render {
@@ -46,8 +45,8 @@ public:
               bool fillPolygons) const;
 
 private:
-    explicit Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices);
-    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
+    explicit Model(const std::pair<std::vector<glm::vec4>, std::vector<uint32_t>> &vertices);
+    Model(const std::vector<glm::vec4> &vertices, const std::vector<uint32_t> &indices);
 };
 
 }

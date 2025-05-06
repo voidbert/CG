@@ -28,7 +28,7 @@ Axis::Axis(const glm::vec3 &direction) {
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(glm::vec4), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 4, GL_FLOAT, false, 4 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 4, GL_FLOAT, false, sizeof(glm::vec4), nullptr);
     glEnableVertexAttribArray(0);
 
     this->color = glm::vec4(normalized, 1.0f);
