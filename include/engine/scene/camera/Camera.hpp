@@ -53,7 +53,8 @@ public:
     virtual int getEntityCount() const;
     virtual int draw(render::RenderPipelineManager &pipelineManager,
                      bool fillPolygons,
-                     bool showBoundingSpheres) const;
+                     bool showBoundingSpheres,
+                     bool showNormals) const;
 
     bool isInFrustum(const render::BoundingSphere &sphere) const;
 

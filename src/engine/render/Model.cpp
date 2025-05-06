@@ -18,64 +18,6 @@ namespace engine::render {
 
 Model::Model(const utils::WavefrontOBJ &objectFile) : Model(objectFile.getIndexedVertices()) {}
 
-Model::Model(const std::tuple<std::vector<glm::vec4>,
-                              std::vector<glm::vec2>,
-                              std::vector<glm::vec4>,
-                              std::vector<uint32_t>> &modelData) :
-    boundingSphere(std::get<0>(modelData)) {
-
-    const auto &[positions, textureCoordinates, normals, indices] = modelData;
-
-    // Generate buffers
-    glGenVertexArrays(1, &this->vao);
-    glBindVertexArray(this->vao);
-
-    GLuint buffers[4];
-    glGenBuffers(4, buffers);
-    this->positionsVBO = buffers[0];
-    this->textureCoordinatesVBO = buffers[1];
-    this->normalsVBO = buffers[2];
-    this->ibo = buffers[3];
-
-    // Fill position, texture coordinate, and normal data
-    glBindBuffer(GL_ARRAY_BUFFER, this->positionsVBO);
-    glBufferData(GL_ARRAY_BUFFER,
-                 positions.size() * sizeof(glm::vec4),
-                 positions.data(),
-                 GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 4, GL_FLOAT, false, sizeof(glm::vec4), nullptr);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->textureCoordinatesVBO);
-    glBufferData(GL_ARRAY_BUFFER,
-                 textureCoordinates.size() * sizeof(glm::vec2),
-                 textureCoordinates.data(),
-                 GL_STATIC_DRAW);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(glm::vec2), nullptr);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, this->normalsVBO);
-    glBufferData(GL_ARRAY_BUFFER,
-                 normals.size() * sizeof(glm::vec4),
-                 normals.data(),
-                 GL_STATIC_DRAW);
-
-    glVertexAttribPointer(2, 4, GL_FLOAT, false, sizeof(glm::vec4), nullptr);
-    glEnableVertexAttribArray(2);
-
-    // Fill index data
-    glGenBuffers(1, &this->ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 indices.size() * sizeof(GLuint),
-                 indices.data(),
-                 GL_STATIC_DRAW);
-
-    this->vertexCount = indices.size();
-}
-
 Model::~Model() {
     GLuint buffers[4] = { this->positionsVBO,
                           this->textureCoordinatesVBO,
@@ -90,6 +32,10 @@ const BoundingSphere &Model::getBoundingSphere() const {
     return this->boundingSphere;
 }
 
+const NormalsPreview &Model::getNormalsPreview() const {
+    return this->normalsPreview;
+}
+
 void Model::draw(RenderPipelineManager &pipelineManager,
                  const glm::mat4 &transformMatrix,
                  const glm::vec4 &color,
@@ -102,6 +48,49 @@ void Model::draw(RenderPipelineManager &pipelineManager,
 
     glBindVertexArray(this->vao);
     glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
+}
+
+Model::Model(const std::tuple<std::vector<glm::vec4>,
+                              std::vector<glm::vec2>,
+                              std::vector<glm::vec4>,
+                              std::vector<uint32_t>> &modelData) :
+    boundingSphere(std::get<0>(modelData)),
+    normalsPreview(std::get<0>(modelData), std::get<2>(modelData), std::get<3>(modelData)) {
+
+    const auto &[positions, textureCoordinates, normals, indices] = modelData;
+
+    // Generate buffers
+    glGenVertexArrays(1, &this->vao);
+
+    GLuint buffers[4];
+    glGenBuffers(4, buffers);
+    this->positionsVBO = buffers[0];
+    this->textureCoordinatesVBO = buffers[1];
+    this->normalsVBO = buffers[2];
+    this->ibo = buffers[3];
+
+    // Upload position, texture coordinate, and normal data
+    glBindVertexArray(this->vao);
+    this->initializeBuffer(0, this->positionsVBO, positions);
+    this->initializeBuffer(1, this->textureCoordinatesVBO, textureCoordinates);
+    this->initializeBuffer(2, this->normalsVBO, normals);
+
+    // Fill index data
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 indices.size() * sizeof(uint32_t),
+                 indices.data(),
+                 GL_STATIC_DRAW);
+
+    this->vertexCount = indices.size();
+}
+
+template<class V>
+void Model::initializeBuffer(GLuint attribute, GLuint vbo, const std::vector<V> &data) {
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(V), data.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(attribute, V::length(), GL_FLOAT, false, sizeof(V), nullptr);
+    glEnableVertexAttribArray(attribute);
 }
 
 }

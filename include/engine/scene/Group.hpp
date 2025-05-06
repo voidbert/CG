@@ -54,7 +54,8 @@ public:
              const glm::mat4 &_transform,
              bool fillPolygons,
              bool showBoundingSpheres,
-             bool showAnimationLines) const;
+             bool showAnimationLines,
+             bool showNormals) const;
 
 private:
     const render::BoundingSphere &getBoundingSphere() const;

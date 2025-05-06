@@ -51,7 +51,8 @@ public:
              bool backFaceCulling,
              bool showAxes,
              bool showBoundingSpheres,
-             bool showAnimationLines) const;
+             bool showAnimationLines,
+             bool showNormals) const;
 };
 
 }

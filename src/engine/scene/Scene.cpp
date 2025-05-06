@@ -101,7 +101,8 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
                 bool backFaceCulling,
                 bool showAxes,
                 bool showBoundingSpheres,
-                bool showAnimationLines) const {
+                bool showAnimationLines,
+                bool showNormals) const {
 
     if (backFaceCulling) {
         glEnable(GL_CULL_FACE);
@@ -112,7 +113,8 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
 
     // Draw scene contents
     int entityCount = 0;
-    entityCount += this->camera->draw(pipelineManager, fillPolygons, showBoundingSpheres);
+    entityCount +=
+        this->camera->draw(pipelineManager, fillPolygons, showBoundingSpheres, showNormals);
 
     const glm::mat4 &cameraMatrix = this->camera->getCameraMatrix();
     for (const std::unique_ptr<Group> &group : this->groups) {
@@ -122,7 +124,8 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
                                    cameraMatrix,
                                    fillPolygons,
                                    showBoundingSpheres,
-                                   showAnimationLines);
+                                   showAnimationLines,
+                                   showNormals);
     }
 
     // Draw axes

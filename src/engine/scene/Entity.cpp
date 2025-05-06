@@ -46,6 +46,10 @@ const render::BoundingSphere &Entity::getBoundingSphere() const {
     return this->boundingSphere;
 }
 
+const render::NormalsPreview &Entity::getNormalsPreview() const {
+    return this->model->getNormalsPreview();
+}
+
 void Entity::draw(render::RenderPipelineManager &pipelineManager,
                   const glm::mat4 &transformMatrix,
                   bool fillPolygons) const {

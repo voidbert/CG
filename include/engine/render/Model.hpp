@@ -14,12 +14,17 @@
 
 #pragma once
 
+#include <cstdint>
 #include <glad/glad.h>
 #include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <tuple>
 #include <vector>
 
 #include "engine/render/BoundingSphere.hpp"
+#include "engine/render/NormalsPreview.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
@@ -30,14 +35,16 @@ private:
     GLuint vao, positionsVBO, textureCoordinatesVBO, normalsVBO, ibo;
     int vertexCount;
     BoundingSphere boundingSphere;
+    NormalsPreview normalsPreview;
 
 public:
     explicit Model(const utils::WavefrontOBJ &objectFile);
     Model(const Model &model) = delete;
-    Model(Model &&) = delete;
+    Model(Model &&model) = delete;
     ~Model();
 
     const BoundingSphere &getBoundingSphere() const;
+    const NormalsPreview &getNormalsPreview() const;
 
     void draw(RenderPipelineManager &pipelineManager,
               const glm::mat4 &transformMatrix,
@@ -50,6 +57,9 @@ private:
                            std::vector<glm::vec4>, // Normals (padded)
                            std::vector<uint32_t>> // Indices
               &modelData);
+
+    template<class V>
+    void initializeBuffer(GLuint attribute, GLuint vbo, const std::vector<V> &data);
 };
 
 }
