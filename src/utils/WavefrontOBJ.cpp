@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
+#include <optional>
 #include <unordered_map>
 
 #include "utils/Vertex.hpp"
@@ -32,6 +33,7 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) {
     }
 
     std::string line;
+    std::optional<bool> completeFaces;
     int lineNumber = 1;
     while (std::getline(file, line)) {
         std::smatch match;
@@ -58,13 +60,23 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) {
                 const float y = std::stof(match.str(8));
                 const float z = std::stof(match.str(9));
 
+                if (completeFaces.value_or(false)) {
+                    throw std::runtime_error("Can't mix face types in OBJ file: " + filename);
+                }
+
                 this->normals.push_back(glm::vec3(x, y, z));
+                completeFaces = std::make_optional<bool>(false);
             } else if (match.str(10).length() > 0) {
                 const int p1 = std::stoi(match.str(10)) - 1;
                 const int p2 = std::stoi(match.str(11)) - 1;
                 const int p3 = std::stoi(match.str(12)) - 1;
 
+                if (!completeFaces.value_or(true)) {
+                    throw std::runtime_error("Can't mix face types in OBJ file: " + filename);
+                }
+
                 this->faces.push_back(TriangleFace(p1, p2, p3));
+                completeFaces = std::make_optional<bool>(true);
             } else if (match.str(13).length() > 0) {
                 const int p1 = std::stoi(match.str(13)) - 1;
                 const int t1 = std::stoi(match.str(14)) - 1;
@@ -95,10 +107,27 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) {
     for (const TriangleFace &face : this->faces) {
         if (std::any_of(face.positions.cbegin(),
                         face.positions.cend(),
-                        [this](const uint32_t &positionIndex) {
-                            return positionIndex >= this->positions.size();
+                        [this](const int32_t &positionIndex) {
+                            return positionIndex >= static_cast<int32_t>(this->positions.size());
                         })) {
-            throw std::runtime_error("Invalid indices in OBJ file: " + filename);
+            throw std::runtime_error("Invalid position indices in OBJ file: " + filename);
+        }
+
+        if (std::any_of(face.textureCoordinates.cbegin(),
+                        face.textureCoordinates.cend(),
+                        [this](const int32_t &textureCoordinateIndex) {
+                            return textureCoordinateIndex >=
+                                static_cast<int32_t>(this->textureCoordinates.size());
+                        })) {
+            throw std::runtime_error("Invalid texture coordinate indices in OBJ file: " + filename);
+        }
+
+        if (std::any_of(face.normals.cbegin(),
+                        face.normals.cend(),
+                        [this](const int32_t &normalIndex) {
+                            return normalIndex >= static_cast<int32_t>(this->normals.size());
+                        })) {
+            throw std::runtime_error("Invalid normal indices in OBJ file: " + filename);
         }
     }
 }
