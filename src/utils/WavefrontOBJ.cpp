@@ -19,6 +19,7 @@
 #include <glm/gtx/hash.hpp>
 #include <optional>
 #include <unordered_map>
+#include <utility>
 
 #include "utils/WavefrontOBJ.hpp"
 
@@ -143,6 +144,18 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) {
             throw std::runtime_error("Invalid normal indices in OBJ file: " + filename);
         }
     }
+
+    for (const TriangleFace &face : this->faces) {
+        if (std::any_of(face.textureCoordinates.cbegin(),
+                        face.textureCoordinates.cend(),
+                        [this](const int32_t &textureCoordinateIndex) {
+                            return textureCoordinateIndex < 0;
+                        })) {
+
+            this->generateNormals();
+            break;
+        }
+    }
 }
 
 void WavefrontOBJ::writeToFile(const std::string &filename) const {
@@ -210,15 +223,16 @@ std::tuple<std::vector<glm::vec4>,
         for (int i = 0; i < 3; ++i) {
             const glm::vec4 position = this->positions[face.positions[i]];
 
-            // TODO - remove later with auto generation
             glm::vec2 textureCoordinate = glm::vec2(0.0f, 0.0f);
             if (face.textureCoordinates[i] > 0) {
                 textureCoordinate = this->textureCoordinates[face.textureCoordinates[i]];
             }
 
-            glm::vec3 normal = glm::vec3(0.0f, 1.0f, 0.0f);
+            glm::vec3 normal;
             if (face.textureCoordinates[i] > 0) {
                 normal = this->normals[face.normals[i]];
+            } else {
+                normal = this->normals[face.positions[i]];
             }
 
             const std::tuple<glm::vec4, glm::vec2, glm::vec3> key =
@@ -242,6 +256,47 @@ std::tuple<std::vector<glm::vec4>,
     }
 
     return std::make_tuple(bufferPositions, bufferTextureCoordinates, bufferNormals, indices);
+}
+
+void WavefrontOBJ::generateNormals() {
+    std::unordered_map<glm::vec4, glm::vec3> averageNormals;
+    std::unordered_map<glm::vec4, float> averageWeights;
+
+    for (const TriangleFace &face : this->faces) {
+        // Get points and sides of the triangle
+        const glm::vec4 p0 = this->positions[face.positions[0]];
+        const glm::vec4 p1 = this->positions[face.positions[1]];
+        const glm::vec4 p2 = this->positions[face.positions[2]];
+
+        const glm::vec3 v0 = glm::vec3(p0) - glm::vec3(p1);
+        const glm::vec3 v1 = glm::vec3(p0) - glm::vec3(p2);
+        const glm::vec3 v2 = glm::vec3(p1) - glm::vec3(p2);
+
+        // Calculate area of triangle via Heron's formula
+        const float sideLength0 = glm::length(v0);
+        const float sideLength1 = glm::length(v1);
+        const float sideLength2 = glm::length(v2);
+        const float semiPerimeter = 0.5f * (sideLength0 + sideLength1 + sideLength2);
+        const float area = semiPerimeter * (semiPerimeter - sideLength0) *
+            (semiPerimeter - sideLength1) * (semiPerimeter - sideLength2);
+
+        // Calculate weighted average
+        const glm::vec3 normal = glm::cross(v0, v1) * area;
+
+        averageNormals[p0] += normal;
+        averageWeights[p0] += area;
+        averageNormals[p1] += normal;
+        averageWeights[p1] += area;
+        averageNormals[p2] += normal;
+        averageWeights[p2] += area;
+    }
+
+    for (const glm::vec4 &position : this->positions) {
+        const glm::vec3 perpendicular = averageNormals[position];
+        const float weight = averageWeights[position];
+
+        this->normals.push_back(glm::normalize(perpendicular / weight));
+    }
 }
 
 // clang-format off

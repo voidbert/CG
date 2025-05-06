@@ -49,6 +49,11 @@ public:
                std::vector<glm::vec4>, // Normals (padded)
                std::vector<uint32_t>> // Indices
         getIndexedVertices() const;
+
+    // TODO - Mariana, please make generateNormals private when Sphere.cpp doesn't need it anymore
+
+protected:
+    void generateNormals();
 };
 
 }
