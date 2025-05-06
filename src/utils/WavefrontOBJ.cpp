@@ -12,14 +12,27 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
+#include <glm/gtx/hash.hpp>
 #include <optional>
 #include <unordered_map>
 
-#include "utils/Vertex.hpp"
 #include "utils/WavefrontOBJ.hpp"
+
+namespace std {
+template<>
+struct hash<tuple<glm::vec4, glm::vec2, glm::vec3>> {
+    size_t operator()(const tuple<glm::vec4, glm::vec2, glm::vec3> &t) const {
+        const size_t h1 = hash<glm::vec4>()(get<0>(t));
+        const size_t h2 = hash<glm::vec2>()(get<1>(t));
+        const size_t h3 = hash<glm::vec3>()(get<2>(t));
+        return h1 ^ (h2 << 1) ^ (h3 << 2);
+    }
+};
+}
 
 namespace utils {
 
@@ -181,22 +194,45 @@ void WavefrontOBJ::writeToFile(const std::string &filename) const {
     }
 }
 
-std::pair<std::vector<glm::vec4>, std::vector<uint32_t>> WavefrontOBJ::getIndexedVertices() const {
-    std::unordered_map<Vertex, int32_t> addedVertices;
+std::tuple<std::vector<glm::vec4>,
+           std::vector<glm::vec2>,
+           std::vector<glm::vec4>,
+           std::vector<uint32_t>>
+    WavefrontOBJ::getIndexedVertices() const {
+
+    std::unordered_map<std::tuple<glm::vec4, glm::vec2, glm::vec3>, int32_t> addedVertices;
     std::vector<glm::vec4> bufferPositions;
+    std::vector<glm::vec2> bufferTextureCoordinates;
+    std::vector<glm::vec4> bufferNormals;
     std::vector<uint32_t> indices;
 
     for (const TriangleFace &face : faces) {
         for (int i = 0; i < 3; ++i) {
-            Vertex vertex(this->positions[face.positions[i]]);
+            const glm::vec4 position = this->positions[face.positions[i]];
 
-            auto it = addedVertices.find(vertex);
+            // TODO - remove later with auto generation
+            glm::vec2 textureCoordinate = glm::vec2(0.0f, 0.0f);
+            if (face.textureCoordinates[i] > 0) {
+                textureCoordinate = this->textureCoordinates[face.textureCoordinates[i]];
+            }
+
+            glm::vec3 normal = glm::vec3(0.0f, 1.0f, 0.0f);
+            if (face.textureCoordinates[i] > 0) {
+                normal = this->normals[face.normals[i]];
+            }
+
+            const std::tuple<glm::vec4, glm::vec2, glm::vec3> key =
+                std::make_tuple(position, textureCoordinate, normal);
+            auto it = addedVertices.find(key);
+
             uint32_t bufferIndex;
-
             if (it == addedVertices.end()) {
-                bufferPositions.push_back(vertex.position);
+                bufferPositions.push_back(position);
+                bufferTextureCoordinates.push_back(textureCoordinate);
+                bufferNormals.push_back(glm::vec4(normal, 0.0f));
+
                 bufferIndex = bufferPositions.size() - 1;
-                addedVertices[vertex] = bufferIndex;
+                addedVertices[key] = bufferIndex;
             } else {
                 bufferIndex = it->second;
             }
@@ -205,7 +241,7 @@ std::pair<std::vector<glm::vec4>, std::vector<uint32_t>> WavefrontOBJ::getIndexe
         }
     }
 
-    return std::make_pair(bufferPositions, indices);
+    return std::make_tuple(bufferPositions, bufferTextureCoordinates, bufferNormals, indices);
 }
 
 // clang-format off

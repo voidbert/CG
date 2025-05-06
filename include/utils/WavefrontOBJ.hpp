@@ -20,6 +20,7 @@
 #include <glm/vec4.hpp>
 #include <regex>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "utils/TriangleFace.hpp"
@@ -33,8 +34,8 @@ private:
 protected:
     std::string comment;
     std::vector<glm::vec4> positions;
-    std::vector<glm::vec3> normals;
     std::vector<glm::vec2> textureCoordinates;
+    std::vector<glm::vec3> normals;
     std::vector<TriangleFace> faces;
 
     WavefrontOBJ();
@@ -43,7 +44,11 @@ public:
     explicit WavefrontOBJ(const std::string &filename);
 
     void writeToFile(const std::string &filename) const;
-    std::pair<std::vector<glm::vec4>, std::vector<uint32_t>> getIndexedVertices() const;
+    std::tuple<std::vector<glm::vec4>, // Positions
+               std::vector<glm::vec2>, // Texture coordinates
+               std::vector<glm::vec4>, // Normals (padded)
+               std::vector<uint32_t>> // Indices
+        getIndexedVertices() const;
 };
 
 }

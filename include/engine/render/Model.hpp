@@ -27,7 +27,7 @@ namespace engine::render {
 
 class Model {
 private:
-    GLuint vao, vbo, ibo;
+    GLuint vao, positionsVBO, textureCoordinatesVBO, normalsVBO, ibo;
     int vertexCount;
     BoundingSphere boundingSphere;
 
@@ -45,8 +45,11 @@ public:
               bool fillPolygons) const;
 
 private:
-    explicit Model(const std::pair<std::vector<glm::vec4>, std::vector<uint32_t>> &vertices);
-    Model(const std::vector<glm::vec4> &vertices, const std::vector<uint32_t> &indices);
+    Model(const std::tuple<std::vector<glm::vec4>, // Positions
+                           std::vector<glm::vec2>, // Texture coordinates
+                           std::vector<glm::vec4>, // Normals (padded)
+                           std::vector<uint32_t>> // Indices
+              &modelData);
 };
 
 }
