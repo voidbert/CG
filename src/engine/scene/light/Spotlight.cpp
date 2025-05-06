@@ -15,6 +15,8 @@
 #include "engine/scene/light/Spotlight.hpp"
 
 namespace engine::scene::light {
+
 Spotlight::Spotlight(const glm::vec3 &_position, const glm::vec3 &_direction, float _cutoff) :
     position(_position), direction(glm::normalize(_direction)), cutoff(_cutoff) {}
+
 }
