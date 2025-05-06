@@ -23,7 +23,7 @@ private:
     glm::vec3 direction;
 
 public:
-    DirectionalLight(const glm::vec3 &_direction);
+    explicit DirectionalLight(const glm::vec3 &_direction);
 };
 
 }

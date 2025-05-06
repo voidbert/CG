@@ -32,7 +32,7 @@ private:
     std::unique_ptr<camera::Camera> camera;
     std::vector<std::unique_ptr<Group>> groups;
     render::Axis xAxis, yAxis, zAxis;
-    std::unique_ptr<light::Light> light;
+    std::vector<std::unique_ptr<light::Light>> lights;
 
 public:
     explicit Scene(const std::string &file);

@@ -23,7 +23,7 @@ private:
     glm::vec3 position;
 
 public:
-    PointLight(const glm::vec3 &_position);
+    explicit PointLight(const glm::vec3 &_position);
 };
 
 }

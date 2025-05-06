@@ -48,4 +48,17 @@ glm::vec3 XMLUtils::getXYZ(const tinyxml2::XMLElement *element) {
     return glm::vec3(x, y, z);
 }
 
+glm::vec3 XMLUtils::getRGB(const tinyxml2::XMLElement *element) {
+    float R = element->FloatAttribute("R", NAN);
+    float G = element->FloatAttribute("G", NAN);
+    float B = element->FloatAttribute("B", NAN);
+
+    if (std::isnan(R) || std::isnan(G) || std::isnan(B)) {
+        std::string name = element->Name();
+        throw std::runtime_error("Invalid vector in <" + name + "> in scene XML file");
+    }
+
+    return glm::vec3(R, G, B);
+}
+
 }

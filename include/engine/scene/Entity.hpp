@@ -27,10 +27,20 @@
 
 namespace engine::scene {
 
+struct Material {
+    glm::vec3 diffuse;
+    glm::vec3 ambient;
+    glm::vec3 specular;
+    glm::vec3 emissive;
+    float shininess;
+};
+
 class Entity {
 private:
     std::shared_ptr<render::Model> model;
     render::BoundingSphere boundingSphere;
+    std::string texturePath;
+    Material material;
 
 public:
     Entity(const tinyxml2::XMLElement *modelElement,

@@ -56,9 +56,13 @@ Scene::Scene(const std::string &file) :
         loadedModels);
 
     // Get light properties
-    const tinyxml2::XMLElement *lightElement = worldElement->FirstChildElement("light");
-    if (lightElement) {
-        this->light = light::LightFactory::createFromXML(lightElement);
+    const tinyxml2::XMLElement *lightsElement = worldElement->FirstChildElement("lights");
+    if (lightsElement) {
+        const tinyxml2::XMLElement *lightElement = lightsElement->FirstChildElement("light");
+        while (lightElement) {
+            this->lights.push_back(light::LightFactory::createFromXML(lightElement));
+            lightElement = lightElement->NextSiblingElement("light");
+        }
     }
 
     // Get rendering groups

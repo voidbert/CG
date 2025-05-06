@@ -25,7 +25,7 @@ private:
     float cutoff;
 
 public:
-    Spotlight(const glm::vec3 &_position, const glm::vec3 &_direction, float _cutoff);
+    explicit Spotlight(const glm::vec3 &_position, const glm::vec3 &_direction, float _cutoff);
 };
 
 }
