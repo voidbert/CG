@@ -20,7 +20,7 @@ namespace generator::figures {
 
 class Box : public utils::WavefrontOBJ {
 public:
-    Box(float size, int divisions);
+    Box(float size, int divisions, bool multiTextured = false);
 };
 
 }
