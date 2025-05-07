@@ -146,11 +146,10 @@ WavefrontOBJ::WavefrontOBJ(const std::string &filename) {
     }
 
     for (const TriangleFace &face : this->faces) {
-        if (std::any_of(face.textureCoordinates.cbegin(),
-                        face.textureCoordinates.cend(),
-                        [this](const int32_t &textureCoordinateIndex) {
-                            return textureCoordinateIndex < 0;
-                        })) {
+        if (std::any_of(
+                face.textureCoordinates.cbegin(),
+                face.textureCoordinates.cend(),
+                [](const int32_t &textureCoordinateIndex) { return textureCoordinateIndex < 0; })) {
 
             this->generateNormals();
             break;
@@ -224,12 +223,12 @@ std::tuple<std::vector<glm::vec4>,
             const glm::vec4 position = this->positions[face.positions[i]];
 
             glm::vec2 textureCoordinate = glm::vec2(0.0f, 0.0f);
-            if (face.textureCoordinates[i] > 0) {
+            if (face.textureCoordinates[i] >= 0) {
                 textureCoordinate = this->textureCoordinates[face.textureCoordinates[i]];
             }
 
             glm::vec3 normal;
-            if (face.textureCoordinates[i] > 0) {
+            if (face.textureCoordinates[i] >= 0) {
                 normal = this->normals[face.normals[i]];
             } else {
                 normal = this->normals[face.positions[i]];
