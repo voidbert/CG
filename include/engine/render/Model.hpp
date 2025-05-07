@@ -52,11 +52,11 @@ public:
               bool fillPolygons) const;
 
 private:
-    Model(const std::tuple<std::vector<glm::vec4>, // Positions
-                           std::vector<glm::vec2>, // Texture coordinates
-                           std::vector<glm::vec4>, // Normals (padded)
-                           std::vector<uint32_t>> // Indices
-              &modelData);
+    explicit Model(const std::tuple<std::vector<glm::vec4>, // Positions
+                                    std::vector<glm::vec2>, // Texture coordinates
+                                    std::vector<glm::vec4>, // Normals (padded)
+                                    std::vector<uint32_t>> // Indices
+                       &modelData);
 
     template<class V>
     void initializeBuffer(GLuint attribute, GLuint vbo, const std::vector<V> &data);
