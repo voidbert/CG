@@ -18,6 +18,13 @@
 
 namespace engine::scene {
 
+Material::Material() :
+    diffuse(glm::vec3(1.0f)),
+    ambient(glm::vec3(0.2f)),
+    specular(glm::vec3(0.0f)),
+    emissive(glm::vec3(0.0f)),
+    shininess(1.0f) {}
+
 Material::Material(const tinyxml2::XMLElement *colorElement) {
     this->diffuse =
         utils::XMLUtils::getRGB(utils::XMLUtils::getSingleChild(colorElement, "diffuse"));

@@ -28,7 +28,7 @@ protected:
     float shininess;
 
 public:
-    Material() = default;
+    Material();
     explicit Material(const tinyxml2::XMLElement *colorElement);
 };
 
