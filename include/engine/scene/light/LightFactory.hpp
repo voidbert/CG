@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include <filesystem>
 #include <tinyxml2.h>
 
 #include "engine/scene/light/Light.hpp"

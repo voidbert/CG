@@ -24,16 +24,9 @@
 #include "engine/render/BoundingSphere.hpp"
 #include "engine/render/Model.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
+#include "engine/scene/Material.hpp"
 
 namespace engine::scene {
-
-struct Material {
-    glm::vec3 diffuse;
-    glm::vec3 ambient;
-    glm::vec3 specular;
-    glm::vec3 emissive;
-    float shininess;
-};
 
 class Entity {
 private:

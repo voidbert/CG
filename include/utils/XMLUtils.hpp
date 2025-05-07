@@ -26,6 +26,8 @@ public:
                                                       const std::string &name);
     static glm::vec3 getXYZ(const tinyxml2::XMLElement *element);
     static glm::vec3 getRGB(const tinyxml2::XMLElement *element);
+    static glm::vec3 getLightDirection(const tinyxml2::XMLElement *element);
+    static glm::vec3 getLightPosition(const tinyxml2::XMLElement *element);
 };
 
 }

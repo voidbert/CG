@@ -12,19 +12,13 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
-
+#include <cmath>
+#include <glm/trigonometric.hpp>
 #include <glm/vec3.hpp>
+#include <memory>
+
+#include "engine/scene/light/Light.hpp"
 
 namespace engine::scene::light {
-
-class Light {
-protected:
-    glm::vec3 color = glm::vec3(1.0f);
-
-public:
-    Light();
-    virtual ~Light() = default;
-};
-
+Light::Light() : color(glm::vec3(1.0f)) {}
 }

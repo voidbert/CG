@@ -13,6 +13,7 @@
 /// limitations under the License.
 
 #include "engine/scene/light/Spotlight.hpp"
+#include <glm/geometric.hpp>
 
 namespace engine::scene::light {
 

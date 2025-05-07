@@ -49,16 +49,42 @@ glm::vec3 XMLUtils::getXYZ(const tinyxml2::XMLElement *element) {
 }
 
 glm::vec3 XMLUtils::getRGB(const tinyxml2::XMLElement *element) {
-    float R = element->FloatAttribute("R", NAN);
-    float G = element->FloatAttribute("G", NAN);
-    float B = element->FloatAttribute("B", NAN);
+    float r = element->FloatAttribute("R", NAN);
+    float g = element->FloatAttribute("G", NAN);
+    float b = element->FloatAttribute("B", NAN);
 
-    if (std::isnan(R) || std::isnan(G) || std::isnan(B)) {
+    if (std::isnan(r) || std::isnan(g) || std::isnan(b)) {
         std::string name = element->Name();
         throw std::runtime_error("Invalid vector in <" + name + "> in scene XML file");
     }
 
-    return glm::vec3(R, G, B);
+    return glm::vec3(r, g, b);
+}
+
+glm::vec3 XMLUtils::getLightDirection(const tinyxml2::XMLElement *element) {
+    float dirX = element->FloatAttribute("dirX", NAN);
+    float dirY = element->FloatAttribute("dirY", NAN);
+    float dirZ = element->FloatAttribute("dirZ", NAN);
+
+    if (std::isnan(dirX) || std::isnan(dirY) || std::isnan(dirZ)) {
+        std::string name = element->Name();
+        throw std::runtime_error("Invalid vector in <" + name + "> in scene XML file");
+    }
+
+    return glm::vec3(dirX, dirY, dirZ);
+}
+
+glm::vec3 XMLUtils::getLightPosition(const tinyxml2::XMLElement *element) {
+    float posX = element->FloatAttribute("posX", NAN);
+    float posY = element->FloatAttribute("posY", NAN);
+    float posZ = element->FloatAttribute("posZ", NAN);
+
+    if (std::isnan(posX) || std::isnan(posY) || std::isnan(posZ)) {
+        std::string name = element->Name();
+        throw std::runtime_error("Invalid vector in <" + name + "> in scene XML file");
+    }
+
+    return glm::vec3(posX, posY, posZ);
 }
 
 }

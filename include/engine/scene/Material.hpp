@@ -14,17 +14,22 @@
 
 #pragma once
 
-#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include <tinyxml2.h>
 
-namespace engine::scene::light {
+namespace engine::scene {
 
-class Light {
+class Material {
 protected:
-    glm::vec3 color = glm::vec3(1.0f);
+    glm::vec3 diffuse;
+    glm::vec3 ambient;
+    glm::vec3 specular;
+    glm::vec3 emissive;
+    float shininess;
 
 public:
-    Light();
-    virtual ~Light() = default;
+    Material() = default;
+    explicit Material(const tinyxml2::XMLElement *colorElement);
 };
 
 }

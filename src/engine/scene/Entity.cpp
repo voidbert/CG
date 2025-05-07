@@ -15,7 +15,6 @@
 #include "engine/scene/Entity.hpp"
 
 #include "utils/WavefrontOBJ.hpp"
-#include "utils/XMLUtils.hpp"
 
 namespace engine::scene {
 
@@ -50,20 +49,7 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
     // Optional material
     const tinyxml2::XMLElement *colorElement = modelElement->FirstChildElement("color");
     if (colorElement) {
-        this->material.diffuse =
-            utils::XMLUtils::getRGB(colorElement->FirstChildElement("diffuse"));
-        this->material.ambient =
-            utils::XMLUtils::getRGB(colorElement->FirstChildElement("ambient"));
-        this->material.specular =
-            utils::XMLUtils::getRGB(colorElement->FirstChildElement("specular"));
-        this->material.emissive =
-            utils::XMLUtils::getRGB(colorElement->FirstChildElement("emissive"));
-
-        const tinyxml2::XMLElement *shininessElement = colorElement->FirstChildElement("shininess");
-        if (shininessElement) {
-            this->material.shininess =
-                shininessElement->FloatAttribute("value", this->material.shininess);
-        }
+        this->material = Material(colorElement);
     }
 }
 
