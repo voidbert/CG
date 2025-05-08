@@ -23,7 +23,9 @@
 #include <vector>
 
 #include "engine/render/BoundingSphere.hpp"
+#include "engine/render/Model.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
+#include "engine/render/Texture.hpp"
 #include "engine/scene/camera/Camera.hpp"
 #include "engine/scene/Entity.hpp"
 #include "engine/scene/transform/TRSTransform.hpp"
@@ -40,7 +42,8 @@ private:
 public:
     Group(const tinyxml2::XMLElement *groupElement,
           const std::filesystem::path &sceneDirectory,
-          std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
+          std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels,
+          std::unordered_map<std::string, std::shared_ptr<render::Texture>> &loadedTextures);
     Group(const Group &group) = delete;
     Group(Group &&group) = delete;
 

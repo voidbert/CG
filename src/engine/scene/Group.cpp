@@ -21,7 +21,8 @@ namespace engine::scene {
 
 Group::Group(const tinyxml2::XMLElement *groupElement,
              const std::filesystem::path &sceneDirectory,
-             std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels) {
+             std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels,
+             std::unordered_map<std::string, std::shared_ptr<render::Texture>> &loadedTextures) {
 
     // Parse entities
     const tinyxml2::XMLElement *modelsElement = groupElement->FirstChildElement("models");
@@ -32,8 +33,10 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
 
         const tinyxml2::XMLElement *modelElement = modelsElement->FirstChildElement("model");
         while (modelElement) {
-            this->entities.push_back(
-                std::make_unique<Entity>(modelElement, sceneDirectory, loadedModels));
+            this->entities.push_back(std::make_unique<Entity>(modelElement,
+                                                              sceneDirectory,
+                                                              loadedModels,
+                                                              loadedTextures));
             modelElement = modelElement->NextSiblingElement("model");
         }
     }
@@ -41,8 +44,10 @@ Group::Group(const tinyxml2::XMLElement *groupElement,
     // Parse subgroups
     const tinyxml2::XMLElement *innerGroupElement = groupElement->FirstChildElement("group");
     while (innerGroupElement) {
-        this->groups.push_back(
-            std::make_unique<Group>(innerGroupElement, sceneDirectory, loadedModels));
+        this->groups.push_back(std::make_unique<Group>(innerGroupElement,
+                                                       sceneDirectory,
+                                                       loadedModels,
+                                                       loadedTextures));
         innerGroupElement = innerGroupElement->NextSiblingElement("group");
     }
 

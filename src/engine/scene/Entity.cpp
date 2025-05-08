@@ -20,29 +20,40 @@ namespace engine::scene {
 
 Entity::Entity(const tinyxml2::XMLElement *modelElement,
                const std::filesystem::path &sceneDirectory,
-               std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels) {
+               std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels,
+               std::unordered_map<std::string, std::shared_ptr<render::Texture>> &loadedTextures) {
 
+    // Get model
     const char *file = modelElement->Attribute("file");
     if (!file) {
         throw std::runtime_error("<rotate> missing file attribute in scene XML file");
     }
 
     const std::string modelPath = std::filesystem::canonical(sceneDirectory / file);
-    auto it = loadedModels.find(modelPath);
-    if (it == loadedModels.end()) {
+    auto modelIt = loadedModels.find(modelPath);
+    if (modelIt == loadedModels.end()) {
         utils::WavefrontOBJ object(modelPath);
         this->model = std::make_shared<render::Model>(object);
         loadedModels[modelPath] = model;
     } else {
-        this->model = it->second;
+        this->model = modelIt->second;
     }
 
     // Optional texture
     const tinyxml2::XMLElement *textureElement = modelElement->FirstChildElement("texture");
     if (textureElement) {
-        const char *texFile = textureElement->Attribute("file");
-        if (texFile) {
-            this->texturePath = (sceneDirectory / texFile).string();
+        const char *textureFile = textureElement->Attribute("file");
+        if (textureFile) {
+            const std::string texturePath =
+                std::filesystem::canonical(sceneDirectory / textureFile);
+
+            auto textureIt = loadedTextures.find(texturePath);
+            if (textureIt == loadedTextures.end()) {
+                this->texture = std::make_shared<render::Texture>(texturePath);
+                loadedTextures[texturePath] = texture;
+            } else {
+                this->texture = textureIt->second;
+            }
         }
     }
 

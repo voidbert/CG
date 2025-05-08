@@ -17,6 +17,8 @@
 #include <tinyxml2.h>
 #include <unordered_map>
 
+#include "engine/render/Model.hpp"
+#include "engine/render/Texture.hpp"
 #include "engine/scene/camera/CameraFactory.hpp"
 #include "engine/scene/light/LightFactory.hpp"
 #include "engine/scene/Scene.hpp"
@@ -31,6 +33,7 @@ Scene::Scene(const std::string &file) :
 
     const std::filesystem::path sceneDirectory = std::filesystem::path(file).parent_path();
     std::unordered_map<std::string, std::shared_ptr<render::Model>> loadedModels;
+    std::unordered_map<std::string, std::shared_ptr<render::Texture>> loadedTextures;
 
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS) {
@@ -53,7 +56,8 @@ Scene::Scene(const std::string &file) :
     this->camera = camera::CameraFactory::createFromXML(
         utils::XMLUtils::getSingleChild(worldElement, "camera"),
         sceneDirectory,
-        loadedModels);
+        loadedModels,
+        loadedTextures);
 
     // Get light properties
     const tinyxml2::XMLElement *lightsElement = worldElement->FirstChildElement("lights");
@@ -68,7 +72,8 @@ Scene::Scene(const std::string &file) :
     // Get rendering groups
     const tinyxml2::XMLElement *groupElement = worldElement->FirstChildElement("group");
     while (groupElement) {
-        this->groups.push_back(std::make_unique<Group>(groupElement, sceneDirectory, loadedModels));
+        this->groups.push_back(
+            std::make_unique<Group>(groupElement, sceneDirectory, loadedModels, loadedTextures));
         groupElement = groupElement->NextSiblingElement("group");
     }
 }

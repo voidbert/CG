@@ -21,6 +21,7 @@
 #include <unordered_map>
 
 #include "engine/render/Model.hpp"
+#include "engine/render/Texture.hpp"
 #include "engine/scene/camera/Camera.hpp"
 
 namespace engine::scene::camera {
@@ -30,7 +31,8 @@ public:
     static std::unique_ptr<Camera> createFromXML(
         const tinyxml2::XMLElement *cameraElement,
         const std::filesystem::path &sceneDirectory,
-        std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels);
+        std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels,
+        std::unordered_map<std::string, std::shared_ptr<render::Texture>> &loadedTextures);
 };
 
 }
