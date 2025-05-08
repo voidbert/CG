@@ -36,6 +36,21 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
     } else {
         this->model = it->second;
     }
+
+    // Optional texture
+    const tinyxml2::XMLElement *textureElement = modelElement->FirstChildElement("texture");
+    if (textureElement) {
+        const char *texFile = textureElement->Attribute("file");
+        if (texFile) {
+            this->texturePath = (sceneDirectory / texFile).string();
+        }
+    }
+
+    // Optional material
+    const tinyxml2::XMLElement *colorElement = modelElement->FirstChildElement("color");
+    if (colorElement) {
+        this->material = Material(colorElement);
+    }
 }
 
 void Entity::updateBoundingSphere(const glm::mat4 &worldTransform) {

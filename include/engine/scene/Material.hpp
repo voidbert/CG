@@ -14,20 +14,22 @@
 
 #pragma once
 
-#include <glm/vec3.hpp>
-#include <string>
+#include <glm/mat4x4.hpp>
 #include <tinyxml2.h>
 
-namespace utils {
+namespace engine::scene {
 
-class XMLUtils {
+class Material {
+protected:
+    glm::vec3 diffuse;
+    glm::vec3 ambient;
+    glm::vec3 specular;
+    glm::vec3 emissive;
+    float shininess;
+
 public:
-    static const tinyxml2::XMLElement *getSingleChild(const tinyxml2::XMLNode *parent,
-                                                      const std::string &name);
-    static glm::vec3 getXYZ(const tinyxml2::XMLElement *element);
-    static glm::vec3 getRGB(const tinyxml2::XMLElement *element);
-    static glm::vec3 getLightDirection(const tinyxml2::XMLElement *element);
-    static glm::vec3 getLightPosition(const tinyxml2::XMLElement *element);
+    Material();
+    explicit Material(const tinyxml2::XMLElement *colorElement);
 };
 
 }

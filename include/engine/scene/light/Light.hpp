@@ -15,19 +15,16 @@
 #pragma once
 
 #include <glm/vec3.hpp>
-#include <string>
-#include <tinyxml2.h>
 
-namespace utils {
+namespace engine::scene::light {
 
-class XMLUtils {
+class Light {
+protected:
+    glm::vec3 color;
+
 public:
-    static const tinyxml2::XMLElement *getSingleChild(const tinyxml2::XMLNode *parent,
-                                                      const std::string &name);
-    static glm::vec3 getXYZ(const tinyxml2::XMLElement *element);
-    static glm::vec3 getRGB(const tinyxml2::XMLElement *element);
-    static glm::vec3 getLightDirection(const tinyxml2::XMLElement *element);
-    static glm::vec3 getLightPosition(const tinyxml2::XMLElement *element);
+    Light();
+    virtual ~Light() = default;
 };
 
 }

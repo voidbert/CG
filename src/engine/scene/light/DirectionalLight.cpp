@@ -12,22 +12,12 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
+#include "engine/scene/light/DirectionalLight.hpp"
+#include <glm/geometric.hpp>
 
-#include <glm/vec3.hpp>
-#include <string>
-#include <tinyxml2.h>
+namespace engine::scene::light {
 
-namespace utils {
-
-class XMLUtils {
-public:
-    static const tinyxml2::XMLElement *getSingleChild(const tinyxml2::XMLNode *parent,
-                                                      const std::string &name);
-    static glm::vec3 getXYZ(const tinyxml2::XMLElement *element);
-    static glm::vec3 getRGB(const tinyxml2::XMLElement *element);
-    static glm::vec3 getLightDirection(const tinyxml2::XMLElement *element);
-    static glm::vec3 getLightPosition(const tinyxml2::XMLElement *element);
-};
+DirectionalLight::DirectionalLight(const glm::vec3 &_direction) :
+    direction(glm::normalize(_direction)) {}
 
 }

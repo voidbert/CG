@@ -18,6 +18,7 @@
 #include <unordered_map>
 
 #include "engine/scene/camera/CameraFactory.hpp"
+#include "engine/scene/light/LightFactory.hpp"
 #include "engine/scene/Scene.hpp"
 #include "utils/XMLUtils.hpp"
 
@@ -53,6 +54,16 @@ Scene::Scene(const std::string &file) :
         utils::XMLUtils::getSingleChild(worldElement, "camera"),
         sceneDirectory,
         loadedModels);
+
+    // Get light properties
+    const tinyxml2::XMLElement *lightsElement = worldElement->FirstChildElement("lights");
+    if (lightsElement) {
+        const tinyxml2::XMLElement *lightElement = lightsElement->FirstChildElement("light");
+        while (lightElement) {
+            this->lights.push_back(light::LightFactory::createFromXML(lightElement));
+            lightElement = lightElement->NextSiblingElement("light");
+        }
+    }
 
     // Get rendering groups
     const tinyxml2::XMLElement *groupElement = worldElement->FirstChildElement("group");

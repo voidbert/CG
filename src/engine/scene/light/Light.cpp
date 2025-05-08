@@ -12,22 +12,13 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
-
+#include <cmath>
+#include <glm/trigonometric.hpp>
 #include <glm/vec3.hpp>
-#include <string>
-#include <tinyxml2.h>
+#include <memory>
 
-namespace utils {
+#include "engine/scene/light/Light.hpp"
 
-class XMLUtils {
-public:
-    static const tinyxml2::XMLElement *getSingleChild(const tinyxml2::XMLNode *parent,
-                                                      const std::string &name);
-    static glm::vec3 getXYZ(const tinyxml2::XMLElement *element);
-    static glm::vec3 getRGB(const tinyxml2::XMLElement *element);
-    static glm::vec3 getLightDirection(const tinyxml2::XMLElement *element);
-    static glm::vec3 getLightPosition(const tinyxml2::XMLElement *element);
-};
-
+namespace engine::scene::light {
+Light::Light() : color(glm::vec3(1.0f)) {}
 }

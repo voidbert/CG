@@ -25,6 +25,7 @@
 #include "engine/render/Model.hpp"
 #include "engine/render/NormalsPreview.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
+#include "engine/scene/Material.hpp"
 
 namespace engine::scene {
 
@@ -32,6 +33,8 @@ class Entity {
 private:
     std::shared_ptr<render::Model> model;
     render::BoundingSphere boundingSphere;
+    std::string texturePath;
+    Material material;
 
 public:
     Entity(const tinyxml2::XMLElement *modelElement,
