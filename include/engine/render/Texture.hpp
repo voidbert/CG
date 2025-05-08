@@ -29,7 +29,7 @@ public:
     Texture(Texture &&texture) = delete;
     ~Texture();
 
-    void use();
+    void use() const;
 };
 
 }

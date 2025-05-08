@@ -36,15 +36,35 @@ const NormalsPreview &Model::getNormalsPreview() const {
     return this->normalsPreview;
 }
 
-void Model::draw(RenderPipelineManager &pipelineManager,
-                 const glm::mat4 &transformMatrix,
-                 const glm::vec4 &color,
-                 bool fillPolygons) const {
+void Model::drawSolidColor(RenderPipelineManager &pipelineManager,
+                           const glm::mat4 &transformMatrix,
+                           const glm::vec4 &color,
+                           bool fillPolygons) const {
 
     const SolidColorShaderProgram &shader = pipelineManager.getSolidColorShaderProgram();
     pipelineManager.setFillPolygons(fillPolygons);
     shader.setMatrix(transformMatrix);
     shader.setColor(color);
+
+    glBindVertexArray(this->vao);
+    glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
+}
+
+void Model::drawShaded(RenderPipelineManager &pipelineManager,
+                       const glm::mat4 &transformMatrix,
+                       const std::shared_ptr<Texture> texture,
+                       const scene::Material &material) const {
+
+    const ShadedShaderProgram &shader = pipelineManager.getShadedShaderProgram();
+    pipelineManager.setFillPolygons(true);
+    shader.setMatrix(transformMatrix);
+
+    if (texture) {
+        texture->use();
+        shader.setTexture(*texture);
+    } else {
+        shader.setMaterial(material);
+    }
 
     glBindVertexArray(this->vao);
     glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);

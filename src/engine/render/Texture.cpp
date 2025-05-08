@@ -27,7 +27,7 @@ Texture::Texture(const std::string &path) {
 
     // Image loading
     int width, height, components;
-    uint8_t *const imageData = stbi_load(path.c_str(), &width, &height, &components, 3);
+    uint8_t *const imageData = stbi_load(path.c_str(), &width, &height, &components, 4);
     if (!imageData) {
         const std::string reason = stbi_failure_reason();
         throw std::runtime_error("Failed to open image " + path + ": " + reason);
@@ -42,7 +42,7 @@ Texture::Texture(const std::string &path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     // Clenaup
@@ -53,7 +53,7 @@ Texture::~Texture() {
     glDeleteTextures(1, &this->tid);
 }
 
-void Texture::use() {
+void Texture::use() const {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, this->tid);
 }

@@ -26,31 +26,53 @@ ShadedShaderProgram::ShadedShaderProgram() :
 void ShadedShaderProgram::use() const {
     ShaderProgram::use();
     this->setMatrix(glm::mat4(1.0f));
+    this->setMaterial(scene::Material());
 }
 
 void ShadedShaderProgram::setMatrix(const glm::mat4 &matrix) const {
     glUniformMatrix4fv(0, 1, false, glm::value_ptr(matrix));
 }
 
+void ShadedShaderProgram::setTexture(const Texture &texture) const {
+    glUniform1i(1, true);
+    texture.use();
+}
+
+void ShadedShaderProgram::setMaterial(const scene::Material &material) const {
+    glUniform1i(1, false);
+}
+
 const std::string ShadedShaderProgram::vertexShaderSource = R"(
 #version 460 core
 layout (location = 0) in vec4 inPosition;
-layout (location = 1) in vec4 inNormal;
-layout (location = 2) in vec4 inTextureCoordinate;
+layout (location = 1) in vec2 inTextureCoordinate;
+layout (location = 2) in vec4 inNormal;
+
+layout (location = 0) out vec2 outTextureCoordinate;
 
 layout (location = 0) uniform mat4 uniMatrix;
 
 void main() {
     gl_Position = uniMatrix * inPosition;
+    outTextureCoordinate = inTextureCoordinate;
 }
 )";
 
 const std::string ShadedShaderProgram::fragmentShaderSource = R"(
 #version 460 core
+layout (location = 0) in vec2 inTextureCoordinate;
+
 layout (location = 0) out vec4 outColor;
 
+layout (location = 1) uniform bool uniTextured;
+uniform sampler2D uniSampler;
+
 void main() {
-    outColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    if (uniTextured) {
+        outColor = texture(uniSampler, inTextureCoordinate);
+    } else {
+        outColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    }
 }
 )";
 

@@ -75,7 +75,7 @@ void BoundingSphere::draw(RenderPipelineManager &pipelineManager,
     const glm::mat4 transformMatrix = cameraMatrix * glm::translate(glm::vec3(this->center)) *
         glm::scale(glm::vec3(this->radius));
 
-    BoundingSphere::sphereModel->draw(pipelineManager, transformMatrix, color, false);
+    BoundingSphere::sphereModel->drawSolidColor(pipelineManager, transformMatrix, color, false);
 }
 
 Model *BoundingSphere::sphereModel = nullptr;

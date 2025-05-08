@@ -19,6 +19,8 @@
 #include <string>
 
 #include "engine/render/ShaderProgram.hpp"
+#include "engine/render/Texture.hpp"
+#include "engine/scene/Material.hpp"
 
 namespace engine::render {
 
@@ -34,6 +36,8 @@ public:
     void use() const override;
 
     void setMatrix(const glm::mat4 &matrix) const;
+    void setTexture(const Texture &texture) const;
+    void setMaterial(const scene::Material &material) const;
 };
 
 }

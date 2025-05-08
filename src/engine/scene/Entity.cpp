@@ -80,7 +80,14 @@ void Entity::draw(render::RenderPipelineManager &pipelineManager,
                   const glm::mat4 &transformMatrix,
                   bool fillPolygons) const {
 
-    this->model->draw(pipelineManager, transformMatrix, glm::vec4(1.0f), fillPolygons);
+    if (fillPolygons) {
+        this->model->drawShaded(pipelineManager, transformMatrix, this->texture, this->material);
+    } else {
+        this->model->drawSolidColor(pipelineManager,
+                                    transformMatrix,
+                                    glm::vec4(1.0f),
+                                    fillPolygons);
+    }
 }
 
 }
