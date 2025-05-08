@@ -24,7 +24,7 @@ UI::UI(Window &window, scene::camera::Camera &_camera, int _entityCount) :
     camera(_camera),
     fpsCounter(),
     entityCount(_entityCount),
-    fillPolygons(false),
+    fillPolygons(true),
     backFaceCulling(true),
     showAxes(true),
     showBoundingSpheres(false),
