@@ -34,7 +34,7 @@ namespace generator {
 
 const std::vector<std::vector<std::string>> FIGURE_USAGES = {
     { "plane", "<length>", "<divisions>" },
-    { "box", "<length>", "<divisions>" },
+    { "box", "<length>", "<divisions>", "[multi-textured]" },
     { "sphere", "<radius>", "<slices>", "<stacks>" },
     { "cone", "<radius>", "<height>", "<slices>", "<stacks>" },
     { "cylinder", "<radius>", "<height>", "<slices>", "<stacks>" },
@@ -117,13 +117,18 @@ int main(int argc, char **argv) {
             figures::Plane plane(length, divisions);
             plane.writeToFile(file);
         } else if (args.at(1) == "box") {
-            validateArgumentCount(argc, 5);
-
             const float length = stringToFloat(args.at(2));
             const int grid = stringToInt(args.at(3));
 
-            figures::Box box(length, grid);
-            box.writeToFile(file);
+            if (argc == 5) {
+                figures::Box box(length, grid);
+                box.writeToFile(file);
+            } else if (argc == 6 && args.at(4) == "multi-textured") {
+                figures::Box box(length, grid, true);
+                box.writeToFile(file);
+            } else {
+                throw std::invalid_argument("Invalid command-line arguments");
+            }
         } else if (args.at(1) == "sphere") {
             validateArgumentCount(argc, 6);
 

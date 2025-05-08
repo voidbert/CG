@@ -46,14 +46,9 @@ BoundingSphere::BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &tr
     this->center = transform * sphere.center;
 }
 
-BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) : BoundingSphere() {
+BoundingSphere::BoundingSphere(const std::vector<glm::vec4> &vertices) : BoundingSphere() {
     // Calculate center of mass
-    this->center =
-        std::transform_reduce(vertices.cbegin(),
-                              vertices.cend(),
-                              glm::vec4(0.0f),
-                              std::plus<>(),
-                              [](const utils::Vertex &vertex) { return vertex.position; }) /
+    this->center = std::reduce(vertices.cbegin(), vertices.cend(), glm::vec4(0.0f), std::plus<>()) /
         static_cast<float>(vertices.size());
 
     // Calculate radius
@@ -62,9 +57,7 @@ BoundingSphere::BoundingSphere(const std::vector<utils::Vertex> &vertices) : Bou
         vertices.cend(),
         -1.0,
         [](float d1, float d2) { return std::max(d1, d2); },
-        [this](const utils::Vertex &vertex) {
-            return glm::distance(this->center, vertex.position);
-        });
+        [this](const glm::vec4 &vertex) { return glm::distance(this->center, vertex); });
 }
 
 const glm::vec4 &BoundingSphere::getCenter() const {

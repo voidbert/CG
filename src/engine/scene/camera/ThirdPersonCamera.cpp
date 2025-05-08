@@ -51,7 +51,8 @@ int ThirdPersonCamera::getEntityCount() const {
 
 int ThirdPersonCamera::draw(render::RenderPipelineManager &pipelineManager,
                             bool fillPolygons,
-                            bool drawBoundingSpheres) const {
+                            bool drawBoundingSpheres,
+                            bool showNormals) const {
 
     const glm::vec3 d = this->lookAt - this->position;
     const float angle = atan2f(d.x, d.z);
@@ -63,7 +64,8 @@ int ThirdPersonCamera::draw(render::RenderPipelineManager &pipelineManager,
                               this->getCameraMatrix() * worldTransform,
                               fillPolygons,
                               drawBoundingSpheres,
-                              false);
+                              false,
+                              showNormals);
 }
 
 }

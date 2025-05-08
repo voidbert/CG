@@ -16,18 +16,15 @@
 
 namespace engine::render {
 
-LineLoop::LineLoop(const std::vector<utils::Vertex> &points) {
+LineLoop::LineLoop(const std::vector<glm::vec4> &points) {
     glGenVertexArrays(1, &this->vao);
     glBindVertexArray(this->vao);
 
     glGenBuffers(1, &this->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 points.size() * sizeof(utils::Vertex),
-                 points.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(glm::vec4), points.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), nullptr);
     glEnableVertexAttribArray(0);
 
     this->pointCount = points.size();

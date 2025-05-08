@@ -91,7 +91,8 @@ int Group::draw(render::RenderPipelineManager &pipelineManager,
                 const glm::mat4 &_transform,
                 bool fillPolygons,
                 bool showBoundingSpheres,
-                bool showAnimationLines) const {
+                bool showAnimationLines,
+                bool showNormals) const {
 
     const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
 
@@ -117,6 +118,12 @@ int Group::draw(render::RenderPipelineManager &pipelineManager,
                                           cameraMatrix,
                                           glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
             }
+
+            if (showNormals) {
+                entity->getNormalsPreview().draw(pipelineManager,
+                                                 subTransform,
+                                                 glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+            }
         }
     }
 
@@ -127,7 +134,8 @@ int Group::draw(render::RenderPipelineManager &pipelineManager,
                                         subTransform,
                                         fillPolygons,
                                         showBoundingSpheres,
-                                        showAnimationLines);
+                                        showAnimationLines,
+                                        showNormals);
     }
 
     if (showBoundingSpheres) {

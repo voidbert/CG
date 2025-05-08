@@ -43,7 +43,8 @@ void SceneWindow::onRender() {
                                                   this->ui.shouldCullBackFaces(),
                                                   this->ui.shouldShowAxes(),
                                                   this->ui.shouldShowBoundingSpheres(),
-                                                  this->ui.shouldShowAnimationLines());
+                                                  this->ui.shouldShowAnimationLines(),
+                                                  this->ui.shouldShowNormals());
 
     if (this->showUI) {
         this->ui.draw(renderedEntities);

@@ -18,11 +18,21 @@
 
 namespace generator::figures {
 
-Box::Box(float size, int divisions) {
-    this->comment = "box " + std::to_string(size) + " " + std::to_string(divisions);
+Box::Box(float size, int divisions, bool multiTextured) {
+    const std::string multiTexturedString = multiTextured ? " multi-textured" : "";
+    this->comment =
+        "box " + std::to_string(size) + " " + std::to_string(divisions) + multiTexturedString;
 
-    const float step = size / divisions;
-    const float half = size / 2.0f;
+    const float positionStep = size / divisions;
+    const float positionHalf = size / 2.0f;
+
+    float textureStepX, textureStepY;
+    if (multiTextured) {
+        textureStepX = 1.0f / (4 * divisions);
+        textureStepY = 1.0f / (3 * divisions);
+    } else {
+        textureStepX = textureStepY = 1.0f / divisions;
+    }
 
     for (int face = 0; face < 6; face++) {
         glm::vec3 ivec, jvec;
@@ -52,12 +62,51 @@ Box::Box(float size, int divisions) {
         const float faceNormalMultiplier = positiveCoordinateFace ? 1.0f : -1.0f;
 
         const glm::vec3 faceNormal = glm::vec3(1.0f, 1.0f, 1.0f) - ivec - jvec;
-        const glm::vec3 facePosition = (ivec + jvec + faceNormal * faceNormalMultiplier) * -half;
+        this->normals.push_back(faceNormal * -faceNormalMultiplier);
+        const int faceNormalIndex = this->normals.size() - 1;
+
+        const glm::vec3 positionStart =
+            (ivec + jvec + faceNormal * faceNormalMultiplier) * -positionHalf;
+
+        glm::vec2 textureCoordinateStart;
+        if (multiTextured) {
+            switch (face) {
+                case 0: // Front
+                    textureCoordinateStart = glm::vec2(0.25f, 1.0f / 3.0f);
+                    break;
+                case 1: // Back
+                    textureCoordinateStart = glm::vec2(0.75f, 1.0f / 3.0f);
+                    break;
+                case 2: // Right
+                    textureCoordinateStart = glm::vec2(0.5f, 1.0f / 3.0f);
+                    break;
+                case 3: // Left
+                    textureCoordinateStart = glm::vec2(0.0f, 1.0f / 3.0f);
+                    break;
+                case 4: // Top
+                    textureCoordinateStart = glm::vec2(0.25f, 2.0f / 3.0f);
+                    break;
+                case 5: // Bottom
+                    textureCoordinateStart = glm::vec2(0.25f, 0.0f);
+                    break;
+            }
+        } else {
+            textureCoordinateStart = glm::vec2(0.0f, 0.0f);
+        }
 
         for (int i = 0; i <= divisions; i++) {
             for (int j = 0; j <= divisions; j++) {
-                const glm::vec3 vertexOffset = ivec * (i * step) + jvec * (j * step);
-                this->positions.push_back(glm::vec4(facePosition + vertexOffset, 1.0f));
+                const glm::vec3 positionOffset =
+                    ivec * (i * positionStep) + jvec * (j * positionStep);
+                this->positions.push_back(glm::vec4(positionStart + positionOffset, 1.0f));
+
+                if (multiTextured || face == 0) {
+                    const glm::vec2 textureCoordinateOffset =
+                        glm::vec2(textureStepX * i, textureStepY * j);
+
+                    this->textureCoordinates.push_back(textureCoordinateStart +
+                                                       textureCoordinateOffset);
+                }
             }
         }
 
@@ -69,14 +118,47 @@ Box::Box(float size, int divisions) {
                 const int nextBottom = currentBottom + 1;
                 const int nextTop = currentTop + 1;
 
+                const int textureModulus = multiTextured ? this->textureCoordinates.size() :
+                                                           ((divisions + 1) * (divisions + 1));
+
                 if (positiveCoordinateFace) {
-                    this->faces.push_back(
-                        utils::TriangleFace(nextBottom, currentTop, currentBottom));
-                    this->faces.push_back(utils::TriangleFace(nextBottom, nextTop, currentTop));
+                    this->faces.push_back(utils::TriangleFace(nextBottom,
+                                                              nextBottom % textureModulus,
+                                                              faceNormalIndex,
+                                                              currentTop,
+                                                              currentTop % textureModulus,
+                                                              faceNormalIndex,
+                                                              currentBottom,
+                                                              currentBottom % textureModulus,
+                                                              faceNormalIndex));
+                    this->faces.push_back(utils::TriangleFace(nextBottom,
+                                                              nextBottom % textureModulus,
+                                                              faceNormalIndex,
+                                                              nextTop,
+                                                              nextTop % textureModulus,
+                                                              faceNormalIndex,
+                                                              currentTop,
+                                                              currentTop % textureModulus,
+                                                              faceNormalIndex));
                 } else {
-                    this->faces.push_back(
-                        utils::TriangleFace(nextBottom, currentBottom, currentTop));
-                    this->faces.push_back(utils::TriangleFace(nextTop, nextBottom, currentTop));
+                    this->faces.push_back(utils::TriangleFace(nextBottom,
+                                                              nextBottom % textureModulus,
+                                                              faceNormalIndex,
+                                                              currentBottom,
+                                                              currentBottom % textureModulus,
+                                                              faceNormalIndex,
+                                                              currentTop,
+                                                              currentTop % textureModulus,
+                                                              faceNormalIndex));
+                    this->faces.push_back(utils::TriangleFace(nextTop,
+                                                              nextTop % textureModulus,
+                                                              faceNormalIndex,
+                                                              nextBottom,
+                                                              nextBottom % textureModulus,
+                                                              faceNormalIndex,
+                                                              currentTop,
+                                                              currentTop % textureModulus,
+                                                              faceNormalIndex));
                 }
             }
         }

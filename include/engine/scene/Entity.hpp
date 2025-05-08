@@ -23,6 +23,7 @@
 
 #include "engine/render/BoundingSphere.hpp"
 #include "engine/render/Model.hpp"
+#include "engine/render/NormalsPreview.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
 
 namespace engine::scene {
@@ -41,6 +42,7 @@ public:
 
     void updateBoundingSphere(const glm::mat4 &worldTransform);
     const render::BoundingSphere &getBoundingSphere() const;
+    const render::NormalsPreview &getNormalsPreview() const;
 
     void draw(render::RenderPipelineManager &pipelineManager,
               const glm::mat4 &transformMatrix,

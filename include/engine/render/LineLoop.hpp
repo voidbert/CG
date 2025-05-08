@@ -20,7 +20,6 @@
 #include <vector>
 
 #include "engine/render/RenderPipelineManager.hpp"
-#include "utils/Vertex.hpp"
 
 namespace engine::render {
 
@@ -30,7 +29,7 @@ private:
     int pointCount;
 
 public:
-    explicit LineLoop(const std::vector<utils::Vertex> &points);
+    explicit LineLoop(const std::vector<glm::vec4> &points);
     LineLoop(const LineLoop &lineLoop) = delete;
     LineLoop(LineLoop &&lineLoop) = delete;
     ~LineLoop();

@@ -19,7 +19,6 @@
 #include <stdexcept>
 
 #include "engine/scene/transform/AnimatedTranslation.hpp"
-#include "utils/Vertex.hpp"
 #include "utils/XMLUtils.hpp"
 
 namespace engine::scene::transform {
@@ -52,7 +51,7 @@ AnimatedTranslation::AnimatedTranslation(const tinyxml2::XMLElement *translateEl
     this->update(glfwGetTime());
 
     // Create renderable line
-    std::vector<utils::Vertex> lineVertices;
+    std::vector<glm::vec4> lineVertices;
 
     const int pointsPerSegment = 32;
     const int totalPoints = (this->points.size() - 3) * pointsPerSegment;
@@ -61,7 +60,7 @@ AnimatedTranslation::AnimatedTranslation(const tinyxml2::XMLElement *translateEl
     lineVertices.reserve(totalPoints);
     for (int i = 0; i < totalPoints; ++i) {
         const glm::vec3 linePoint = this->interpolate(i * iterationIncrement).first;
-        lineVertices.push_back(utils::Vertex(glm::vec4(linePoint, 1.0f)));
+        lineVertices.push_back(glm::vec4(linePoint, 1.0f));
     }
 
     this->line = std::make_unique<render::LineLoop>(lineVertices);

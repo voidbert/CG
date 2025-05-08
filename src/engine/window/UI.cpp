@@ -28,7 +28,8 @@ UI::UI(Window &window, scene::camera::Camera &_camera, int _entityCount) :
     backFaceCulling(true),
     showAxes(true),
     showBoundingSpheres(false),
-    showAnimationLines(true) {
+    showAnimationLines(true),
+    showNormals(false) {
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -74,6 +75,7 @@ void UI::draw(int renderedEntities) {
     ImGui::Checkbox("Show Axes", &this->showAxes);
     ImGui::Checkbox("Show Bounding Spheres", &this->showBoundingSpheres);
     ImGui::Checkbox("Show Animation Lines", &this->showAnimationLines);
+    ImGui::Checkbox("Show Normals", &this->showNormals);
 
     ImGui::Spacing();
     ImGui::Separator();
@@ -109,6 +111,10 @@ bool UI::shouldShowBoundingSpheres() const {
 
 bool UI::shouldShowAnimationLines() const {
     return this->showAnimationLines;
+}
+
+bool UI::shouldShowNormals() const {
+    return this->showNormals;
 }
 
 }

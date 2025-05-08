@@ -14,31 +14,37 @@
 
 #pragma once
 
+#include <cstdint>
 #include <glad/glad.h>
 #include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <tuple>
 #include <vector>
 
 #include "engine/render/BoundingSphere.hpp"
+#include "engine/render/NormalsPreview.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
-#include "utils/Vertex.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace engine::render {
 
 class Model {
 private:
-    GLuint vao, vbo, ibo;
+    GLuint vao, positionsVBO, textureCoordinatesVBO, normalsVBO, ibo;
     int vertexCount;
     BoundingSphere boundingSphere;
+    NormalsPreview normalsPreview;
 
 public:
     explicit Model(const utils::WavefrontOBJ &objectFile);
     Model(const Model &model) = delete;
-    Model(Model &&) = delete;
+    Model(Model &&model) = delete;
     ~Model();
 
     const BoundingSphere &getBoundingSphere() const;
+    const NormalsPreview &getNormalsPreview() const;
 
     void draw(RenderPipelineManager &pipelineManager,
               const glm::mat4 &transformMatrix,
@@ -46,8 +52,14 @@ public:
               bool fillPolygons) const;
 
 private:
-    explicit Model(const std::pair<std::vector<utils::Vertex>, std::vector<uint32_t>> &vertices);
-    Model(const std::vector<utils::Vertex> &vertices, const std::vector<uint32_t> &indices);
+    explicit Model(const std::tuple<std::vector<glm::vec4>, // Positions
+                                    std::vector<glm::vec2>, // Texture coordinates
+                                    std::vector<glm::vec4>, // Normals (padded)
+                                    std::vector<uint32_t>> // Indices
+                       &modelData);
+
+    template<class V>
+    void initializeBuffer(GLuint attribute, GLuint vbo, const std::vector<V> &data);
 };
 
 }

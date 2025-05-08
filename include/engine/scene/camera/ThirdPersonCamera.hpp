@@ -41,7 +41,8 @@ public:
     int getEntityCount() const override;
     int draw(render::RenderPipelineManager &pipelineManager,
              bool fillPolygons,
-             bool showBoundingSpheres) const override;
+             bool showBoundingSpheres,
+             bool showNormals) const override;
 };
 
 }

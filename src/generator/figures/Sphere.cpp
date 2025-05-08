@@ -68,6 +68,9 @@ Sphere::Sphere(float radius, int slices, int stacks) {
 
         this->faces.push_back(utils::TriangleFace(southPoleIndex, next, current));
     }
+
+    // TODO - remove this when adding normals. This is only here for BoundingSphere to work
+    this->generateNormals();
 }
 
 }

@@ -75,10 +75,13 @@ int Camera::getEntityCount() const {
 
 int Camera::draw(render::RenderPipelineManager &pipelineManager,
                  bool fillPolygons,
-                 bool showBoundingSpheres) const {
+                 bool showBoundingSpheres,
+                 bool showNormals) const {
+
     static_cast<void>(pipelineManager);
     static_cast<void>(fillPolygons);
     static_cast<void>(showBoundingSpheres);
+    static_cast<void>(showNormals);
     return 0;
 }
 

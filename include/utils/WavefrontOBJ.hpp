@@ -14,12 +14,16 @@
 
 #pragma once
 
+#include <cstdint>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <regex>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "utils/TriangleFace.hpp"
-#include "utils/Vertex.hpp"
 
 namespace utils {
 
@@ -30,6 +34,8 @@ private:
 protected:
     std::string comment;
     std::vector<glm::vec4> positions;
+    std::vector<glm::vec2> textureCoordinates;
+    std::vector<glm::vec3> normals;
     std::vector<TriangleFace> faces;
 
     WavefrontOBJ();
@@ -38,7 +44,16 @@ public:
     explicit WavefrontOBJ(const std::string &filename);
 
     void writeToFile(const std::string &filename) const;
-    std::pair<std::vector<Vertex>, std::vector<uint32_t>> getIndexedVertices() const;
+    std::tuple<std::vector<glm::vec4>, // Positions
+               std::vector<glm::vec2>, // Texture coordinates
+               std::vector<glm::vec4>, // Normals (padded)
+               std::vector<uint32_t>> // Indices
+        getIndexedVertices() const;
+
+    // TODO - Mariana, please make generateNormals private when Sphere.cpp doesn't need it anymore
+
+protected:
+    void generateNormals();
 };
 
 }

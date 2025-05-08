@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <cstdint>
+#include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 #include <vector>
@@ -22,27 +24,21 @@
 
 namespace engine::render {
 
-class Model; // Importing model would lead to a recursive inclusion
-
-class BoundingSphere {
+class NormalsPreview {
 private:
-    glm::vec4 center;
-    float radius;
-
-    static Model *sphereModel;
-    static bool initializingSphereModel;
+    GLuint vao, vbo;
+    int vertexCount;
 
 public:
-    BoundingSphere();
-    BoundingSphere(const glm::vec4 &_center, float _radius);
-    BoundingSphere(const BoundingSphere &sphere, const glm::mat4 &transform);
-    explicit BoundingSphere(const std::vector<glm::vec4> &vertices);
-
-    const glm::vec4 &getCenter() const;
-    float getRadius() const;
+    NormalsPreview(const std::vector<glm::vec4> &positions,
+                   const std::vector<glm::vec4> &normals,
+                   const std::vector<uint32_t> &indices);
+    NormalsPreview(const NormalsPreview &normalsPreview) = delete;
+    NormalsPreview(NormalsPreview &&normalsPreview) = delete;
+    ~NormalsPreview();
 
     void draw(RenderPipelineManager &pipelineManager,
-              const glm::mat4 &cameraMatrix,
+              const glm::mat4 &transformMatrix,
               const glm::vec4 &color) const;
 };
 

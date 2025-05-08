@@ -25,7 +25,8 @@ private:
     scene::camera::Camera &camera;
     FPSCounter fpsCounter;
     int entityCount;
-    bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines;
+    bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines,
+        showNormals;
 
 public:
     UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
@@ -39,6 +40,7 @@ public:
     bool shouldShowAxes() const;
     bool shouldShowBoundingSpheres() const;
     bool shouldShowAnimationLines() const;
+    bool shouldShowNormals() const;
 };
 
 }

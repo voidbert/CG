@@ -17,7 +17,7 @@
             </translate>
         </transform>
         <models>
-            <model file="../models/box.3d" />
+            <model file="../models/boxSingleTexture.3d" />
         </models>
     </group>
 </world>
