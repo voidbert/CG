@@ -39,7 +39,7 @@ public:
     void pan(const glm::vec2 &v) override;
 
 private:
-    void update() override;
+    void updateWithMotion() override;
 };
 
 }

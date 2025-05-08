@@ -47,7 +47,7 @@ void FreeCamera::move(const glm::vec3 &v) {
     const glm::vec3 right = glm::normalize(glm::cross(d, this->up));
 
     this->position += glm::mat3(right, this->up, d) * (translationSpeed * v);
-    this->update();
+    this->updateWithMotion();
 }
 
 void FreeCamera::pan(const glm::vec2 &v) {
@@ -55,10 +55,10 @@ void FreeCamera::pan(const glm::vec2 &v) {
 
     this->yaw += rotationSpeed * v.x;
     this->pitch += rotationSpeed * v.y;
-    this->update();
+    this->updateWithMotion();
 }
 
-void FreeCamera::update() {
+void FreeCamera::updateWithMotion() {
     this->yaw = glm::mod(this->yaw, glm::two_pi<float>());
     this->pitch =
         glm::clamp(this->pitch, -glm::half_pi<float>() + 0.01f, glm::half_pi<float>() - 0.01f);
@@ -68,7 +68,7 @@ void FreeCamera::update() {
                                   cosf(this->pitch) * sinf(this->yaw));
 
     this->lookAt = this->position + d;
-    Camera::update();
+    Camera::updateWithMotion();
 }
 
 }

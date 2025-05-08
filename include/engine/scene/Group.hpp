@@ -48,20 +48,23 @@ public:
     Group(Group &&group) = delete;
 
     int getEntityCount() const;
-    void updateBoundingSphere(const glm::mat4 &worldTransform);
 
-    void update(float time);
+    void update(const glm::mat4 &worldTransform, float time);
 
-    int draw(render::RenderPipelineManager &pipelineManager,
-             const camera::Camera &camera,
-             const glm::mat4 &_transform,
-             bool fillPolygons,
-             bool showBoundingSpheres,
-             bool showAnimationLines,
-             bool showNormals) const;
+    void drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
+                             const camera::Camera &camera,
+                             const glm::mat4 &_transform,
+                             bool showBoundingSpheres,
+                             bool showAnimationLines,
+                             bool showNormals) const;
+    int drawShadedParts(render::RenderPipelineManager &pipelineManager,
+                        const camera::Camera &camera,
+                        const glm::mat4 &_transform,
+                        bool fillPolygons) const;
 
 private:
     const render::BoundingSphere &getBoundingSphere() const;
+    void updateBoundingSphere(const glm::mat4 &worldTransform);
 
     template<class T>
     glm::vec4 sumBoundingSphereCenters(const std::vector<std::unique_ptr<T>> &ts,

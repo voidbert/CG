@@ -107,9 +107,11 @@ void Scene::setWindowSize(int width, int height) {
 }
 
 void Scene::update(float time) {
+    const glm::mat4 worldTransform = glm::mat4(1.0f);
     for (const std::unique_ptr<Group> &group : this->groups) {
-        group->update(time);
+        group->update(worldTransform, time);
     }
+    this->camera->updateWithTime(time);
 }
 
 int Scene::draw(render::RenderPipelineManager &pipelineManager,
@@ -127,28 +129,35 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
         glDisable(GL_CULL_FACE);
     }
 
-    // Draw scene contents
-    int entityCount = 0;
-    entityCount +=
-        this->camera->draw(pipelineManager, fillPolygons, showBoundingSpheres, showNormals);
-
     const glm::mat4 &cameraMatrix = this->camera->getCameraMatrix();
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        group->updateBoundingSphere(glm::mat4(1.0f));
-        entityCount += group->draw(pipelineManager,
-                                   *this->camera,
-                                   cameraMatrix,
-                                   fillPolygons,
-                                   showBoundingSpheres,
-                                   showAnimationLines,
-                                   showNormals);
-    }
 
     // Draw axes
     if (showAxes) {
         this->xAxis.draw(pipelineManager, cameraMatrix);
         this->yAxis.draw(pipelineManager, cameraMatrix);
         this->zAxis.draw(pipelineManager, cameraMatrix);
+    }
+
+    // Draw scene contents (camera and groups)
+    this->camera->drawSolidColorParts(pipelineManager,
+                                      showBoundingSpheres,
+                                      showAnimationLines,
+                                      showNormals);
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        group->drawSolidColorParts(pipelineManager,
+                                   *this->camera,
+                                   cameraMatrix,
+                                   showBoundingSpheres,
+                                   showAnimationLines,
+                                   showNormals);
+    }
+
+    int entityCount = 0;
+    entityCount += this->camera->drawShadedParts(pipelineManager, fillPolygons);
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        entityCount +=
+            group->drawShadedParts(pipelineManager, *this->camera, cameraMatrix, fillPolygons);
     }
 
     return entityCount;

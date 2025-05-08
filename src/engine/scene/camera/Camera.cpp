@@ -36,7 +36,7 @@ Camera::Camera(const glm::vec3 &_position,
     far(_far),
     aspectRatio(1.0f) {
 
-    this->update();
+    this->updateWithMotion();
 }
 
 const glm::vec3 &Camera::getPosition() const {
@@ -49,12 +49,12 @@ const glm::mat4 &Camera::getCameraMatrix() const {
 
 void Camera::setPosition(const glm::vec3 &pos) {
     this->position = pos;
-    this->update();
+    this->updateWithMotion();
 }
 
 void Camera::setWindowSize(int width, int height) {
     this->aspectRatio = static_cast<float>(width) / height;
-    this->update();
+    this->updateWithMotion();
 }
 
 void Camera::move(const glm::vec3 &v) {
@@ -73,15 +73,26 @@ int Camera::getEntityCount() const {
     return 0;
 }
 
-int Camera::draw(render::RenderPipelineManager &pipelineManager,
-                 bool fillPolygons,
-                 bool showBoundingSpheres,
-                 bool showNormals) const {
+void Camera::updateWithTime(float time) {
+    static_cast<void>(time);
+}
+
+void Camera::drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
+                                 bool showBoundingSpheres,
+                                 bool showAnimationLines,
+                                 bool showNormals) const {
+
+    static_cast<void>(pipelineManager);
+    static_cast<void>(showBoundingSpheres);
+    static_cast<void>(showAnimationLines);
+    static_cast<void>(showNormals);
+}
+
+int Camera::drawShadedParts(render::RenderPipelineManager &pipelineManager,
+                            bool fillPolygons) const {
 
     static_cast<void>(pipelineManager);
     static_cast<void>(fillPolygons);
-    static_cast<void>(showBoundingSpheres);
-    static_cast<void>(showNormals);
     return 0;
 }
 
@@ -95,7 +106,7 @@ bool Camera::isInFrustum(const render::BoundingSphere &sphere) const {
                         });
 }
 
-void Camera::update() {
+void Camera::updateWithMotion() {
     // Update camera matrix
     const glm::mat4 view = glm::lookAt(this->position, this->lookAt, this->up);
     const glm::mat4 projection =

@@ -67,6 +67,101 @@ int Group::getEntityCount() const {
         [](const std::unique_ptr<Group> &group) { return group->getEntityCount(); });
 }
 
+void Group::update(const glm::mat4 &worldTransform, float time) {
+    this->transform.update(time);
+    const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        group->update(subTransform, time);
+    }
+
+    this->updateBoundingSphere(worldTransform);
+}
+
+void Group::drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
+                                const camera::Camera &camera,
+                                const glm::mat4 &_transform,
+                                bool showBoundingSpheres,
+                                bool showAnimationLines,
+                                bool showNormals) const {
+
+    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
+
+    if (showAnimationLines) {
+        this->transform.draw(pipelineManager, _transform);
+    }
+
+    if (!(showBoundingSpheres || showAnimationLines || showNormals) ||
+        !camera.isInFrustum(this->boundingSphere)) {
+        return;
+    }
+
+    const glm::mat4 subTransform = _transform * this->transform.getMatrix();
+    for (const std::unique_ptr<Entity> &entity : this->entities) {
+        const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
+
+        if (camera.isInFrustum(entityBoundingSphere)) {
+            if (showBoundingSpheres) {
+                entityBoundingSphere.draw(pipelineManager,
+                                          cameraMatrix,
+                                          glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            }
+
+            if (showNormals) {
+                entity->getNormalsPreview().draw(pipelineManager,
+                                                 subTransform,
+                                                 glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+            }
+        }
+    }
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        group->drawSolidColorParts(pipelineManager,
+                                   camera,
+                                   subTransform,
+                                   showBoundingSpheres,
+                                   showAnimationLines,
+                                   showNormals);
+    }
+
+    if (showBoundingSpheres) {
+        this->boundingSphere.draw(pipelineManager, cameraMatrix, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    }
+}
+
+int Group::drawShadedParts(render::RenderPipelineManager &pipelineManager,
+                           const camera::Camera &camera,
+                           const glm::mat4 &_transform,
+                           bool fillPolygons) const {
+
+    const glm::mat4 subTransform = _transform * this->transform.getMatrix();
+    int renderedEntities = 0;
+
+    if (!camera.isInFrustum(this->boundingSphere)) {
+        return renderedEntities;
+    }
+
+    for (const std::unique_ptr<Entity> &entity : this->entities) {
+        const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
+
+        if (camera.isInFrustum(entityBoundingSphere)) {
+            entity->draw(pipelineManager, subTransform, fillPolygons);
+            renderedEntities++; // cppcheck-suppress useStlAlgorithm
+        }
+    }
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        // cppcheck-suppress useStlAlgorithm
+        renderedEntities +=
+            group->drawShadedParts(pipelineManager, camera, subTransform, fillPolygons);
+    }
+
+    return renderedEntities;
+}
+
+const render::BoundingSphere &Group::getBoundingSphere() const {
+    return this->boundingSphere;
+}
+
 void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
     const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
 
@@ -84,86 +179,16 @@ void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
     this->boundingSphere = render::BoundingSphere(groupCenter, radius);
 }
 
-void Group::update(float time) {
-    this->transform.update(time);
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        group->update(time);
-    }
-}
-
-int Group::draw(render::RenderPipelineManager &pipelineManager,
-                const camera::Camera &camera,
-                const glm::mat4 &_transform,
-                bool fillPolygons,
-                bool showBoundingSpheres,
-                bool showAnimationLines,
-                bool showNormals) const {
-
-    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
-
-    if (showAnimationLines) {
-        this->transform.draw(pipelineManager, _transform);
-    }
-
-    const glm::mat4 subTransform = _transform * this->transform.getMatrix();
-    int renderedEntities = 0;
-
-    if (!camera.isInFrustum(this->boundingSphere))
-        return renderedEntities;
-
-    for (const std::unique_ptr<Entity> &entity : this->entities) {
-        const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
-
-        if (camera.isInFrustum(entityBoundingSphere)) {
-            entity->draw(pipelineManager, subTransform, fillPolygons);
-            renderedEntities++; // cppcheck-suppress useStlAlgorithm
-
-            if (showBoundingSpheres) {
-                entityBoundingSphere.draw(pipelineManager,
-                                          cameraMatrix,
-                                          glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-            }
-
-            if (showNormals) {
-                entity->getNormalsPreview().draw(pipelineManager,
-                                                 subTransform,
-                                                 glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-            }
-        }
-    }
-
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        // cppcheck-suppress useStlAlgorithm
-        renderedEntities += group->draw(pipelineManager,
-                                        camera,
-                                        subTransform,
-                                        fillPolygons,
-                                        showBoundingSpheres,
-                                        showAnimationLines,
-                                        showNormals);
-    }
-
-    if (showBoundingSpheres) {
-        this->boundingSphere.draw(pipelineManager, cameraMatrix, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    }
-
-    return renderedEntities;
-}
-
-const render::BoundingSphere &Group::getBoundingSphere() const {
-    return this->boundingSphere;
-}
-
 template<class T>
 glm::vec4 Group::sumBoundingSphereCenters(const std::vector<std::unique_ptr<T>> &ts,
-                                          const glm::mat4 &subTransform) {
+                                          const glm::mat4 &worldTransform) {
 
     return std::transform_reduce(ts.cbegin(),
                                  ts.cend(),
                                  glm::vec4(0.0f),
                                  std::plus<>(),
-                                 [subTransform](const std::unique_ptr<T> &t) {
-                                     t->updateBoundingSphere(subTransform);
+                                 [worldTransform](const std::unique_ptr<T> &t) {
+                                     t->updateBoundingSphere(worldTransform);
                                      return t->getBoundingSphere().getCenter();
                                  });
 }
@@ -171,7 +196,6 @@ glm::vec4 Group::sumBoundingSphereCenters(const std::vector<std::unique_ptr<T>> 
 template<class T>
 float Group::calculateBoundingSphereRadius(const std::vector<std::unique_ptr<T>> &ts,
                                            const glm::vec4 &groupCenter) {
-
     return std::transform_reduce(
         ts.cbegin(),
         ts.cend(),

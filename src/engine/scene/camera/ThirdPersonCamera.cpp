@@ -42,30 +42,46 @@ void ThirdPersonCamera::move(const glm::vec3 &v) {
         motionVector.z *= 2.0f;
 
     this->lookAt += glm::mat3(right, this->up, front) * (v * motionVector);
-    this->update();
+    this->updateWithMotion();
 }
 
 int ThirdPersonCamera::getEntityCount() const {
     return this->player->getEntityCount();
 }
 
-int ThirdPersonCamera::draw(render::RenderPipelineManager &pipelineManager,
-                            bool fillPolygons,
-                            bool drawBoundingSpheres,
-                            bool showNormals) const {
+void ThirdPersonCamera::updateWithTime(float time) {
+    OrbitalCamera::updateWithTime(time);
+    this->player->update(this->playerTransform, time);
+}
+
+void ThirdPersonCamera::drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
+                                            bool showBoundingSpheres,
+                                            bool showAnimationLines,
+                                            bool showNormals) const {
+
+    return this->player->drawSolidColorParts(pipelineManager,
+                                             *this,
+                                             this->cameraMatrix * this->playerTransform,
+                                             showBoundingSpheres,
+                                             showAnimationLines,
+                                             showNormals);
+}
+
+int ThirdPersonCamera::drawShadedParts(render::RenderPipelineManager &pipelineManager,
+                                       bool fillPolygons) const {
+
+    return this->player->drawShadedParts(pipelineManager,
+                                         *this,
+                                         this->cameraMatrix * this->playerTransform,
+                                         fillPolygons);
+}
+
+void ThirdPersonCamera::updateWithMotion() {
+    OrbitalCamera::updateWithMotion();
 
     const glm::vec3 d = this->lookAt - this->position;
     const float angle = atan2f(d.x, d.z);
-    const glm::mat4 worldTransform = glm::translate(this->lookAt) * glm::rotate(angle, this->up);
-
-    this->player->updateBoundingSphere(worldTransform);
-    return this->player->draw(pipelineManager,
-                              *this,
-                              this->getCameraMatrix() * worldTransform,
-                              fillPolygons,
-                              drawBoundingSpheres,
-                              false,
-                              showNormals);
+    this->playerTransform = glm::translate(this->lookAt) * glm::rotate(angle, this->up);
 }
 
 }
