@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/render/SolidColorShaderProgram.hpp"
@@ -29,18 +30,18 @@ void SolidColorShaderProgram::use() const {
 }
 
 void SolidColorShaderProgram::setMatrix(const glm::mat4 &matrix) const {
-    glUniformMatrix4fv(1, 1, false, glm::value_ptr(matrix));
+    glUniformMatrix4fv(0, 1, false, glm::value_ptr(matrix));
 }
 
 void SolidColorShaderProgram::setColor(const glm::vec4 &color) const {
-    glUniform4f(2, color.x, color.y, color.z, color.w);
+    glUniform4f(1, color.x, color.y, color.z, color.w);
 }
 
 const std::string SolidColorShaderProgram::vertexShaderSource = R"(
 #version 460 core
 layout (location = 0) in vec4 inPosition;
 
-layout (location = 1) uniform mat4 uniMatrix;
+layout (location = 0) uniform mat4 uniMatrix;
 
 void main() {
     gl_Position = uniMatrix * inPosition;
@@ -51,7 +52,7 @@ const std::string SolidColorShaderProgram::fragmentShaderSource = R"(
 #version 460 core
 layout (location = 0) out vec4 outColor;
 
-layout (location = 2) uniform vec4 uniColor;
+layout (location = 1) uniform vec4 uniColor;
 
 void main() {
     outColor = uniColor;
