@@ -14,31 +14,26 @@
 
 #pragma once
 
-#include "engine/render/ShadedShaderProgram.hpp"
+#include <glm/mat4x4.hpp>
+#include <glm/vec4.hpp>
+#include <string>
+
 #include "engine/render/ShaderProgram.hpp"
-#include "engine/render/SolidColorShaderProgram.hpp"
 
 namespace engine::render {
 
-class RenderPipelineManager {
+class ShadedShaderProgram : public ShaderProgram {
 private:
-    ShadedShaderProgram shadedShaderProgram;
-    SolidColorShaderProgram solidColorShaderProgram;
-    ShaderProgram *currentProgram;
-    bool currentfillPolygons;
+    static const std::string vertexShaderSource, fragmentShaderSource;
 
 public:
-    RenderPipelineManager();
-    RenderPipelineManager(const RenderPipelineManager &model) = delete;
-    RenderPipelineManager(RenderPipelineManager &&) = delete;
+    ShadedShaderProgram();
+    ShadedShaderProgram(const ShadedShaderProgram &program) = delete;
+    ShadedShaderProgram(ShadedShaderProgram &&program) = delete;
 
-    void setFillPolygons(bool fillPolygons);
+    void use() const override;
 
-    const SolidColorShaderProgram &getSolidColorShaderProgram();
-    const ShadedShaderProgram &getShadedShaderProgram();
-
-private:
-    void useProgram(ShaderProgram *program);
+    void setMatrix(const glm::mat4 &matrix) const;
 };
 
 }
