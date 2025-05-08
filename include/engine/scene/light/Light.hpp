@@ -20,7 +20,7 @@ namespace engine::scene::light {
 
 class Light {
 protected:
-    glm::vec3 color = glm::vec3(1.0f);
+    glm::vec3 color;
 
 public:
     Light();
