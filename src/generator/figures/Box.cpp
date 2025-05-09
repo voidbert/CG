@@ -62,7 +62,7 @@ Box::Box(float size, int divisions, bool multiTextured) {
         const float faceNormalMultiplier = positiveCoordinateFace ? 1.0f : -1.0f;
 
         const glm::vec3 faceNormal = glm::vec3(1.0f, 1.0f, 1.0f) - ivec - jvec;
-        this->normals.push_back(faceNormal * faceNormalMultiplier);
+        this->normals.push_back(faceNormal * -faceNormalMultiplier);
         const int faceNormalIndex = this->normals.size() - 1;
 
         const glm::vec3 positionStart =
