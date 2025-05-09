@@ -40,7 +40,7 @@ ShaderProgram::ShaderProgram(const std::string &vertexShaderSource,
         logMessage.reserve(logLength + 1);
         glGetProgramInfoLog(this->program, logLength, nullptr, logMessage.data());
 
-        throw std::runtime_error("Shader compilation error: " + logMessage);
+        throw std::runtime_error("Shader linking error: " + logMessage);
     }
 }
 

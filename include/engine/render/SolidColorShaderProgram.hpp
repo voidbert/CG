@@ -31,8 +31,6 @@ public:
     SolidColorShaderProgram(const SolidColorShaderProgram &program) = delete;
     SolidColorShaderProgram(SolidColorShaderProgram &&program) = delete;
 
-    void use() const override;
-
     void setMatrix(const glm::mat4 &matrix) const;
     void setColor(const glm::vec4 &color) const;
 };

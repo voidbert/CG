@@ -29,7 +29,7 @@ public:
     ShaderProgram(ShaderProgram &&program) = delete;
     ~ShaderProgram();
 
-    virtual void use() const;
+    void use() const;
 
 private:
     GLuint compileShader(GLenum type, const std::string &source);

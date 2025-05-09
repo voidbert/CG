@@ -23,12 +23,6 @@ SolidColorShaderProgram::SolidColorShaderProgram() :
     ShaderProgram(SolidColorShaderProgram::vertexShaderSource,
                   SolidColorShaderProgram::fragmentShaderSource) {}
 
-void SolidColorShaderProgram::use() const {
-    ShaderProgram::use();
-    this->setMatrix(glm::mat4(1.0f));
-    this->setColor(glm::vec4(1.0f));
-}
-
 void SolidColorShaderProgram::setMatrix(const glm::mat4 &matrix) const {
     glUniformMatrix4fv(0, 1, false, glm::value_ptr(matrix));
 }
