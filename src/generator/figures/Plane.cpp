@@ -32,7 +32,7 @@ Plane::Plane(float size, int divisions) {
                                                 j * positionStep - positionStart,
                                                 1.0));
 
-            this->textureCoordinates.push_back(glm::vec2(i * textureStep, j * textureStep));
+            this->textureCoordinates.push_back(glm::vec2(j * textureStep, i * textureStep));
         }
     }
 

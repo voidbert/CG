@@ -8,7 +8,9 @@
     </camera>
     <group>
         <models>
-            <model file="../models/boxMultiTexture.3d" />
+            <model file="../models/boxMultiTexture.3d">
+                <texture file="../textures/boxOrientation.png" />
+            </model>
         </models>
     </group>
 </world>
