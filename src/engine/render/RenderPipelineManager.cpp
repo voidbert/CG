@@ -18,8 +18,10 @@
 
 namespace engine::render {
 
-RenderPipelineManager::RenderPipelineManager() :
-    shadedShaderProgram(),
+RenderPipelineManager::RenderPipelineManager(int pointLights,
+                                             int directionalLights,
+                                             int spotlights) :
+    shadedShaderProgram(pointLights, directionalLights, spotlights),
     solidColorShaderProgram(),
     currentProgram(nullptr),
     currentfillPolygons(true) {}

@@ -16,10 +16,13 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "engine/render/ShaderProgram.hpp"
 #include "engine/render/Texture.hpp"
+#include "engine/scene/light/Light.hpp"
 #include "engine/scene/Material.hpp"
 
 namespace engine::render {
@@ -29,15 +32,22 @@ private:
     static const std::string vertexShaderSource, fragmentShaderSource;
 
 public:
-    ShadedShaderProgram();
+    ShadedShaderProgram(int pointLights, int directionalLights, int spotlights);
     ShadedShaderProgram(const ShadedShaderProgram &program) = delete;
     ShadedShaderProgram(ShadedShaderProgram &&program) = delete;
 
-    void use() const override;
+    void setFullMatrix(const glm::mat4 &fullMatrix) const;
+    void setWorldMatrix(const glm::mat4 &worldMatrix) const;
+    void setNormalMatrix(const glm::mat4 &normalMatrix) const;
+    void setCameraPosition(const glm::vec3 &position) const;
 
-    void setMatrix(const glm::mat4 &matrix) const;
     void setTexture(const Texture &texture) const;
     void setMaterial(const scene::Material &material) const;
+    void setLights(const std::vector<std::unique_ptr<scene::light::Light>> &lights) const;
+
+private:
+    static std::string
+        getFragmentShaderSource(int pointLights, int directionalLights, int spotlights);
 };
 
 }

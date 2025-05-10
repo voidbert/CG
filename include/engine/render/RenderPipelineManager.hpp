@@ -28,7 +28,7 @@ private:
     bool currentfillPolygons;
 
 public:
-    RenderPipelineManager();
+    RenderPipelineManager(int pointLights, int directionalLights, int spotLights);
     RenderPipelineManager(const RenderPipelineManager &model) = delete;
     RenderPipelineManager(RenderPipelineManager &&) = delete;
 
