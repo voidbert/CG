@@ -15,7 +15,7 @@
 #pragma once
 
 #include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -30,9 +30,11 @@ namespace engine::render {
 class ShadedShaderProgram : public ShaderProgram {
 private:
     static const std::string vertexShaderSource, fragmentShaderSource;
+    int pointLights, directionalLights, spotlights;
+    int pointLightPositionsUniformLocation, directionalLightDirectionsUniformLocation;
 
 public:
-    ShadedShaderProgram(int pointLights, int directionalLights, int spotlights);
+    ShadedShaderProgram(int _pointLights, int _directionalLights, int _spotlights);
     ShadedShaderProgram(const ShadedShaderProgram &program) = delete;
     ShadedShaderProgram(ShadedShaderProgram &&program) = delete;
 
@@ -46,8 +48,7 @@ public:
     void setLights(const std::vector<std::unique_ptr<scene::light::Light>> &lights) const;
 
 private:
-    static std::string
-        getFragmentShaderSource(int pointLights, int directionalLights, int spotlights);
+    std::string initializeFragmentShader(int pointLights, int directionalLights, int spotlights);
 };
 
 }

@@ -16,6 +16,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream> // TODO - remove
 #include <regex>
+#include <sstream>
+#include <stdexcept>
 
 #include "engine/render/ShadedShaderProgram.hpp"
 #include "engine/scene/light/DirectionalLight.hpp"
@@ -24,10 +26,11 @@
 
 namespace engine::render {
 
-ShadedShaderProgram::ShadedShaderProgram(int pointLights, int directionalLights, int spotlights) :
-    ShaderProgram(
-        ShadedShaderProgram::vertexShaderSource,
-        ShadedShaderProgram::getFragmentShaderSource(pointLights, directionalLights, spotlights)) {}
+ShadedShaderProgram::ShadedShaderProgram(int _pointLights,
+                                         int _directionalLights,
+                                         int _spotlights) :
+    ShaderProgram(ShadedShaderProgram::vertexShaderSource,
+                  this->initializeFragmentShader(_pointLights, _directionalLights, _spotlights)) {}
 
 void ShadedShaderProgram::setFullMatrix(const glm::mat4 &fullMatrix) const {
     glUniformMatrix4fv(0, 1, false, glm::value_ptr(fullMatrix));
@@ -71,30 +74,66 @@ void ShadedShaderProgram::setMaterial(const scene::Material &material) const {
 
 void ShadedShaderProgram::setLights(
     const std::vector<std::unique_ptr<scene::light::Light>> &lights) const {
-    int pointLights = 0, directionalLights = 0, spotlights = 0;
+    int pointLightCount = 0, directionalLightCount = 0, spotlightCount = 0;
 
     for (const std::unique_ptr<scene::light::Light> &light : lights) {
-        if (dynamic_cast<scene::light::DirectionalLight *>(light.get())) {
+        if (dynamic_cast<scene::light::PointLight *>(light.get())) {
+            scene::light::PointLight pointLight = dynamic_cast<scene::light::PointLight &>(*light);
+
+            const glm::vec3 &position = pointLight.getPosition();
+            glUniform3f(this->pointLightPositionsUniformLocation + pointLightCount,
+                        position.x,
+                        position.y,
+                        position.z);
+
+            pointLightCount++;
+        } else if (dynamic_cast<scene::light::DirectionalLight *>(light.get())) {
             scene::light::DirectionalLight directionalLight =
                 dynamic_cast<scene::light::DirectionalLight &>(*light);
 
             const glm::vec3 &direction = directionalLight.getDirection();
-            glUniform3f(10 + directionalLights, direction.x, direction.y, direction.z);
-            directionalLights++;
+            glUniform3f(this->directionalLightDirectionsUniformLocation + directionalLightCount,
+                        direction.x,
+                        direction.y,
+                        direction.z);
+
+            directionalLightCount++;
         }
+    }
+
+    if (pointLightCount != this->pointLights || directionalLightCount != this->directionalLights ||
+        spotlightCount != this->spotlights) {
+
+        throw std::runtime_error("ShadedShaderProgram got wrong number of lights");
     }
 }
 
-std::string ShadedShaderProgram::getFragmentShaderSource(int pointLights,
-                                                         int directionalLights,
-                                                         int spotlights) {
-    std::string r = std::string("#version 460 core\n") + "\n#define NUM_POINT_LIGHTS " +
-        std::to_string(pointLights) + "\n#define NUM_DIRECTIONAL_LIGHTS " +
-        std::to_string(directionalLights) + "\n#define NUM_SPOTLIGHTS " +
-        std::to_string(spotlights) + "\n" + ShadedShaderProgram::fragmentShaderSource;
+std::string ShadedShaderProgram::initializeFragmentShader(int _pointLights,
+                                                          int _directionalLights,
+                                                          int _spotlights) {
+    // Initialize instance variables
+    this->pointLights = _pointLights;
+    this->directionalLights = _directionalLights;
+    this->spotlights = _spotlights;
+    this->pointLightPositionsUniformLocation = 10;
+    this->directionalLightDirectionsUniformLocation = 10 + pointLights;
 
-    std::cout << r << std::endl;
-    return r;
+    // Add constants to shader source
+    std::stringstream ss;
+    ss << "#version 460 core" << std::endl;
+
+    ss << "#define NUM_DIRECTIONAL_LIGHTS " << _directionalLights << std::endl;
+    ss << "#define NUM_POINT_LIGHTS " << _pointLights << std::endl;
+    ss << "#define NUM_SPOTLIGHTS " << _spotlights << std::endl;
+
+    ss << "#define POINT_LIGHT_POSITIONS_UNIFORM_LOCATION "
+       << this->pointLightPositionsUniformLocation << std::endl;
+    ss << "#define DIRECTIONAL_LIGHT_DIRECTIONS_UNIFORM_LOCATION "
+       << this->directionalLightDirectionsUniformLocation << std::endl;
+
+    ss << ShadedShaderProgram::fragmentShaderSource;
+    std::cout << ss.str();
+    return ss.str();
 }
 
 const std::string ShadedShaderProgram::vertexShaderSource = R"(
@@ -140,9 +179,46 @@ struct ColorPair {
     vec3 specularColor;
 };
 
+#if NUM_POINT_LIGHTS > 0
+
+layout (location = POINT_LIGHT_POSITIONS_UNIFORM_LOCATION)
+    uniform vec3 uniPointPositions[NUM_POINT_LIGHTS]; // World space
+
+ColorPair point(vec3 normal, vec3 cameraDirection) {
+    ColorPair ret;
+    ret.regularColor = vec3(0.0f, 0.0f, 0.0f);
+    ret.specularColor = vec3(0.0f, 0.0f, 0.0f);
+
+    for (uint i = 0; i < NUM_POINT_LIGHTS; ++i) {
+        vec3 lightDirection = normalize(uniPointPositions[i] - inFragmentPosition);
+        float intensity = max(dot(normal, lightDirection), 0.0);
+        ret.regularColor += intensity * uniDiffuse;
+
+        if (intensity > 0.0f) {
+            vec3 reflectDirection = reflect(-lightDirection, normal);
+            float specularIntensity = max(dot(cameraDirection, reflectDirection), 0.0);
+            ret.specularColor += uniSpecular * pow(specularIntensity, uniShininess);
+        }
+    }
+
+    return ret;
+}
+
+#else
+
+ColorPair point(vec3 normal, vec3 cameraDirection) {
+    ColorPair ret;
+    ret.regularColor = vec3(0.0f, 0.0f, 0.0f);
+    ret.specularColor = vec3(0.0f, 0.0f, 0.0f);
+    return ret;
+}
+
+#endif
+
 #if NUM_DIRECTIONAL_LIGHTS > 0
 
-layout (location = 10) uniform vec3 uniDirectionalDirections[NUM_DIRECTIONAL_LIGHTS]; // World space
+layout (location = DIRECTIONAL_LIGHT_DIRECTIONS_UNIFORM_LOCATION)
+    uniform vec3 uniDirectionalDirections[NUM_DIRECTIONAL_LIGHTS]; // World space
 
 ColorPair directional(vec3 normal, vec3 cameraDirection) {
     ColorPair ret;
@@ -172,6 +248,7 @@ ColorPair directional(vec3 normal, vec3 cameraDirection) {
     ret.specularColor = vec3(0.0f, 0.0f, 0.0f);
     return ret;
 }
+
 #endif
 
 uniform sampler2D uniSampler;
@@ -180,10 +257,12 @@ void main() {
     vec3 normal = normalize(inNormal);
     vec3 cameraDirection = normalize(uniCameraPosition - inFragmentPosition);
 
+    ColorPair pointColors = point(normal, cameraDirection);
     ColorPair directionalColors = directional(normal, cameraDirection);
 
-    vec3 regularColor = directionalColors.regularColor + uniAmbient + uniEmissive;
-    vec3 specularColor = directionalColors.specularColor;
+    vec3 regularColor =
+        pointColors.regularColor + directionalColors.regularColor + uniAmbient + uniEmissive;
+    vec3 specularColor = pointColors.specularColor + directionalColors.specularColor;
 
     if (uniTextured) {
         vec3 textureColor = vec3(texture(uniSampler, inTextureCoordinate));
