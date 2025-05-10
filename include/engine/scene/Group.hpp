@@ -53,13 +53,13 @@ public:
 
     void drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
                              const camera::Camera &camera,
-                             const glm::mat4 &_transform,
+                             const glm::mat4 &worldTransform,
                              bool showBoundingSpheres,
                              bool showAnimationLines,
                              bool showNormals) const;
     int drawShadedParts(render::RenderPipelineManager &pipelineManager,
                         const camera::Camera &camera,
-                        const glm::mat4 &_transform,
+                        const glm::mat4 &worldtransform,
                         bool fillPolygons) const;
 
 private:

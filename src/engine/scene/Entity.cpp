@@ -77,16 +77,20 @@ const render::NormalsPreview &Entity::getNormalsPreview() const {
 }
 
 void Entity::draw(render::RenderPipelineManager &pipelineManager,
-                  const glm::mat4 &transformMatrix,
+                  const glm::mat4 &fullMatrix,
+                  const glm::mat4 &worldMatrix,
+                  const glm::mat4 &normalMatrix,
                   bool fillPolygons) const {
 
     if (fillPolygons) {
-        this->model->drawShaded(pipelineManager, transformMatrix, this->texture, this->material);
+        this->model->drawShaded(pipelineManager,
+                                fullMatrix,
+                                worldMatrix,
+                                normalMatrix,
+                                this->texture,
+                                this->material);
     } else {
-        this->model->drawSolidColor(pipelineManager,
-                                    transformMatrix,
-                                    glm::vec4(1.0f),
-                                    fillPolygons);
+        this->model->drawSolidColor(pipelineManager, fullMatrix, glm::vec4(1.0f), fillPolygons);
     }
 }
 

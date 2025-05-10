@@ -55,7 +55,9 @@ public:
                         bool fillPolygons) const;
 
     void drawShaded(RenderPipelineManager &pipelineManager,
-                    const glm::mat4 &transformMatrix,
+                    const glm::mat4 &fullMatrix,
+                    const glm::mat4 &worldMatrix,
+                    const glm::mat4 &normalMatrix,
                     const std::shared_ptr<Texture> texture,
                     const scene::Material &material) const;
 

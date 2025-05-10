@@ -50,7 +50,9 @@ public:
     const render::NormalsPreview &getNormalsPreview() const;
 
     void draw(render::RenderPipelineManager &pipelineManager,
-              const glm::mat4 &transformMatrix,
+              const glm::mat4 &fullMatrix,
+              const glm::mat4 &worldMatrix,
+              const glm::mat4 &normalMatrix,
               bool fillPolygons) const;
 };
 

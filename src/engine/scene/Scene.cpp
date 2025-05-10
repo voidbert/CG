@@ -20,7 +20,10 @@
 #include "engine/render/Model.hpp"
 #include "engine/render/Texture.hpp"
 #include "engine/scene/camera/CameraFactory.hpp"
+#include "engine/scene/light/DirectionalLight.hpp"
 #include "engine/scene/light/LightFactory.hpp"
+#include "engine/scene/light/PointLight.hpp"
+#include "engine/scene/light/Spotlight.hpp"
 #include "engine/scene/Scene.hpp"
 #include "utils/XMLUtils.hpp"
 
@@ -96,6 +99,30 @@ int Scene::getEntityCount() const {
         this->camera->getEntityCount();
 }
 
+int Scene::getPointLightCount() const {
+    return std::count_if(this->lights.cbegin(),
+                         this->lights.cend(),
+                         [](const std::unique_ptr<light::Light> &light) {
+                             return dynamic_cast<light::PointLight *>(light.get());
+                         });
+}
+
+int Scene::getDirectionalLightCount() const {
+    return std::count_if(this->lights.cbegin(),
+                         this->lights.cend(),
+                         [](const std::unique_ptr<light::Light> &light) {
+                             return dynamic_cast<light::DirectionalLight *>(light.get());
+                         });
+}
+
+int Scene::getSpotlightCount() const {
+    return std::count_if(this->lights.cbegin(),
+                         this->lights.cend(),
+                         [](const std::unique_ptr<light::Light> &light) {
+                             return dynamic_cast<light::Spotlight *>(light.get());
+                         });
+}
+
 camera::Camera &Scene::getCamera() {
     return *camera;
 }
@@ -138,7 +165,7 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
         this->zAxis.draw(pipelineManager, cameraMatrix);
     }
 
-    // Draw scene contents (camera and groups)
+    // Draw shaded parts
     this->camera->drawSolidColorParts(pipelineManager,
                                       showBoundingSpheres,
                                       showAnimationLines,
@@ -147,17 +174,23 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
     for (const std::unique_ptr<Group> &group : this->groups) {
         group->drawSolidColorParts(pipelineManager,
                                    *this->camera,
-                                   cameraMatrix,
+                                   glm::mat4(1.0f),
                                    showBoundingSpheres,
                                    showAnimationLines,
                                    showNormals);
     }
 
+    // Draw shaded parts
     int entityCount = 0;
+
+    const render::ShadedShaderProgram &shader = pipelineManager.getShadedShaderProgram();
+    shader.setCameraPosition(this->camera->getPosition());
+    shader.setLights(this->lights);
+
     entityCount += this->camera->drawShadedParts(pipelineManager, fillPolygons);
     for (const std::unique_ptr<Group> &group : this->groups) {
         entityCount +=
-            group->drawShadedParts(pipelineManager, *this->camera, cameraMatrix, fillPolygons);
+            group->drawShadedParts(pipelineManager, *this->camera, glm::mat4(1.0f), fillPolygons);
     }
 
     return entityCount;

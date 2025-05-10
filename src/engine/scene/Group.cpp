@@ -79,15 +79,16 @@ void Group::update(const glm::mat4 &worldTransform, float time) {
 
 void Group::drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
                                 const camera::Camera &camera,
-                                const glm::mat4 &_transform,
+                                const glm::mat4 &worldTransform,
                                 bool showBoundingSpheres,
                                 bool showAnimationLines,
                                 bool showNormals) const {
 
     const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
+    const glm::mat4 fullTransform = cameraMatrix * worldTransform;
 
     if (showAnimationLines) {
-        this->transform.draw(pipelineManager, _transform);
+        this->transform.draw(pipelineManager, fullTransform);
     }
 
     if (!(showBoundingSpheres || showAnimationLines || showNormals) ||
@@ -95,7 +96,7 @@ void Group::drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
         return;
     }
 
-    const glm::mat4 subTransform = _transform * this->transform.getMatrix();
+    const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
     for (const std::unique_ptr<Entity> &entity : this->entities) {
         const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
 
@@ -108,7 +109,7 @@ void Group::drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
 
             if (showNormals) {
                 entity->getNormalsPreview().draw(pipelineManager,
-                                                 subTransform,
+                                                 fullTransform,
                                                  glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
             }
         }
@@ -130,10 +131,12 @@ void Group::drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
 
 int Group::drawShadedParts(render::RenderPipelineManager &pipelineManager,
                            const camera::Camera &camera,
-                           const glm::mat4 &_transform,
+                           const glm::mat4 &worldTransform,
                            bool fillPolygons) const {
 
-    const glm::mat4 subTransform = _transform * this->transform.getMatrix();
+    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
+    const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
+    const glm::mat4 fullTransform = cameraMatrix * subTransform;
     int renderedEntities = 0;
 
     if (!camera.isInFrustum(this->boundingSphere)) {
@@ -144,7 +147,8 @@ int Group::drawShadedParts(render::RenderPipelineManager &pipelineManager,
         const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
 
         if (camera.isInFrustum(entityBoundingSphere)) {
-            entity->draw(pipelineManager, subTransform, fillPolygons);
+            const glm::mat4 normalMatrix = glm::inverse(glm::transpose(subTransform));
+            entity->draw(pipelineManager, fullTransform, subTransform, normalMatrix, fillPolygons);
             renderedEntities++; // cppcheck-suppress useStlAlgorithm
         }
     }

@@ -51,13 +51,17 @@ void Model::drawSolidColor(RenderPipelineManager &pipelineManager,
 }
 
 void Model::drawShaded(RenderPipelineManager &pipelineManager,
-                       const glm::mat4 &transformMatrix,
+                       const glm::mat4 &fullMatrix,
+                       const glm::mat4 &worldMatrix,
+                       const glm::mat4 &normalMatrix,
                        const std::shared_ptr<Texture> texture,
                        const scene::Material &material) const {
 
     const ShadedShaderProgram &shader = pipelineManager.getShadedShaderProgram();
     pipelineManager.setFillPolygons(true);
-    shader.setMatrix(transformMatrix);
+    shader.setFullMatrix(fullMatrix);
+    shader.setWorldMatrix(worldMatrix);
+    shader.setNormalMatrix(normalMatrix);
 
     if (texture) {
         texture->use();

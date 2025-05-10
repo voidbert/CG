@@ -18,8 +18,10 @@ namespace engine::window {
 
 SceneWindow::SceneWindow(const std::string &sceneFile) :
     Window(sceneFile + " (press U to toggle UI)", 640, 480),
-    pipelineManager(),
     scene(sceneFile),
+    pipelineManager(scene.getPointLightCount(),
+                    scene.getDirectionalLightCount(),
+                    scene.getSpotlightCount()),
     cameraController(scene.getCamera()),
     ui(*this, scene.getCamera(), scene.getEntityCount()),
     showUI(true) {

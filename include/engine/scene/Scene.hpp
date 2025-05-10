@@ -42,6 +42,9 @@ public:
     int getWindowWidth() const;
     int getWindowHeight() const;
     int getEntityCount() const;
+    int getPointLightCount() const;
+    int getDirectionalLightCount() const;
+    int getSpotlightCount() const;
     camera::Camera &getCamera();
 
     void setWindowSize(int width, int height);
