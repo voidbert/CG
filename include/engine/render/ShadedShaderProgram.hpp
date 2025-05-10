@@ -31,7 +31,9 @@ class ShadedShaderProgram : public ShaderProgram {
 private:
     static const std::string vertexShaderSource, fragmentShaderSource;
     int pointLights, directionalLights, spotlights;
-    int pointLightPositionsUniformLocation, directionalLightDirectionsUniformLocation;
+    int pointLightPositionsUniformLocation, directionalLightDirectionsUniformLocation,
+        spotlightPositionsUniformLocation, spotlightDirectionsUniformLocation,
+        spotlightCutoffsUniformLocation;
 
 public:
     ShadedShaderProgram(int _pointLights, int _directionalLights, int _spotlights);

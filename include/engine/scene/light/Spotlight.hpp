@@ -31,7 +31,7 @@ public:
 
     const glm::vec3 &getPosition() const;
     const glm::vec3 &getDirection() const;
-    float getCuttoff() const;
+    float getCutoff() const;
 };
 
 }

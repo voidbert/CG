@@ -28,7 +28,7 @@ const glm::vec3 &Spotlight::getDirection() const {
     return this->direction;
 }
 
-float Spotlight::getCuttoff() const {
+float Spotlight::getCutoff() const {
     return this->cutoff;
 }
 

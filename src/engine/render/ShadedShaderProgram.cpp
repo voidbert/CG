@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <cmath>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream> // TODO - remove
@@ -98,6 +99,25 @@ void ShadedShaderProgram::setLights(
                         direction.z);
 
             directionalLightCount++;
+        } else if (dynamic_cast<scene::light::Spotlight *>(light.get())) {
+            scene::light::Spotlight spotlight = dynamic_cast<scene::light::Spotlight &>(*light);
+
+            const glm::vec3 &position = spotlight.getPosition();
+            glUniform3f(this->spotlightPositionsUniformLocation + spotlightCount,
+                        position.x,
+                        position.y,
+                        position.z);
+
+            const glm::vec3 &direction = spotlight.getDirection();
+            glUniform3f(this->spotlightDirectionsUniformLocation + spotlightCount,
+                        direction.x,
+                        direction.y,
+                        direction.z);
+
+            const float cutoffAngle = spotlight.getCutoff();
+            glUniform1f(this->spotlightCutoffsUniformLocation + spotlightCount, cosf(cutoffAngle));
+
+            spotlightCount++;
         }
     }
 
@@ -116,7 +136,12 @@ std::string ShadedShaderProgram::initializeFragmentShader(int _pointLights,
     this->directionalLights = _directionalLights;
     this->spotlights = _spotlights;
     this->pointLightPositionsUniformLocation = 10;
-    this->directionalLightDirectionsUniformLocation = 10 + pointLights;
+    this->directionalLightDirectionsUniformLocation =
+        this->pointLightPositionsUniformLocation + pointLights;
+    this->spotlightPositionsUniformLocation =
+        this->directionalLightDirectionsUniformLocation + directionalLights;
+    this->spotlightDirectionsUniformLocation = this->spotlightPositionsUniformLocation + spotlights;
+    this->spotlightCutoffsUniformLocation = this->spotlightDirectionsUniformLocation + spotlights;
 
     // Add constants to shader source
     std::stringstream ss;
@@ -130,6 +155,12 @@ std::string ShadedShaderProgram::initializeFragmentShader(int _pointLights,
        << this->pointLightPositionsUniformLocation << std::endl;
     ss << "#define DIRECTIONAL_LIGHT_DIRECTIONS_UNIFORM_LOCATION "
        << this->directionalLightDirectionsUniformLocation << std::endl;
+    ss << "#define SPOTLIGHT_POSITIONS_UNIFORM_LOCATION " << this->spotlightPositionsUniformLocation
+       << std::endl;
+    ss << "#define SPOTLIGHT_DIRECTIONS_UNIFORM_LOCATION "
+       << this->spotlightDirectionsUniformLocation << std::endl;
+    ss << "#define SPOTLIGHT_CUTOFFS_UNIFORM_LOCATION " << this->spotlightCutoffsUniformLocation
+       << std::endl;
 
     ss << ShadedShaderProgram::fragmentShaderSource;
     std::cout << ss.str();
@@ -194,7 +225,7 @@ ColorPair point(vec3 normal, vec3 cameraDirection) {
         float intensity = max(dot(normal, lightDirection), 0.0);
         ret.regularColor += intensity * uniDiffuse;
 
-        if (intensity > 0.0f) {
+        if (intensity > 0.0f && uniShininess > 0.0f) {
             vec3 reflectDirection = reflect(-lightDirection, normal);
             float specularIntensity = max(dot(cameraDirection, reflectDirection), 0.0);
             ret.specularColor += uniSpecular * pow(specularIntensity, uniShininess);
@@ -230,7 +261,7 @@ ColorPair directional(vec3 normal, vec3 cameraDirection) {
         float intensity = max(dot(normal, lightDirection), 0.0);
         ret.regularColor += intensity * uniDiffuse;
 
-        if (intensity > 0.0f) {
+        if (intensity > 0.0f && uniShininess > 0.0f) {
             vec3 reflectDirection = reflect(-lightDirection, normal);
             float specularIntensity = max(dot(cameraDirection, reflectDirection), 0.0);
             ret.specularColor += uniSpecular * pow(specularIntensity, uniShininess);
@@ -251,6 +282,52 @@ ColorPair directional(vec3 normal, vec3 cameraDirection) {
 
 #endif
 
+#if NUM_SPOTLIGHTS > 0
+
+layout (location = SPOTLIGHT_POSITIONS_UNIFORM_LOCATION)
+    uniform vec3 uniSpotPositions[NUM_SPOTLIGHTS]; // World space
+layout (location = SPOTLIGHT_DIRECTIONS_UNIFORM_LOCATION)
+    uniform vec3 uniSpotDirections[NUM_SPOTLIGHTS]; // World space
+layout (location = SPOTLIGHT_CUTOFFS_UNIFORM_LOCATION)
+    uniform float uniSpotCutoffs[NUM_SPOTLIGHTS];
+
+ColorPair spot(vec3 normal, vec3 cameraDirection) {
+    ColorPair ret;
+    ret.regularColor = vec3(0.0f, 0.0f, 0.0f);
+    ret.specularColor = vec3(0.0f, 0.0f, 0.0f);
+
+    for (uint i = 0; i < NUM_SPOTLIGHTS; ++i) {
+        vec3 lightDirection = normalize(uniSpotPositions[i] - inFragmentPosition);
+        float angle = max(dot(lightDirection, -uniSpotDirections[i]), 0.0f);
+
+        if (angle <= uniSpotCutoffs[i]) {
+            continue;
+        }
+
+        float intensity = max(dot(normal, lightDirection), 0.0);
+        ret.regularColor += intensity * uniDiffuse;
+
+        if (intensity > 0.0f && uniShininess > 0.0f) {
+            vec3 reflectDirection = reflect(-lightDirection, normal);
+            float specularIntensity = max(dot(cameraDirection, reflectDirection), 0.0);
+            ret.specularColor += uniSpecular * pow(specularIntensity, uniShininess);
+        }
+    }
+
+    return ret;
+}
+
+#else
+
+ColorPair spot(vec3 normal, vec3 cameraDirection) {
+    ColorPair ret;
+    ret.regularColor = vec3(0.0f, 0.0f, 0.0f);
+    ret.specularColor = vec3(0.0f, 0.0f, 0.0f);
+    return ret;
+}
+
+#endif
+
 uniform sampler2D uniSampler;
 
 void main() {
@@ -259,10 +336,15 @@ void main() {
 
     ColorPair pointColors = point(normal, cameraDirection);
     ColorPair directionalColors = directional(normal, cameraDirection);
+    ColorPair spotColors = spot(normal, cameraDirection);
 
-    vec3 regularColor =
-        pointColors.regularColor + directionalColors.regularColor + uniAmbient + uniEmissive;
-    vec3 specularColor = pointColors.specularColor + directionalColors.specularColor;
+    vec3 regularColor = pointColors.regularColor +
+                        directionalColors.regularColor +
+                        spotColors.regularColor +
+                        // uniAmbient +
+                        uniEmissive;
+    vec3 specularColor =
+        pointColors.specularColor + directionalColors.specularColor + spotColors.specularColor;
 
     if (uniTextured) {
         vec3 textureColor = vec3(texture(uniSampler, inTextureCoordinate));
