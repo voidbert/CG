@@ -165,7 +165,7 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
         this->zAxis.draw(pipelineManager, cameraMatrix);
     }
 
-    // Draw shaded parts
+    // Draw solid colors parts
     this->camera->drawSolidColorParts(pipelineManager,
                                       showBoundingSpheres,
                                       showAnimationLines,
@@ -189,6 +189,7 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
 
     entityCount += this->camera->drawShadedParts(pipelineManager, fillPolygons);
     for (const std::unique_ptr<Group> &group : this->groups) {
+        // cppcheck-suppress useStlAlgorithm
         entityCount +=
             group->drawShadedParts(pipelineManager, *this->camera, glm::mat4(1.0f), fillPolygons);
     }

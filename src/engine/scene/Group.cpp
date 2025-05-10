@@ -109,7 +109,7 @@ void Group::drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
 
             if (showNormals) {
                 entity->getNormalsPreview().draw(pipelineManager,
-                                                 fullTransform,
+                                                 camera.getCameraMatrix() * subTransform,
                                                  glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
             }
         }
