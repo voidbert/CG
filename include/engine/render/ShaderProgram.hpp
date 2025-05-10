@@ -31,6 +31,9 @@ public:
 
     void use() const;
 
+protected:
+    GLint getUniformLocation(const std::string &name);
+
 private:
     GLuint compileShader(GLenum type, const std::string &source);
 };

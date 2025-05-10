@@ -54,6 +54,10 @@ void ShaderProgram::use() const {
     glUseProgram(this->program);
 }
 
+GLint ShaderProgram::getUniformLocation(const std::string &name) {
+    return glGetUniformLocation(program, name.c_str());
+}
+
 GLuint ShaderProgram::compileShader(GLenum type, const std::string &source) {
     const GLuint shader = glCreateShader(type);
     const char *rawSource = source.c_str();

@@ -14,6 +14,9 @@
 
 #include "engine/render/Model.hpp"
 
+#include "engine/render/ShadedShaderProgram.hpp"
+#include "engine/render/SolidColorShaderProgram.hpp"
+
 namespace engine::render {
 
 Model::Model(const utils::WavefrontOBJ &objectFile) : Model(objectFile.getIndexedVertices()) {}
@@ -37,13 +40,13 @@ const NormalsPreview &Model::getNormalsPreview() const {
 }
 
 void Model::drawSolidColor(RenderPipelineManager &pipelineManager,
-                           const glm::mat4 &transformMatrix,
+                           const glm::mat4 &fullMatrix,
                            const glm::vec4 &color,
                            bool fillPolygons) const {
 
     const SolidColorShaderProgram &shader = pipelineManager.getSolidColorShaderProgram();
     pipelineManager.setFillPolygons(fillPolygons);
-    shader.setMatrix(transformMatrix);
+    shader.setFullMatrix(fullMatrix);
     shader.setColor(color);
 
     glBindVertexArray(this->vao);
@@ -64,7 +67,6 @@ void Model::drawShaded(RenderPipelineManager &pipelineManager,
     shader.setNormalMatrix(normalMatrix);
 
     if (texture) {
-        texture->use();
         shader.setTexture(*texture);
     } else {
         shader.setMaterial(material);

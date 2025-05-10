@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <memory>
@@ -31,9 +32,13 @@ class ShadedShaderProgram : public ShaderProgram {
 private:
     static const std::string vertexShaderSource, fragmentShaderSource;
     int pointLights, directionalLights, spotlights;
-    int pointLightPositionsUniformLocation, directionalLightDirectionsUniformLocation,
-        spotlightPositionsUniformLocation, spotlightDirectionsUniformLocation,
-        spotlightCutoffsUniformLocation;
+
+    GLint fullMatrixUniformLocation, worldMatrixUniformLocation, normalMatrixUniformLocation,
+        cameraPositionUniformLocation, texturedUniformLocation, diffuseUniformLocation,
+        ambientUniformLocation, specularUniformLocation, emissiveUniformLocation,
+        shininessUniformLocation, pointPositionsUniformLocation,
+        directionalDirectionsUniformLocation, spotPositionsUniformLocation,
+        spotDirectionsUniformLocation, spotCutoffsUniformLocation;
 
 public:
     ShadedShaderProgram(int _pointLights, int _directionalLights, int _spotlights);
@@ -50,7 +55,8 @@ public:
     void setLights(const std::vector<std::unique_ptr<scene::light::Light>> &lights) const;
 
 private:
-    std::string initializeFragmentShader(int pointLights, int directionalLights, int spotlights);
+    static std::string
+        initializeFragmentShader(int pointLights, int directionalLights, int spotlights);
 };
 
 }

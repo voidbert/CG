@@ -18,7 +18,6 @@
 #include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <memory>
 #include <tuple>
@@ -50,7 +49,7 @@ public:
     const NormalsPreview &getNormalsPreview() const;
 
     void drawSolidColor(RenderPipelineManager &pipelineManager,
-                        const glm::mat4 &transformMatrix,
+                        const glm::mat4 &fullMatrix,
                         const glm::vec4 &color,
                         bool fillPolygons) const;
 
