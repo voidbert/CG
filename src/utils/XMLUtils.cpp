@@ -58,7 +58,7 @@ glm::vec3 XMLUtils::getRGB(const tinyxml2::XMLElement *element) {
         throw std::runtime_error("Invalid vector in <" + name + "> in scene XML file");
     }
 
-    return glm::vec3(r, g, b);
+    return glm::vec3(r / 255.0f, g / 255.0f, b / 255.0f);
 }
 
 glm::vec3 XMLUtils::getLightDirection(const tinyxml2::XMLElement *element) {

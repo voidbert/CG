@@ -23,7 +23,7 @@ Material::Material() :
     ambient(glm::vec3(0.2f)),
     specular(glm::vec3(0.0f)),
     emissive(glm::vec3(0.0f)),
-    shininess(1.0f) {}
+    shininess(0.0f) {}
 
 Material::Material(const tinyxml2::XMLElement *colorElement) {
     this->diffuse =
@@ -39,6 +39,26 @@ Material::Material(const tinyxml2::XMLElement *colorElement) {
     if (shininessElement) {
         this->shininess = shininessElement->FloatAttribute("value", this->shininess);
     }
+}
+
+const glm::vec3 &Material::getDiffuse() const {
+    return this->diffuse;
+}
+
+const glm::vec3 &Material::getAmbient() const {
+    return this->ambient;
+}
+
+const glm::vec3 &Material::getSpecular() const {
+    return this->specular;
+}
+
+const glm::vec3 &Material::getEmissive() const {
+    return this->emissive;
+}
+
+float Material::getShininess() const {
+    return this->shininess;
 }
 
 }

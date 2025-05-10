@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <glm/vec3.hpp>
+
 #include "Light.hpp"
 
 namespace engine::scene::light {
@@ -26,6 +28,10 @@ private:
 
 public:
     explicit Spotlight(const glm::vec3 &_position, const glm::vec3 &_direction, float _cutoff);
+
+    const glm::vec3 &getPosition() const;
+    const glm::vec3 &getDirection() const;
+    float getCuttoff() const;
 };
 
 }

@@ -18,4 +18,8 @@ namespace engine::scene::light {
 
 PointLight::PointLight(const glm::vec3 &_position) : position(_position) {}
 
+const glm::vec3 &PointLight::getPosition() const {
+    return this->position;
+}
+
 }

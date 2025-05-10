@@ -14,13 +14,13 @@
 
 #pragma once
 
-#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 #include <tinyxml2.h>
 
 namespace engine::scene {
 
 class Material {
-protected:
+private:
     glm::vec3 diffuse;
     glm::vec3 ambient;
     glm::vec3 specular;
@@ -30,6 +30,12 @@ protected:
 public:
     Material();
     explicit Material(const tinyxml2::XMLElement *colorElement);
+
+    const glm::vec3 &getDiffuse() const;
+    const glm::vec3 &getAmbient() const;
+    const glm::vec3 &getSpecular() const;
+    const glm::vec3 &getEmissive() const;
+    float getShininess() const;
 };
 
 }
