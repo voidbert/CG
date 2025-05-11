@@ -197,4 +197,34 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
     return entityCount;
 }
 
+void Scene::drawForPicking(render::PickingShaderProgram &shader) const {
+    uint32_t id = 1;
+
+    for (const auto &group : this->groups) {
+        group->drawForPicking(shader, id);
+    }
+}
+
+int Scene::performPicking(int mouseX,
+                          int mouseY,
+                          render::PickingShaderProgram &shader,
+                          window::ObjectPicker &picker) const {
+
+    GLboolean msaaWasEnabled = glIsEnabled(GL_MULTISAMPLE);
+    glDisable(GL_MULTISAMPLE);
+
+    picker.bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    shader.setMatrix(this->camera->getCameraMatrix());
+    this->drawForPicking(shader);
+
+    picker.unbind();
+
+    if (msaaWasEnabled)
+        glEnable(GL_MULTISAMPLE);
+
+    return static_cast<int>(picker.readID(mouseX, mouseY));
+}
+
 }

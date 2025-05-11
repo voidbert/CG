@@ -60,6 +60,8 @@ public:
                     const std::shared_ptr<Texture> texture,
                     const scene::Material &material) const;
 
+    void drawPicking() const;
+
 private:
     explicit Model(const std::tuple<std::vector<glm::vec4>, // Positions
                                     std::vector<glm::vec2>, // Texture coordinates

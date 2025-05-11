@@ -59,6 +59,13 @@ Window::Window(const std::string &title, int _width, int _height) : width(_width
                            window->onKeyEvent(key, action);
                        });
 
+    glfwSetMouseButtonCallback(this->handle,
+                               [](GLFWwindow *_handle, int button, int action, int mods) {
+                                   Window *window = reinterpret_cast<Window *>(
+                                       glfwGetWindowUserPointer(_handle));
+                                   window->onMouseButton(button, action, mods);
+                               });
+
     // Load OpenGL
     const int version = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
     if (version == 0) {

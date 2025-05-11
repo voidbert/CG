@@ -17,6 +17,7 @@
 #include "engine/render/RenderPipelineManager.hpp"
 #include "engine/scene/camera/CameraController.hpp"
 #include "engine/scene/Scene.hpp"
+#include "engine/window/ObjectPicker.hpp"
 #include "engine/window/UI.hpp"
 #include "engine/window/Window.hpp"
 
@@ -28,6 +29,7 @@ private:
     render::RenderPipelineManager pipelineManager;
     scene::camera::CameraController cameraController;
 
+    ObjectPicker objectPicker;
     UI ui;
     bool showUI;
 
@@ -41,6 +43,7 @@ protected:
     void onRender() override;
     void onResize(int _width, int _height) override;
     void onKeyEvent(int key, int action) override;
+    void onMouseButton(int button, int action, int mods) override;
 };
 
 }

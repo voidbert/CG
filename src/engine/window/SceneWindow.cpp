@@ -12,6 +12,9 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <glad/glad.h>
+#include <iostream>
+
 #include "engine/window/SceneWindow.hpp"
 
 namespace engine::window {
@@ -23,6 +26,7 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
                     scene.getDirectionalLightCount(),
                     scene.getSpotlightCount()),
     cameraController(scene.getCamera()),
+    objectPicker(scene.getWindowWidth(), scene.getWindowHeight()),
     ui(*this, scene.getCamera(), scene.getEntityCount()),
     showUI(true) {
 
@@ -65,6 +69,20 @@ void SceneWindow::onKeyEvent(int key, int action) {
 
     if (key == GLFW_KEY_U && action == GLFW_PRESS) {
         this->showUI = !this->showUI;
+    }
+}
+
+void SceneWindow::onMouseButton(int button, int action, int /*mods*/) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        double xpos, ypos;
+        glfwGetCursorPos(this->getHandle(), &xpos, &ypos);
+
+        int selectedId = this->scene.performPicking(static_cast<int>(xpos),
+                                                    static_cast<int>(ypos),
+                                                    this->pipelineManager.getPickingShader(),
+                                                    this->objectPicker);
+
+        std::cout << "Selected: " << selectedId << std::endl;
     }
 }
 

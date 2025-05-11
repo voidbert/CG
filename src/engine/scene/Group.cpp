@@ -183,6 +183,13 @@ void Group::updateBoundingSphere(const glm::mat4 &worldTransform) {
     this->boundingSphere = render::BoundingSphere(groupCenter, radius);
 }
 
+void Group::drawForPicking(render::PickingShaderProgram &shader, uint32_t &id) const {
+    for (const auto &entity : entities)
+        entity->drawForPicking(shader, id++);
+    for (const auto &group : groups)
+        group->drawForPicking(shader, id);
+}
+
 template<class T>
 glm::vec4 Group::sumBoundingSphereCenters(const std::vector<std::unique_ptr<T>> &ts,
                                           const glm::mat4 &worldTransform) {

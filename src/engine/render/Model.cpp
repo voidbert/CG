@@ -111,6 +111,19 @@ Model::Model(const std::tuple<std::vector<glm::vec4>,
     this->vertexCount = indices.size();
 }
 
+void Model::drawPicking() const {
+    glBindVertexArray(this->vao);
+
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
+
+    glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
+
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+}
 template<class V>
 void Model::initializeBuffer(GLuint attribute, GLuint vbo, const std::vector<V> &data) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);

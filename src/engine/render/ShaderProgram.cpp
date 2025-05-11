@@ -12,6 +12,7 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <glm/gtc/type_ptr.hpp>
 #include <stdexcept>
 
 #include "engine/render/ShaderProgram.hpp"
@@ -78,6 +79,20 @@ GLuint ShaderProgram::compileShader(GLenum type, const std::string &source) {
     }
 
     return shader;
+}
+
+void ShaderProgram::setUniformVec3(const std::string &name, const glm::vec3 &value) {
+    GLint location = glGetUniformLocation(this->program, name.c_str());
+    if (location != -1) {
+        glUniform3fv(location, 1, glm::value_ptr(value));
+    }
+}
+
+void ShaderProgram::setUniformMat4(const std::string &name, const glm::mat4 &value) {
+    GLint location = glGetUniformLocation(this->program, name.c_str());
+    if (location != -1) {
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    }
 }
 
 }

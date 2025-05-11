@@ -23,6 +23,7 @@ RenderPipelineManager::RenderPipelineManager(int pointLights,
                                              int spotlights) :
     shadedShaderProgram(pointLights, directionalLights, spotlights),
     solidColorShaderProgram(),
+    pickingShaderProgram(),
     currentProgram(nullptr),
     currentfillPolygons(true) {}
 
@@ -48,6 +49,11 @@ void RenderPipelineManager::useProgram(ShaderProgram *program) {
         program->use();
         this->currentProgram = program;
     }
+}
+
+PickingShaderProgram &RenderPipelineManager::getPickingShader() {
+    this->useProgram(&this->pickingShaderProgram);
+    return this->pickingShaderProgram;
 }
 
 }

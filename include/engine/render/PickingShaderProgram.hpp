@@ -14,33 +14,18 @@
 
 #pragma once
 
-#include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
-#include <string>
+
+#include "engine/render/ShaderProgram.hpp"
 
 namespace engine::render {
 
-class ShaderProgram {
-private:
-    GLuint vertexShader, fragmentShader, program;
-
+class PickingShaderProgram : public ShaderProgram {
 public:
-    ShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource);
-    ShaderProgram(const ShaderProgram &program) = delete;
-    ShaderProgram(ShaderProgram &&program) = delete;
-    ~ShaderProgram();
-
-    void use() const;
-
-    void setUniformVec3(const std::string &name, const glm::vec3 &value);
-    void setUniformMat4(const std::string &name, const glm::mat4 &value);
-
-protected:
-    GLint getUniformLocation(const std::string &name);
-
-private:
-    GLuint compileShader(GLenum type, const std::string &source);
+    PickingShaderProgram();
+    void setColorID(const glm::vec3 &color);
+    void setMatrix(const glm::mat4 &matrix);
 };
 
 }

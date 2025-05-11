@@ -23,6 +23,7 @@
 #include "engine/scene/camera/Camera.hpp"
 #include "engine/scene/Group.hpp"
 #include "engine/scene/light/Light.hpp"
+#include "engine/window/ObjectPicker.hpp"
 
 namespace engine::scene {
 
@@ -58,6 +59,12 @@ public:
              bool showBoundingSpheres,
              bool showAnimationLines,
              bool showNormals) const;
+
+    void drawForPicking(render::PickingShaderProgram &shader) const;
+    int performPicking(int mouseX,
+                       int mouseY,
+                       render::PickingShaderProgram &shader,
+                       window::ObjectPicker &picker) const;
 };
 
 }

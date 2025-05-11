@@ -54,6 +54,8 @@ public:
               const glm::mat4 &worldMatrix,
               const glm::mat4 &normalMatrix,
               bool fillPolygons) const;
+
+    void drawForPicking(render::PickingShaderProgram &shader, uint32_t id) const;
 };
 
 }

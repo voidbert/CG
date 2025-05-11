@@ -62,6 +62,8 @@ public:
                         const glm::mat4 &worldtransform,
                         bool fillPolygons) const;
 
+    void drawForPicking(render::PickingShaderProgram &shader, uint32_t &id) const;
+
 private:
     const render::BoundingSphere &getBoundingSphere() const;
     void updateBoundingSphere(const glm::mat4 &worldTransform);

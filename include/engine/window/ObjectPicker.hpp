@@ -14,35 +14,28 @@
 
 #pragma once
 
-#include <GLFW/glfw3.h>
-#include <string>
+#include <glad/glad.h>
 
-namespace engine {
+namespace engine::window {
 
-class Window {
+class ObjectPicker {
 private:
-    GLFWwindow *handle;
+    GLuint fbo;
+    GLuint colorTexture;
+    GLuint depthRenderbuffer;
     int width, height;
 
+    void init();
+    void cleanup();
+
 public:
-    Window(const std::string &title, int _width, int _height);
-    Window(const Window &window) = delete;
-    Window(Window &&window) = delete;
-    ~Window();
+    ObjectPicker(int w, int h);
+    ~ObjectPicker();
 
-    void runLoop();
-    void resize(int _width, int _height);
-
-    int getWidth() const;
-    int getHeight() const;
-    GLFWwindow *getHandle();
-
-protected:
-    virtual void onUpdate(float time, float timeElapsed) = 0;
-    virtual void onRender() = 0;
-    virtual void onResize(int _width, int _height) = 0;
-    virtual void onKeyEvent(int key, int action) = 0;
-    virtual void onMouseButton(int button, int action, int mods) = 0;
+    void resize(int newWidth, int newHeight);
+    void bind() const;
+    void unbind() const;
+    unsigned char readID(int x, int y) const;
 };
 
 }

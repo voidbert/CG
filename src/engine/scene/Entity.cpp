@@ -12,8 +12,9 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include "engine/scene/Entity.hpp"
+#include <iostream>
 
+#include "engine/scene/Entity.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace engine::scene {
@@ -92,6 +93,25 @@ void Entity::draw(render::RenderPipelineManager &pipelineManager,
     } else {
         this->model->drawSolidColor(pipelineManager, fullMatrix, glm::vec4(1.0f), fillPolygons);
     }
+}
+
+void Entity::drawForPicking(render::PickingShaderProgram &shader, uint32_t id) const {
+    std::cout << "DRAWING ENTITY " << id << " with color (" << (int) r << ", " << (int) g << ", "
+              << (int) b << ")\n";
+
+    shader.use();
+
+    uint8_t r = (id & 0xFF);
+    uint8_t g = (id >> 8) & 0xFF;
+    uint8_t b = (id >> 16) & 0xFF;
+    glm::vec3 colorID = glm::vec3(r, g, b) / 255.0f;
+
+    shader.setColorID(colorID);
+
+    std::cout << "Picking Entity ID: " << id << " → RGB = (" << (int) r << ", " << (int) g << ", "
+              << (int) b << ")\n";
+
+    this->model->drawPicking();
 }
 
 }
