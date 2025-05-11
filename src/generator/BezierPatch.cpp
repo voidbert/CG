@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/vec4.hpp>
 #include <stdexcept>
@@ -94,16 +95,24 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
         const float tessellationStep = 1.0f / tessellation;
         for (int i = 0; i <= tessellation; ++i) {
             const float u = i * tessellationStep;
-            const glm::vec4 uVec = glm::vec4(powf(u, 3), powf(u, 2), u, 1.0f);
 
             for (int j = 0; j <= tessellation; ++j) {
                 const float v = j * tessellationStep;
-                const glm::vec4 vVec = glm::vec4(powf(v, 3), powf(v, 2), v, 1.0f);
 
-                this->positions.push_back(glm::vec4(glm::dot(uVec * mx, vVec),
-                                                    glm::dot(uVec * my, vVec),
-                                                    glm::dot(uVec * mz, vVec),
-                                                    1.0f));
+                glm::vec3 pos = evaluateBezierSurface(mx, my, mz, u, v);
+                glm::vec3 du = evaluateBezierSurfaceDu(mx, my, mz, u, v);
+                glm::vec3 dv = evaluateBezierSurfaceDv(mx, my, mz, u, v);
+
+                glm::vec3 normal = glm::cross(du, dv);
+                if (glm::length(normal) > 1e-6f) {
+                    normal = glm::normalize(normal);
+                } else {
+                    normal = glm::vec3(0.0f, 1.0f, 0.0f);
+                }
+
+                this->positions.push_back(glm::vec4(pos, 1.0f));
+                this->normals.push_back(normal);
+                this->textureCoordinates.push_back(glm::vec2(u, v));
             }
         }
 
@@ -115,8 +124,25 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
                 const int nextBottom = currentBottom + 1;
                 const int nextTop = currentTop + 1;
 
-                this->faces.push_back(utils::TriangleFace(currentBottom, nextBottom, currentTop));
-                this->faces.push_back(utils::TriangleFace(nextBottom, nextTop, currentTop));
+                this->faces.push_back(utils::TriangleFace(currentBottom,
+                                                          currentBottom,
+                                                          currentBottom,
+                                                          nextBottom,
+                                                          nextBottom,
+                                                          nextBottom,
+                                                          currentTop,
+                                                          currentTop,
+                                                          currentTop));
+
+                this->faces.push_back(utils::TriangleFace(nextBottom,
+                                                          nextBottom,
+                                                          nextBottom,
+                                                          nextTop,
+                                                          nextTop,
+                                                          nextTop,
+                                                          currentTop,
+                                                          currentTop,
+                                                          currentTop));
             }
         }
     }
@@ -193,6 +219,54 @@ glm::mat4 BezierPatch::preComputePatchMatrix(const std::vector<glm::vec3> &patch
     }
 
     return m * pointsMatrix * transposed;
+}
+
+glm::vec3 BezierPatch::evaluateBezierSurface(const glm::mat4 &mx,
+                                             const glm::mat4 &my,
+                                             const glm::mat4 &mz,
+                                             float u,
+                                             float v) {
+    glm::vec4 uVec(powf(u, 3), powf(u, 2), u, 1.0f);
+    glm::vec4 vVec(powf(v, 3), powf(v, 2), v, 1.0f);
+
+    glm::vec3 result;
+    result.x = glm::dot(mx * uVec, vVec);
+    result.y = glm::dot(my * uVec, vVec);
+    result.z = glm::dot(mz * uVec, vVec);
+
+    return result;
+}
+
+glm::vec3 BezierPatch::evaluateBezierSurfaceDu(const glm::mat4 &mx,
+                                               const glm::mat4 &my,
+                                               const glm::mat4 &mz,
+                                               float u,
+                                               float v) {
+    glm::vec4 duVec(3 * powf(u, 2), 2 * u, 1.0f, 0.0f);
+    glm::vec4 vVec(powf(v, 3), powf(v, 2), v, 1.0f);
+
+    glm::vec3 result;
+    result.x = glm::dot(mx * duVec, vVec);
+    result.y = glm::dot(my * duVec, vVec);
+    result.z = glm::dot(mz * duVec, vVec);
+
+    return result;
+}
+
+glm::vec3 BezierPatch::evaluateBezierSurfaceDv(const glm::mat4 &mx,
+                                               const glm::mat4 &my,
+                                               const glm::mat4 &mz,
+                                               float u,
+                                               float v) {
+    glm::vec4 uVec(powf(u, 3), powf(u, 2), u, 1.0f);
+    glm::vec4 dvVec(3 * powf(v, 2), 2 * v, 1.0f, 0.0f);
+
+    glm::vec3 result;
+    result.x = glm::dot(mx * uVec, dvVec);
+    result.y = glm::dot(my * uVec, dvVec);
+    result.z = glm::dot(mz * uVec, dvVec);
+
+    return result;
 }
 
 }
