@@ -30,6 +30,7 @@ namespace utils {
 class WavefrontOBJ {
 private:
     static std::regex lineRegex;
+    void generateNormals();
 
 protected:
     std::string comment;
@@ -49,11 +50,6 @@ public:
                std::vector<glm::vec4>, // Normals (padded)
                std::vector<uint32_t>> // Indices
         getIndexedVertices() const;
-
-    // TODO - Mariana, please make generateNormals private when Sphere.cpp doesn't need it anymore
-
-protected:
-    void generateNormals();
 };
 
 }
