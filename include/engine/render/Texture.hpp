@@ -14,28 +14,22 @@
 
 #pragma once
 
-#include <glm/vec3.hpp>
-#include <tinyxml2.h>
+#include <glad/glad.h>
+#include <string>
 
-namespace engine::scene {
+namespace engine::render {
 
-class Material {
+class Texture {
 private:
-    glm::vec3 diffuse;
-    glm::vec3 ambient;
-    glm::vec3 specular;
-    glm::vec3 emissive;
-    float shininess;
+    GLuint tid;
 
 public:
-    Material();
-    explicit Material(const tinyxml2::XMLElement *colorElement);
+    explicit Texture(const std::string &path);
+    Texture(const Texture &texture) = delete;
+    Texture(Texture &&texture) = delete;
+    ~Texture();
 
-    const glm::vec3 &getDiffuse() const;
-    const glm::vec3 &getAmbient() const;
-    const glm::vec3 &getSpecular() const;
-    const glm::vec3 &getEmissive() const;
-    float getShininess() const;
+    void use() const;
 };
 
 }

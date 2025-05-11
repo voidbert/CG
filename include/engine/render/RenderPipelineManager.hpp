@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "engine/render/ShadedShaderProgram.hpp"
 #include "engine/render/ShaderProgram.hpp"
 #include "engine/render/SolidColorShaderProgram.hpp"
 
@@ -21,18 +22,20 @@ namespace engine::render {
 
 class RenderPipelineManager {
 private:
+    ShadedShaderProgram shadedShaderProgram;
     SolidColorShaderProgram solidColorShaderProgram;
     ShaderProgram *currentProgram;
     bool currentfillPolygons;
 
 public:
-    RenderPipelineManager();
+    RenderPipelineManager(int pointLights, int directionalLights, int spotlights);
     RenderPipelineManager(const RenderPipelineManager &model) = delete;
     RenderPipelineManager(RenderPipelineManager &&) = delete;
 
     void setFillPolygons(bool fillPolygons);
 
     const SolidColorShaderProgram &getSolidColorShaderProgram();
+    const ShadedShaderProgram &getShadedShaderProgram();
 
 private:
     void useProgram(ShaderProgram *program);

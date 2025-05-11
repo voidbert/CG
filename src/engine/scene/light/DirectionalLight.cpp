@@ -20,4 +20,8 @@ namespace engine::scene::light {
 DirectionalLight::DirectionalLight(const glm::vec3 &_direction) :
     direction(glm::normalize(_direction)) {}
 
+const glm::vec3 &DirectionalLight::getDirection() const {
+    return this->direction;
+}
+
 }

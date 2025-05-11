@@ -51,15 +51,20 @@ public:
     virtual void zoom(float factor);
 
     virtual int getEntityCount() const;
-    virtual int draw(render::RenderPipelineManager &pipelineManager,
-                     bool fillPolygons,
-                     bool showBoundingSpheres,
-                     bool showNormals) const;
+
+    virtual void updateWithTime(float time);
+
+    virtual void drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
+                                     bool showBoundingSpheres,
+                                     bool showAnimationLines,
+                                     bool showNormals) const;
+    virtual int drawShadedParts(render::RenderPipelineManager &pipelineManager,
+                                bool fillPolygons) const;
 
     bool isInFrustum(const render::BoundingSphere &sphere) const;
 
 protected:
-    virtual void update();
+    virtual void updateWithMotion();
 
 private:
     static glm::vec4 planeEquation(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3);

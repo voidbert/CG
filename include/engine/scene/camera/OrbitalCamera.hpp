@@ -39,7 +39,7 @@ public:
     void zoom(float factor) override;
 
 protected:
-    void update() override;
+    void updateWithMotion() override;
 };
 
 }

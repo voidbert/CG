@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <glm/vec3.hpp>
+
 #include "Light.hpp"
 
 namespace engine::scene::light {
@@ -24,6 +26,7 @@ private:
 
 public:
     explicit PointLight(const glm::vec3 &_position);
+    const glm::vec3 &getPosition() const;
 };
 
 }

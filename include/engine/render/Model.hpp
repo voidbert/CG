@@ -18,14 +18,16 @@
 #include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <memory>
 #include <tuple>
 #include <vector>
 
 #include "engine/render/BoundingSphere.hpp"
 #include "engine/render/NormalsPreview.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
+#include "engine/render/Texture.hpp"
+#include "engine/scene/Material.hpp"
 #include "utils/WavefrontOBJ.hpp"
 
 namespace engine::render {
@@ -46,10 +48,17 @@ public:
     const BoundingSphere &getBoundingSphere() const;
     const NormalsPreview &getNormalsPreview() const;
 
-    void draw(RenderPipelineManager &pipelineManager,
-              const glm::mat4 &transformMatrix,
-              const glm::vec4 &color,
-              bool fillPolygons) const;
+    void drawSolidColor(RenderPipelineManager &pipelineManager,
+                        const glm::mat4 &fullMatrix,
+                        const glm::vec4 &color,
+                        bool fillPolygons) const;
+
+    void drawShaded(RenderPipelineManager &pipelineManager,
+                    const glm::mat4 &fullMatrix,
+                    const glm::mat4 &worldMatrix,
+                    const glm::mat4 &normalMatrix,
+                    const std::shared_ptr<Texture> texture,
+                    const scene::Material &material) const;
 
 private:
     explicit Model(const std::tuple<std::vector<glm::vec4>, // Positions

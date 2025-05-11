@@ -27,7 +27,8 @@ namespace engine::scene::camera {
 std::unique_ptr<Camera> CameraFactory::createFromXML(
     const tinyxml2::XMLElement *cameraElement,
     const std::filesystem::path &sceneDirectory,
-    std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels) {
+    std::unordered_map<std::string, std::shared_ptr<render::Model>> &loadedModels,
+    std::unordered_map<std::string, std::shared_ptr<render::Texture>> &loadedTextures) {
 
     // View matrix
     const glm::vec3 position =
@@ -64,7 +65,7 @@ std::unique_ptr<Camera> CameraFactory::createFromXML(
     } else if (cameraType == "thirdperson") {
         const tinyxml2::XMLElement *group = utils::XMLUtils::getSingleChild(cameraElement, "group");
         std::unique_ptr<scene::Group> player =
-            std::make_unique<scene::Group>(group, sceneDirectory, loadedModels);
+            std::make_unique<scene::Group>(group, sceneDirectory, loadedModels, loadedTextures);
 
         return std::make_unique<ThirdPersonCamera>(position,
                                                    lookAt,

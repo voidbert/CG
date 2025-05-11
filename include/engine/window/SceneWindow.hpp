@@ -24,8 +24,8 @@ namespace engine::window {
 
 class SceneWindow : public Window {
 private:
-    render::RenderPipelineManager pipelineManager;
     scene::Scene scene;
+    render::RenderPipelineManager pipelineManager;
     scene::camera::CameraController cameraController;
 
     UI ui;

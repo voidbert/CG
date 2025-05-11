@@ -55,16 +55,16 @@ void OrbitalCamera::pan(const glm::vec2 &v) {
 
     this->azimuth -= realV.x;
     this->polar -= realV.y;
-    this->update();
+    this->updateWithMotion();
 }
 
 void OrbitalCamera::zoom(float factor) {
     const float zoomSpeed = 0.8f;
     this->radius /= 1.0f + factor * zoomSpeed;
-    this->update();
+    this->updateWithMotion();
 }
 
-void OrbitalCamera::update() {
+void OrbitalCamera::updateWithMotion() {
     this->azimuth = glm::mod(this->azimuth, glm::two_pi<float>());
     this->polar = glm::clamp(this->polar, 0.01f, glm::pi<float>() - 0.01f);
 
@@ -73,7 +73,7 @@ void OrbitalCamera::update() {
                   this->radius * cosf(this->polar),
                   this->radius * sinf(this->polar) * sinf(this->azimuth));
 
-    Camera::update();
+    Camera::updateWithMotion();
 }
 
 }

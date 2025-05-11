@@ -14,16 +14,13 @@
 
 #pragma once
 
-#include <glm/vec3.hpp>
-
 namespace engine::scene::light {
 
 class Light {
 protected:
-    glm::vec3 color;
+    Light();
 
 public:
-    Light();
     virtual ~Light() = default;
 };
 

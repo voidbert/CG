@@ -40,7 +40,7 @@ ShaderProgram::ShaderProgram(const std::string &vertexShaderSource,
         logMessage.reserve(logLength + 1);
         glGetProgramInfoLog(this->program, logLength, nullptr, logMessage.data());
 
-        throw std::runtime_error("Shader compilation error: " + logMessage);
+        throw std::runtime_error("Shader linking error: " + logMessage);
     }
 }
 
@@ -52,6 +52,10 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::use() const {
     glUseProgram(this->program);
+}
+
+GLint ShaderProgram::getUniformLocation(const std::string &name) {
+    return glGetUniformLocation(program, name.c_str());
 }
 
 GLuint ShaderProgram::compileShader(GLenum type, const std::string &source) {

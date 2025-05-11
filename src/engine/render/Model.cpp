@@ -14,6 +14,9 @@
 
 #include "engine/render/Model.hpp"
 
+#include "engine/render/ShadedShaderProgram.hpp"
+#include "engine/render/SolidColorShaderProgram.hpp"
+
 namespace engine::render {
 
 Model::Model(const utils::WavefrontOBJ &objectFile) : Model(objectFile.getIndexedVertices()) {}
@@ -36,15 +39,38 @@ const NormalsPreview &Model::getNormalsPreview() const {
     return this->normalsPreview;
 }
 
-void Model::draw(RenderPipelineManager &pipelineManager,
-                 const glm::mat4 &transformMatrix,
-                 const glm::vec4 &color,
-                 bool fillPolygons) const {
+void Model::drawSolidColor(RenderPipelineManager &pipelineManager,
+                           const glm::mat4 &fullMatrix,
+                           const glm::vec4 &color,
+                           bool fillPolygons) const {
 
     const SolidColorShaderProgram &shader = pipelineManager.getSolidColorShaderProgram();
     pipelineManager.setFillPolygons(fillPolygons);
-    shader.setMatrix(transformMatrix);
+    shader.setFullMatrix(fullMatrix);
     shader.setColor(color);
+
+    glBindVertexArray(this->vao);
+    glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
+}
+
+void Model::drawShaded(RenderPipelineManager &pipelineManager,
+                       const glm::mat4 &fullMatrix,
+                       const glm::mat4 &worldMatrix,
+                       const glm::mat4 &normalMatrix,
+                       const std::shared_ptr<Texture> texture,
+                       const scene::Material &material) const {
+
+    const ShadedShaderProgram &shader = pipelineManager.getShadedShaderProgram();
+    pipelineManager.setFillPolygons(true);
+    shader.setFullMatrix(fullMatrix);
+    shader.setWorldMatrix(worldMatrix);
+    shader.setNormalMatrix(normalMatrix);
+
+    if (texture) {
+        shader.setTexture(*texture);
+    } else {
+        shader.setMaterial(material);
+    }
 
     glBindVertexArray(this->vao);
     glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);

@@ -14,6 +14,8 @@
 
 #include "engine/render/Axis.hpp"
 
+#include "engine/render/SolidColorShaderProgram.hpp"
+
 namespace engine::render {
 
 Axis::Axis(const glm::vec3 &direction) {
@@ -41,7 +43,7 @@ Axis::~Axis() {
 
 void Axis::draw(RenderPipelineManager &pipelineManager, const glm::mat4 &cameraMatrix) const {
     const SolidColorShaderProgram &shader = pipelineManager.getSolidColorShaderProgram();
-    shader.setMatrix(cameraMatrix);
+    shader.setFullMatrix(cameraMatrix);
     shader.setColor(this->color);
 
     glBindVertexArray(this->vao);

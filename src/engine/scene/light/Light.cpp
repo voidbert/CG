@@ -20,5 +20,5 @@
 #include "engine/scene/light/Light.hpp"
 
 namespace engine::scene::light {
-Light::Light() : color(glm::vec3(1.0f)) {}
+Light::Light() {}
 }

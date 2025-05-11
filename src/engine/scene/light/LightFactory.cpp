@@ -12,11 +12,8 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#include <cmath>
-#include <filesystem>
 #include <glm/trigonometric.hpp>
 #include <glm/vec3.hpp>
-#include <memory>
 
 #include "engine/scene/light/DirectionalLight.hpp"
 #include "engine/scene/light/LightFactory.hpp"
@@ -34,20 +31,19 @@ std::unique_ptr<Light> LightFactory::createFromXML(const tinyxml2::XMLElement *l
     }
 
     if (lightType == "directional") {
-        glm::vec3 direction = utils::XMLUtils::getLightDirection(lightElement);
+        const glm::vec3 direction = utils::XMLUtils::getLightDirection(lightElement);
         return std::make_unique<light::DirectionalLight>(direction);
 
     } else if (lightType == "point") {
-        glm::vec3 position = utils::XMLUtils::getLightPosition(lightElement);
+        const glm::vec3 position = utils::XMLUtils::getLightPosition(lightElement);
         return std::make_unique<light::PointLight>(position);
 
     } else if (lightType == "spotlight") {
-        glm::vec3 position = utils::XMLUtils::getLightPosition(lightElement);
-        glm::vec3 direction = utils::XMLUtils::getLightDirection(lightElement);
-        float cutoff = glm::radians(lightElement->FloatAttribute("cutoff", 0.0f));
+        const glm::vec3 position = utils::XMLUtils::getLightPosition(lightElement);
+        const glm::vec3 direction = utils::XMLUtils::getLightDirection(lightElement);
+        const float cutoff = glm::radians(lightElement->FloatAttribute("cutoff", 10.0f));
 
         return std::make_unique<light::Spotlight>(position, direction, cutoff);
-
     } else {
         throw std::runtime_error("Invalid light type in scene XML file");
     }

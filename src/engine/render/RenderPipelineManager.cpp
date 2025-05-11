@@ -18,8 +18,13 @@
 
 namespace engine::render {
 
-RenderPipelineManager::RenderPipelineManager() :
-    solidColorShaderProgram(), currentProgram(nullptr), currentfillPolygons(true) {}
+RenderPipelineManager::RenderPipelineManager(int pointLights,
+                                             int directionalLights,
+                                             int spotlights) :
+    shadedShaderProgram(pointLights, directionalLights, spotlights),
+    solidColorShaderProgram(),
+    currentProgram(nullptr),
+    currentfillPolygons(true) {}
 
 void RenderPipelineManager::setFillPolygons(bool fillPolygons) {
     if (this->currentfillPolygons != fillPolygons) {
@@ -31,6 +36,11 @@ void RenderPipelineManager::setFillPolygons(bool fillPolygons) {
 const SolidColorShaderProgram &RenderPipelineManager::getSolidColorShaderProgram() {
     this->useProgram(&this->solidColorShaderProgram);
     return this->solidColorShaderProgram;
+}
+
+const ShadedShaderProgram &RenderPipelineManager::getShadedShaderProgram() {
+    this->useProgram(&this->shadedShaderProgram);
+    return this->shadedShaderProgram;
 }
 
 void RenderPipelineManager::useProgram(ShaderProgram *program) {

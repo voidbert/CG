@@ -38,7 +38,7 @@ public:
     ~NormalsPreview();
 
     void draw(RenderPipelineManager &pipelineManager,
-              const glm::mat4 &transformMatrix,
+              const glm::mat4 &fullMatrix,
               const glm::vec4 &color) const;
 };
 

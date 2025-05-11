@@ -6,9 +6,26 @@
         <up x="0" y="1" z="0" />
         <projection fov="60" near="1" far="1000" />
     </camera>
+    <lights>
+        <light type="spotlight"
+            posX="0" posY="2" posZ="0"
+            dirX="0" dirY="-1" dirZ="0"
+            cutoff="30"
+        />
+    </lights>
     <group>
+        <transform>
+            <translate time="10">
+                <point x = "2" y = "0" z = "0" />
+                <point x = "0" y = "0" z = "2" />
+                <point x = "-2" y = "0" z = "0" />
+                <point x = "0" y = "0" z = "-2" />
+                </translate>
+        </transform>
         <models>
-            <model file="../models/plane.3d" />
+            <model file="../models/plane.3d">
+                <texture file="../textures/planeOrientation.jpg" />
+            </model>
         </models>
     </group>
 </world>

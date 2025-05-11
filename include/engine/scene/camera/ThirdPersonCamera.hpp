@@ -25,6 +25,7 @@ namespace engine::scene::camera {
 
 class ThirdPersonCamera : public OrbitalCamera {
 private:
+    glm::mat4 playerTransform;
     std::unique_ptr<scene::Group> player;
 
 public:
@@ -39,10 +40,18 @@ public:
     void move(const glm::vec3 &v) override;
 
     int getEntityCount() const override;
-    int draw(render::RenderPipelineManager &pipelineManager,
-             bool fillPolygons,
-             bool showBoundingSpheres,
-             bool showNormals) const override;
+
+    virtual void updateWithTime(float time) override;
+
+    virtual void drawSolidColorParts(render::RenderPipelineManager &pipelineManager,
+                                     bool showBoundingSpheres,
+                                     bool showAnimationLines,
+                                     bool showNormals) const override;
+    virtual int drawShadedParts(render::RenderPipelineManager &pipelineManager,
+                                bool fillPolygons) const override;
+
+protected:
+    virtual void updateWithMotion() override;
 };
 
 }

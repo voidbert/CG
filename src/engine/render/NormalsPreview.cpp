@@ -14,6 +14,8 @@
 
 #include "engine/render/NormalsPreview.hpp"
 
+#include "engine/render/SolidColorShaderProgram.hpp"
+
 namespace engine::render {
 
 NormalsPreview::NormalsPreview(const std::vector<glm::vec4> &positions,
@@ -52,11 +54,11 @@ NormalsPreview::~NormalsPreview() {
 }
 
 void NormalsPreview::draw(RenderPipelineManager &pipelineManager,
-                          const glm::mat4 &transformMatrix,
+                          const glm::mat4 &fullMatrix,
                           const glm::vec4 &color) const {
 
     const SolidColorShaderProgram &shader = pipelineManager.getSolidColorShaderProgram();
-    shader.setMatrix(transformMatrix);
+    shader.setFullMatrix(fullMatrix);
     shader.setColor(color);
 
     glBindVertexArray(this->vao);

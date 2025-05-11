@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 #include <string>
@@ -25,15 +26,14 @@ namespace engine::render {
 class SolidColorShaderProgram : public ShaderProgram {
 private:
     static const std::string vertexShaderSource, fragmentShaderSource;
+    GLint fullMatrixUniformLocation, colorUniformLocation;
 
 public:
     SolidColorShaderProgram();
     SolidColorShaderProgram(const SolidColorShaderProgram &program) = delete;
     SolidColorShaderProgram(SolidColorShaderProgram &&program) = delete;
 
-    void use() const override;
-
-    void setMatrix(const glm::mat4 &matrix) const;
+    void setFullMatrix(const glm::mat4 &fullMatrix) const;
     void setColor(const glm::vec4 &color) const;
 };
 

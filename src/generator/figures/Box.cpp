@@ -58,7 +58,7 @@ Box::Box(float size, int divisions, bool multiTextured) {
                 break;
         }
 
-        const bool positiveCoordinateFace = (face % 2) == 0;
+        const bool positiveCoordinateFace = (face % 2) == 1;
         const float faceNormalMultiplier = positiveCoordinateFace ? 1.0f : -1.0f;
 
         const glm::vec3 faceNormal = glm::vec3(1.0f, 1.0f, 1.0f) - ivec - jvec;

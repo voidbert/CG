@@ -17,8 +17,13 @@
 #include <tinyxml2.h>
 #include <unordered_map>
 
+#include "engine/render/Model.hpp"
+#include "engine/render/Texture.hpp"
 #include "engine/scene/camera/CameraFactory.hpp"
+#include "engine/scene/light/DirectionalLight.hpp"
 #include "engine/scene/light/LightFactory.hpp"
+#include "engine/scene/light/PointLight.hpp"
+#include "engine/scene/light/Spotlight.hpp"
 #include "engine/scene/Scene.hpp"
 #include "utils/XMLUtils.hpp"
 
@@ -31,6 +36,7 @@ Scene::Scene(const std::string &file) :
 
     const std::filesystem::path sceneDirectory = std::filesystem::path(file).parent_path();
     std::unordered_map<std::string, std::shared_ptr<render::Model>> loadedModels;
+    std::unordered_map<std::string, std::shared_ptr<render::Texture>> loadedTextures;
 
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS) {
@@ -53,7 +59,8 @@ Scene::Scene(const std::string &file) :
     this->camera = camera::CameraFactory::createFromXML(
         utils::XMLUtils::getSingleChild(worldElement, "camera"),
         sceneDirectory,
-        loadedModels);
+        loadedModels,
+        loadedTextures);
 
     // Get light properties
     const tinyxml2::XMLElement *lightsElement = worldElement->FirstChildElement("lights");
@@ -68,7 +75,8 @@ Scene::Scene(const std::string &file) :
     // Get rendering groups
     const tinyxml2::XMLElement *groupElement = worldElement->FirstChildElement("group");
     while (groupElement) {
-        this->groups.push_back(std::make_unique<Group>(groupElement, sceneDirectory, loadedModels));
+        this->groups.push_back(
+            std::make_unique<Group>(groupElement, sceneDirectory, loadedModels, loadedTextures));
         groupElement = groupElement->NextSiblingElement("group");
     }
 }
@@ -91,6 +99,30 @@ int Scene::getEntityCount() const {
         this->camera->getEntityCount();
 }
 
+int Scene::getPointLightCount() const {
+    return std::count_if(this->lights.cbegin(),
+                         this->lights.cend(),
+                         [](const std::unique_ptr<light::Light> &light) {
+                             return dynamic_cast<light::PointLight *>(light.get());
+                         });
+}
+
+int Scene::getDirectionalLightCount() const {
+    return std::count_if(this->lights.cbegin(),
+                         this->lights.cend(),
+                         [](const std::unique_ptr<light::Light> &light) {
+                             return dynamic_cast<light::DirectionalLight *>(light.get());
+                         });
+}
+
+int Scene::getSpotlightCount() const {
+    return std::count_if(this->lights.cbegin(),
+                         this->lights.cend(),
+                         [](const std::unique_ptr<light::Light> &light) {
+                             return dynamic_cast<light::Spotlight *>(light.get());
+                         });
+}
+
 camera::Camera &Scene::getCamera() {
     return *camera;
 }
@@ -102,9 +134,11 @@ void Scene::setWindowSize(int width, int height) {
 }
 
 void Scene::update(float time) {
+    const glm::mat4 worldTransform = glm::mat4(1.0f);
     for (const std::unique_ptr<Group> &group : this->groups) {
-        group->update(time);
+        group->update(worldTransform, time);
     }
+    this->camera->updateWithTime(time);
 }
 
 int Scene::draw(render::RenderPipelineManager &pipelineManager,
@@ -122,28 +156,42 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
         glDisable(GL_CULL_FACE);
     }
 
-    // Draw scene contents
-    int entityCount = 0;
-    entityCount +=
-        this->camera->draw(pipelineManager, fillPolygons, showBoundingSpheres, showNormals);
-
     const glm::mat4 &cameraMatrix = this->camera->getCameraMatrix();
-    for (const std::unique_ptr<Group> &group : this->groups) {
-        group->updateBoundingSphere(glm::mat4(1.0f));
-        entityCount += group->draw(pipelineManager,
-                                   *this->camera,
-                                   cameraMatrix,
-                                   fillPolygons,
-                                   showBoundingSpheres,
-                                   showAnimationLines,
-                                   showNormals);
-    }
 
     // Draw axes
     if (showAxes) {
         this->xAxis.draw(pipelineManager, cameraMatrix);
         this->yAxis.draw(pipelineManager, cameraMatrix);
         this->zAxis.draw(pipelineManager, cameraMatrix);
+    }
+
+    // Draw solid colors parts
+    this->camera->drawSolidColorParts(pipelineManager,
+                                      showBoundingSpheres,
+                                      showAnimationLines,
+                                      showNormals);
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        group->drawSolidColorParts(pipelineManager,
+                                   *this->camera,
+                                   glm::mat4(1.0f),
+                                   showBoundingSpheres,
+                                   showAnimationLines,
+                                   showNormals);
+    }
+
+    // Draw shaded parts
+    int entityCount = 0;
+
+    const render::ShadedShaderProgram &shader = pipelineManager.getShadedShaderProgram();
+    shader.setCameraPosition(this->camera->getPosition());
+    shader.setLights(this->lights);
+
+    entityCount += this->camera->drawShadedParts(pipelineManager, fillPolygons);
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        // cppcheck-suppress useStlAlgorithm
+        entityCount +=
+            group->drawShadedParts(pipelineManager, *this->camera, glm::mat4(1.0f), fillPolygons);
     }
 
     return entityCount;

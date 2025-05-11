@@ -31,7 +31,8 @@ First, you'll need to install the following dependencies:
 Other libraries are already included in this repository:
 
  - [GLAD](https://glad.dav1d.de/);
- - [Dear ImGui](https://github.com/ocornut/imgui).
+ - [Dear ImGui](https://github.com/ocornut/imgui);
+ - [stb_image](https://github.com/nothings/stb).
 
 Then, to compile the project, run:
 
