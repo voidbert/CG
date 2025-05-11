@@ -148,14 +148,21 @@ int main(int argc, char **argv) {
             figures::Cone cone(radius, height, slices, stacks);
             cone.writeToFile(file);
         } else if (args.at(1) == "cylinder") {
-            validateArgumentCount(argc, 7);
             float radius = stringToFloat(args.at(2));
             float height = stringToFloat(args.at(3));
             int slices = stringToInt(args.at(4));
             int stacks = stringToInt(args.at(5));
 
-            figures::Cylinder cylinder(radius, height, slices, stacks);
-            cylinder.writeToFile(file);
+            if (argc == 7) {
+                figures::Cylinder cylinder(radius, height, slices, stacks);
+                cylinder.writeToFile(file);
+            } else if (argc == 8 && args.at(6) == "multi-textured") {
+                figures::Cylinder cylinder(radius, height, slices, stacks, true);
+                cylinder.writeToFile(file);
+            } else {
+                throw std::invalid_argument("Invalid command-line arguments");
+            }
+
         } else if (args.at(1) == "torus") {
             validateArgumentCount(argc, 7);
             float majorRadius = stringToFloat(args.at(2));
