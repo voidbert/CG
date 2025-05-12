@@ -14,8 +14,7 @@
 
 #include <cmath>
 #include <glm/gtc/constants.hpp>
-#include <iostream>
-
+#include <glm/gtx/transform.hpp>
 
 #include "generator/figures/Cone.hpp"
 
@@ -29,6 +28,13 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
     const float sliceStep = glm::two_pi<float>() / slices;
 
     this->positions.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+    for (int jSlice = 0; jSlice <= slices; jSlice++) {
+        const float angle = jSlice * sliceStep;
+        const float x = radius * cosf(angle);
+        const float z = radius * sinf(angle);
+        this->positions.push_back(glm::vec4(x, 0.0f, z, 1.0f));
+    }
 
     for (int iStack = 0; iStack < stacks; iStack++) {
         const float y = iStack * stackStep;
@@ -47,15 +53,21 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
 
     this->textureCoordinates.push_back(glm::vec2(0.5f, 0.5f));
 
+    for (int jSlice = 0; jSlice <= slices; jSlice++) {
+        const float angle = jSlice * sliceStep;
+        const float x = 0.5 + 0.5 * cosf(angle);
+        const float y = 0.5 + 0.5 * sinf(angle);
+        this->textureCoordinates.push_back(glm::vec2(x, y));
+    }
+
     for (int iStack = 0; iStack < stacks; iStack++) {
-        const float y = iStack * stackStep;
-        const float stackRadius = ((height - y) * radius) / height;
+        float v = static_cast<float>(iStack) / stacks;
+        float y = iStack * stackStep;
+        float stackRadius = ((height - y) * radius) / height;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
-            const float angle = jSlice * sliceStep;
-            const float x = stackRadius * cosf(angle);
-            const float z = stackRadius * sinf(angle);
-            this->textureCoordinates.push_back(glm::vec2(0.5f, 0.5f));
+            float u = static_cast<float>(jSlice) / slices;
+            this->textureCoordinates.push_back(glm::vec2(u, v));
         }
     }
 
@@ -63,6 +75,27 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
 
     this->normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
 
+    for (int jSlice = 0; jSlice <= slices; jSlice++) {
+        const float angle = jSlice * sliceStep;
+        const float x = radius * cosf(angle);
+        const float z = radius * sinf(angle);
+        this->normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
+    }
+
+    for (int iStack = 0; iStack <= stacks; iStack++) {
+        float y = iStack * stackStep;
+        float stackRadius = ((height - y) * radius) / height;
+    
+        for (int jSlice = 0; jSlice <= slices; jSlice++) {
+            float angle = jSlice * sliceStep;
+            float nx = cosf(angle);
+            float ny = radius / height;
+            float nz = sinf(angle);
+            glm::vec3 normal = glm::normalize(glm::vec3(nx, ny, nz));
+            this->normals.push_back(normal);
+        }
+    }
+/*
     for (int iStack = 0; iStack < stacks; iStack++) {
         const float y = iStack * stackStep;
         const float stackRadius = ((height - y) * radius) / height;
@@ -71,14 +104,9 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
             const float angle = jSlice * sliceStep;
             const float x = stackRadius * cosf(angle);
             const float z = stackRadius * sinf(angle);
-            if (iStack == 0) {
-                this->normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
-            }
-            else {
-                this->normals.push_back(glm::vec3(x, radius / height, z));
-            }
+            this->normals.push_back(glm::vec3(x, radius / height, z));
         }
-    }
+    }*/
 
     this->normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -88,7 +116,7 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
                                                   jSlice + 2, jSlice + 2, jSlice + 2));
     }
 
-    for (int iStack = 0; iStack < stacks - 1; iStack++) {
+    for (int iStack = 0; iStack < stacks; iStack++) {
         for (int jSlice = 0; jSlice < slices; jSlice++) {
             const int currentBottom = iStack * (slices + 1) + jSlice + 1;
             const int nextBottom = currentBottom + 1;
@@ -112,9 +140,6 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
                                                   topVertexIndex, topVertexIndex, topVertexIndex,
                                                   next, next, next));
     }
-    std::cout << "positions: " << positions.size()
-          << ", texCoords: " << textureCoordinates.size()
-          << ", normals: " << normals.size() << std::endl;
 }
 
 }
