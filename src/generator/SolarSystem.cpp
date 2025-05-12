@@ -84,7 +84,7 @@ tinyxml2::XMLElement *SolarSystem::createBody(const std::string &path,
     model->SetAttribute("file", "sphere.3d");
     if (path != "") {
         tinyxml2::XMLElement *texture = model->InsertNewChildElement("texture");
-        texture->SetAttribute("file",path.c_str());
+        texture->SetAttribute("file", path.c_str());
     }
 
     // Distributions for transforms
@@ -181,7 +181,7 @@ tinyxml2::XMLElement *SolarSystem::createAsteroidBelt(float minDistance,
         const float radius = radiusDistribution(this->rng);
         const float y = yDistribution(this->rng);
 
-        tinyxml2::XMLElement *asteroid = this->createBody("",radius, distance, orbitTime, 0.0f, y);
+        tinyxml2::XMLElement *asteroid = this->createBody("", radius, distance, orbitTime, 0.0f, y);
         const int group = floorf(this->lastTranslationAngle / groupArc);
         subGroups[group]->InsertEndChild(asteroid);
     }
@@ -250,40 +250,94 @@ void SolarSystem::createObjects(float sunScale, float rockyScale, float gasScale
 
     // Sun
     this->bodyScale = sunScale;
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/sunmap.jpg",80.0f, 0.0f, 0.0f, 10.0f));
+    group->InsertEndChild(
+        this->createBody("../texturesSolarSystem/sunmap.jpg", 80.0f, 0.0f, 0.0f, 10.0f));
 
     // Rocky planets
     this->bodyScale = rockyScale;
 
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/mercurymap.jpg",5.0f, 200.0f, 25.0f, 15.0f)); // Mercury
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/venusmap.jpg",6.5f, 370.0f, 35.0f, 18.0f)); // Venus
+    group->InsertEndChild(this->createBody("../texturesSolarSystem/mercurymap.jpg",
+                                           5.0f,
+                                           200.0f,
+                                           25.0f,
+                                           15.0f)); // Mercury
+    group->InsertEndChild(this->createBody("../texturesSolarSystem/venusmap.jpg",
+                                           6.5f,
+                                           370.0f,
+                                           35.0f,
+                                           18.0f)); // Venus
 
-    tinyxml2::XMLElement *earth = this->createBody("../texturesSolarSystem/earthmap.jpg",7.0f, 550.0f, 50.0f, 20.0f, 0.0f, true);
-    earth->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",1.0f, rockyScale * 12.0f, 10.0f, 10.0f)); // Moon
+    tinyxml2::XMLElement *earth = this->createBody("../texturesSolarSystem/earthmap.jpg",
+                                                   7.0f,
+                                                   550.0f,
+                                                   50.0f,
+                                                   20.0f,
+                                                   0.0f,
+                                                   true);
+    earth->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
+                                           1.0f,
+                                           rockyScale * 12.0f,
+                                           10.0f,
+                                           10.0f)); // Moon
     group->InsertEndChild(earth);
 
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/mars_1k_color.jpg",6.5f, 730.0f, 65.0f, 22.0f)); // Mars
+    group->InsertEndChild(this->createBody("../texturesSolarSystem/mars_1k_color.jpg",
+                                           6.5f,
+                                           730.0f,
+                                           65.0f,
+                                           22.0f)); // Mars
 
     // Gas giants
     this->bodyScale = gasScale;
 
-    tinyxml2::XMLElement *jupiter = this->createBody("../texturesSolarSystem/jupitermap.jpg",35.0f, 1900.0f, 90.0f, 25.0f, 0.0f, true);
+    tinyxml2::XMLElement *jupiter = this->createBody("../texturesSolarSystem/jupitermap.jpg",
+                                                     35.0f,
+                                                     1900.0f,
+                                                     90.0f,
+                                                     25.0f,
+                                                     0.0f,
+                                                     true);
 
     this->bodyScale = rockyScale;
-    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",0.5f, 40.0f * gasScale, 3.0f, 5.0f)); // Io
-    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",0.5f, 45.0f * gasScale, 4.0f, 6.0f)); // Europa
-    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",0.7f, 50.0f * gasScale, 5.0f, 7.0f)); // Ganymede
-    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",0.7f, 55.0f * gasScale, 6.0f, 8.0f)); // Callisto
+    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
+                                             0.5f,
+                                             40.0f * gasScale,
+                                             3.0f,
+                                             5.0f)); // Io
+    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
+                                             0.5f,
+                                             45.0f * gasScale,
+                                             4.0f,
+                                             6.0f)); // Europa
+    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
+                                             0.7f,
+                                             50.0f * gasScale,
+                                             5.0f,
+                                             7.0f)); // Ganymede
+    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
+                                             0.7f,
+                                             55.0f * gasScale,
+                                             6.0f,
+                                             8.0f)); // Callisto
     group->InsertEndChild(jupiter);
 
     this->bodyScale = gasScale;
 
-    tinyxml2::XMLElement *saturn = this->createBody("../texturesSolarSystem/saturnmap.jpg",30.0f, 2400.0f, 100.0f, 30.0f);
+    tinyxml2::XMLElement *saturn =
+        this->createBody("../texturesSolarSystem/saturnmap.jpg", 30.0f, 2400.0f, 100.0f, 30.0f);
     saturn->InsertEndChild(this->createRings(3.0f));
     group->InsertEndChild(saturn);
 
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/uranusmap.jpg",24.0f, 2850.0f, 130.0f, 32.0f)); // Uranus
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/neptunemap.jpg",23.0f, 3330.0f, 150.0f, 35.0f)); // Neptune
+    group->InsertEndChild(this->createBody("../texturesSolarSystem/uranusmap.jpg",
+                                           24.0f,
+                                           2850.0f,
+                                           130.0f,
+                                           32.0f)); // Uranus
+    group->InsertEndChild(this->createBody("../texturesSolarSystem/neptunemap.jpg",
+                                           23.0f,
+                                           3330.0f,
+                                           150.0f,
+                                           35.0f)); // Neptune
 
     // Asteroid belts
     this->bodyScale = rockyScale;
