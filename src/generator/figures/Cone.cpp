@@ -87,18 +87,6 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
             this->normals.push_back(normal);
         }
     }
-    /*
-        for (int iStack = 0; iStack < stacks; iStack++) {
-            const float y = iStack * stackStep;
-            const float stackRadius = ((height - y) * radius) / height;
-
-            for (int jSlice = 0; jSlice <= slices; jSlice++) {
-                const float angle = jSlice * sliceStep;
-                const float x = stackRadius * cosf(angle);
-                const float z = stackRadius * sinf(angle);
-                this->normals.push_back(glm::vec3(x, radius / height, z));
-            }
-        }*/
 
     this->normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
 
