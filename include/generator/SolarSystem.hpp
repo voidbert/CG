@@ -40,7 +40,8 @@ public:
 
 private:
     tinyxml2::XMLElement *createVector(const std::string &name, const glm::vec3 &vec);
-    tinyxml2::XMLElement *createBody(float radius,
+    tinyxml2::XMLElement *createBody(const std::string &path,
+                                     float radius,
                                      float distance,
                                      float orbitTime,
                                      float rotationTime,
