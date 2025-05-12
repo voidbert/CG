@@ -97,7 +97,23 @@
 
 \subsection{Cone}
 
-{\color{red} TODO - Ana}
+No cone, as normais são definidas conforme a sua geometria:
+
+\begin{itemize}
+    \item Na base do cone, as normais são verticais e viradas para baixo: $(0, -1, 0)$.
+    \item Na superfície lateral, as normais são vetores radiais no plano $XZ$, ou seja, $(x, 0, z)$
+    normalizado e apontam para fora.
+    \item No vértice do cone, a normal é vertical e virada para cima: $(0, 1, 0)$.
+\end{itemize}
+
+As coordenadas de textura são atribuídas da seguinte forma:
+
+\begin{itemize}
+    \item As coordenadas da base são calculadas a partir da posição do
+    vértice no plano $XZ$, centradas em $(0.5, 0.5)$.
+    \item Na lateral, o valor de $u$ varia ao longo da circunferência
+    e $v$ varia com a altura.
+\end{itemize}
 
 \subsection{Cilindro}
 
@@ -113,7 +129,20 @@
 
 \subsection{Sistema Solar}
 
-{\color{red} TODO - Ana}
+Nesta fase, a cena do sistema solar evoluiu significativamente com a introdução de iluminação e
+texturas. A aplicação de luzes adequadas valorizou os planetas, destacando suas formas e posições
+no espaço, enquanto as texturas acrescentaram detalhes visuais como relevos, cores e superfícies
+características de cada corpo celeste. Esses elementos contribuíram para uma representação mais
+fiel e envolvente do sistema solar, aumentando consideravelmente o realismo da cena e proporcionando
+uma experiência visual mais imersiva.
+
+{\color{red} TODO - PRINT DO SISTEMA SOLAR Ana}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{res/phase3/VAO.pdf}
+    \caption{Sistema Solar}
+\end{figure}
 
 \section{\emph{Engine}}
 
