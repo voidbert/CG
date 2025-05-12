@@ -14,6 +14,8 @@
 
 #include <cmath>
 #include <glm/gtc/constants.hpp>
+#include <iostream>
+
 
 #include "generator/figures/Cone.hpp"
 
@@ -41,10 +43,49 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
     }
 
     const int topVertexIndex = this->positions.size();
-    this->positions.push_back(glm::vec4(0.0f, height, 0.0f, 1.0f));
+    this->positions.push_back(glm::vec4(0.0f, height, 0.0f,1.0f));
+
+    this->textureCoordinates.push_back(glm::vec2(0.5f, 0.5f));
+
+    for (int iStack = 0; iStack < stacks; iStack++) {
+        const float y = iStack * stackStep;
+        const float stackRadius = ((height - y) * radius) / height;
+
+        for (int jSlice = 0; jSlice <= slices; jSlice++) {
+            const float angle = jSlice * sliceStep;
+            const float x = stackRadius * cosf(angle);
+            const float z = stackRadius * sinf(angle);
+            this->textureCoordinates.push_back(glm::vec2(0.5f, 0.5f));
+        }
+    }
+
+    this->textureCoordinates.push_back(glm::vec2(0.5f, 0.5f));
+
+    this->normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
+
+    for (int iStack = 0; iStack < stacks; iStack++) {
+        const float y = iStack * stackStep;
+        const float stackRadius = ((height - y) * radius) / height;
+
+        for (int jSlice = 0; jSlice <= slices; jSlice++) {
+            const float angle = jSlice * sliceStep;
+            const float x = stackRadius * cosf(angle);
+            const float z = stackRadius * sinf(angle);
+            if (iStack == 0) {
+                this->normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
+            }
+            else {
+                this->normals.push_back(glm::vec3(x, radius / height, z));
+            }
+        }
+    }
+
+    this->normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {
-        this->faces.push_back(utils::TriangleFace(0, jSlice + 1, jSlice + 2));
+        this->faces.push_back(utils::TriangleFace(0, 0, 0,
+                                                  jSlice + 1, jSlice + 1, jSlice + 1,
+                                                  jSlice + 2, jSlice + 2, jSlice + 2));
     }
 
     for (int iStack = 0; iStack < stacks - 1; iStack++) {
@@ -54,8 +95,12 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
             const int currentTop = currentBottom + slices + 1;
             const int nextTop = currentTop + 1;
 
-            this->faces.push_back(utils::TriangleFace(currentBottom, currentTop, nextTop));
-            this->faces.push_back(utils::TriangleFace(currentBottom, nextTop, nextBottom));
+            this->faces.push_back(utils::TriangleFace(currentBottom, currentBottom, currentBottom,
+                                                      currentTop, currentTop, currentTop,
+                                                      nextTop, nextTop, nextTop));
+            this->faces.push_back(utils::TriangleFace(currentBottom, currentBottom, currentBottom,
+                                                      nextTop, nextTop, nextTop,
+                                                      nextBottom, nextBottom, nextBottom));
         }
     }
 
@@ -63,8 +108,13 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
     for (int jSlice = 0; jSlice < slices; jSlice++) {
         const int current = topStackStart + jSlice;
         const int next = current + 1;
-        this->faces.push_back(utils::TriangleFace(current, topVertexIndex, next));
+        this->faces.push_back(utils::TriangleFace(current, current, current,
+                                                  topVertexIndex, topVertexIndex, topVertexIndex,
+                                                  next, next, next));
     }
+    std::cout << "positions: " << positions.size()
+          << ", texCoords: " << textureCoordinates.size()
+          << ", normals: " << normals.size() << std::endl;
 }
 
 }
