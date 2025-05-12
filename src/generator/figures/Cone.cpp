@@ -62,7 +62,6 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
 
     for (int iStack = 0; iStack < stacks; iStack++) {
         float v = static_cast<float>(iStack) / stacks;
-        float y = iStack * stackStep;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
             float u = static_cast<float>(jSlice) / slices;
@@ -79,8 +78,6 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
     }
 
     for (int iStack = 0; iStack <= stacks; iStack++) {
-        float y = iStack * stackStep;
-
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
             float angle = jSlice * sliceStep;
             float nx = cosf(angle);
