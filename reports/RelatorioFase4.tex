@@ -101,18 +101,29 @@ No cone, as normais são definidas conforme a sua geometria:
 
 \begin{itemize}
     \item Na base do cone, as normais são verticais e viradas para baixo: $(0, -1, 0)$.
-    \item Na superfície lateral, as normais são vetores radiais no plano $XZ$, ou seja, $(x, 0, z)$
-    normalizado e apontam para fora.
+    \item Na superfície lateral, as normais são vetores perpendiculares à superfície
+    inclinada (ou seja, à geratriz do cone) e são calculadas da seguinte forma:
+\[
+\vec{n} = \text{normalize}(\cos(\theta), \tfrac{r}{h}, \sin(\theta))
+\]
+onde \( \theta \) é o ângulo da fatia atual ao redor do eixo \( y \), \( r \) é o raio da
+base e \( h \) é a altura do cone.
+Esta fórmula resulta em vetores normais inclinados corretamente em relação à superfície
+lateral do cone.
+
     \item No vértice do cone, a normal é vertical e virada para cima: $(0, 1, 0)$.
 \end{itemize}
 
 As coordenadas de textura são atribuídas da seguinte forma:
 
 \begin{itemize}
-    \item As coordenadas da base são calculadas a partir da posição do
-    vértice no plano $XZ$, centradas em $(0.5, 0.5)$.
-    \item Na lateral, o valor de $u$ varia ao longo da circunferência
-    e $v$ varia com a altura.
+    \item As coordenadas da base são obtidas a partir da posição do vértice no plano XZ,
+    centralizadas em $(0{,}5,\ 0{,}5)$ e normalizadas para o intervalo $[0,\ 1]$,
+    permitindo o mapeamento de uma textura circular sobre a base do cone.
+    \item Na lateral, o valor de $u$ varia ao longo da circunferência de acordo com o ângulo
+    $\theta$ em torno do eixo $y$, sendo calculado como $u = \theta / 2\pi$. O valor de $v$
+    varia com a altura, indo de $v = 0$ na base até $v = 1$ no topo, de forma proporcional à
+    coordenada $y$ dos vértices, ou seja, $v = y/h$.
 \end{itemize}
 
 \subsection{Cilindro}
