@@ -14,7 +14,7 @@
 
 #include <cmath>
 #include <fstream>
-#include <glm/glm.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/vec4.hpp>
 #include <stdexcept>
@@ -24,7 +24,7 @@
 namespace generator {
 
 BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
-    this->comment = "bezier " + filename + " " + std::to_string(tessellation);
+    this->comment = "patch " + filename + " " + std::to_string(tessellation);
 
     std::ifstream file;
     file.open(filename);
@@ -99,19 +99,15 @@ BezierPatch::BezierPatch(const std::string &filename, int tessellation) {
             for (int j = 0; j <= tessellation; ++j) {
                 const float v = j * tessellationStep;
 
-                glm::vec3 pos = evaluateBezierSurface(mx, my, mz, u, v);
-                glm::vec3 du = evaluateBezierSurfaceDu(mx, my, mz, u, v);
-                glm::vec3 dv = evaluateBezierSurfaceDv(mx, my, mz, u, v);
+                const float adaptedU = u == 0.0f ? 0.001f : u;
+                const float adaptedV = v == 0.0f ? 0.001f : v;
 
-                glm::vec3 normal = glm::cross(du, dv);
-                if (glm::length(normal) > 1e-6f) {
-                    normal = glm::normalize(normal);
-                } else {
-                    normal = glm::vec3(0.0f, 1.0f, 0.0f);
-                }
+                const glm::vec3 pos = evaluateBezierSurface(mx, my, mz, u, v);
+                const glm::vec3 du = evaluateBezierSurfaceDu(mx, my, mz, adaptedU, adaptedV);
+                const glm::vec3 dv = evaluateBezierSurfaceDv(mx, my, mz, adaptedU, adaptedV);
 
                 this->positions.push_back(glm::vec4(pos, 1.0f));
-                this->normals.push_back(normal);
+                this->normals.push_back(glm::normalize(glm::cross(dv, du)));
                 this->textureCoordinates.push_back(glm::vec2(u, v));
             }
         }
@@ -226,14 +222,12 @@ glm::vec3 BezierPatch::evaluateBezierSurface(const glm::mat4 &mx,
                                              const glm::mat4 &mz,
                                              float u,
                                              float v) {
-    glm::vec4 uVec(powf(u, 3), powf(u, 2), u, 1.0f);
-    glm::vec4 vVec(powf(v, 3), powf(v, 2), v, 1.0f);
 
-    glm::vec3 result;
-    result.x = glm::dot(mx * uVec, vVec);
-    result.y = glm::dot(my * uVec, vVec);
-    result.z = glm::dot(mz * uVec, vVec);
-
+    const glm::vec4 uVec(powf(u, 3), powf(u, 2), u, 1.0f);
+    const glm::vec4 vVec(powf(v, 3), powf(v, 2), v, 1.0f);
+    const glm::vec3 result { glm::dot(mx * uVec, vVec),
+                             glm::dot(my * uVec, vVec),
+                             glm::dot(mz * uVec, vVec) };
     return result;
 }
 
@@ -242,14 +236,12 @@ glm::vec3 BezierPatch::evaluateBezierSurfaceDu(const glm::mat4 &mx,
                                                const glm::mat4 &mz,
                                                float u,
                                                float v) {
-    glm::vec4 duVec(3 * powf(u, 2), 2 * u, 1.0f, 0.0f);
-    glm::vec4 vVec(powf(v, 3), powf(v, 2), v, 1.0f);
 
-    glm::vec3 result;
-    result.x = glm::dot(mx * duVec, vVec);
-    result.y = glm::dot(my * duVec, vVec);
-    result.z = glm::dot(mz * duVec, vVec);
-
+    const glm::vec4 duVec(3 * powf(u, 2), 2 * u, 1.0f, 0.0f);
+    const glm::vec4 vVec(powf(v, 3), powf(v, 2), v, 1.0f);
+    const glm::vec3 result { glm::dot(mx * duVec, vVec),
+                             glm::dot(my * duVec, vVec),
+                             glm::dot(mz * duVec, vVec) };
     return result;
 }
 
@@ -258,14 +250,12 @@ glm::vec3 BezierPatch::evaluateBezierSurfaceDv(const glm::mat4 &mx,
                                                const glm::mat4 &mz,
                                                float u,
                                                float v) {
-    glm::vec4 uVec(powf(u, 3), powf(u, 2), u, 1.0f);
-    glm::vec4 dvVec(3 * powf(v, 2), 2 * v, 1.0f, 0.0f);
 
-    glm::vec3 result;
-    result.x = glm::dot(mx * uVec, dvVec);
-    result.y = glm::dot(my * uVec, dvVec);
-    result.z = glm::dot(mz * uVec, dvVec);
-
+    const glm::vec4 uVec(powf(u, 3), powf(u, 2), u, 1.0f);
+    const glm::vec4 dvVec(3 * powf(v, 2), 2 * v, 1.0f, 0.0f);
+    const glm::vec3 result { glm::dot(mx * uVec, dvVec),
+                             glm::dot(my * uVec, dvVec),
+                             glm::dot(mz * uVec, dvVec) };
     return result;
 }
 
