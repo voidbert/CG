@@ -37,7 +37,7 @@ const std::vector<std::vector<std::string>> FIGURE_USAGES = {
     { "box", "<length>", "<divisions>", "[multi-textured]" },
     { "sphere", "<radius>", "<slices>", "<stacks>" },
     { "cone", "<radius>", "<height>", "<slices>", "<stacks>" },
-    { "cylinder", "<radius>", "<height>", "<slices>", "<stacks>" },
+    { "cylinder", "<radius>", "<height>", "<slices>", "<stacks>", "[multi-textured]" },
     { "torus", "<majorRadius>", "<minorRadius>", "<slices>", "<sides>" },
     { "mobiusStrip", "<radius>", "<width>", "<twists>", "<slices>", "<stacks>" },
     { "kleinBottle", "<radius>", "<slices>", "<stacks>" },
