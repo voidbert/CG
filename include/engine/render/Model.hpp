@@ -59,6 +59,7 @@ public:
                     const glm::mat4 &normalMatrix,
                     const std::shared_ptr<Texture> texture,
                     const scene::Material &material) const;
+    void drawRaw() const;
 
 private:
     explicit Model(const std::tuple<std::vector<glm::vec4>, // Positions
