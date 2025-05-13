@@ -13,7 +13,7 @@
 /// limitations under the License.
 
 #include <cmath>
-#include <glm/glm.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtc/constants.hpp>
 
 #include "generator/figures/Cylinder.hpp"
@@ -21,8 +21,9 @@
 namespace generator::figures {
 
 Cylinder::Cylinder(float radius, float height, int slices, int stacks, bool multiTextured) {
+    const std::string multiTexturedString = multiTextured ? " multi-textured" : "";
     this->comment = "cylinder " + std::to_string(radius) + " " + std::to_string(height) + " " +
-        std::to_string(slices) + " " + std::to_string(stacks);
+        std::to_string(slices) + " " + std::to_string(stacks) + multiTexturedString;
 
     const float sliceStep = glm::two_pi<float>() / slices;
     const float stackStep = height / stacks;
@@ -46,15 +47,15 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks, bool mult
     }
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {
-        this->faces.emplace_back(0,
-                                 0,
-                                 0,
-                                 jSlice + 1,
-                                 jSlice + 1,
-                                 jSlice + 1,
-                                 jSlice + 2,
-                                 jSlice + 2,
-                                 jSlice + 2);
+        this->faces.push_back(utils::TriangleFace(0,
+                                                  0,
+                                                  0,
+                                                  jSlice + 1,
+                                                  jSlice + 1,
+                                                  jSlice + 1,
+                                                  jSlice + 2,
+                                                  jSlice + 2,
+                                                  jSlice + 2));
     }
 
     int offset = this->positions.size();
@@ -84,24 +85,24 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks, bool mult
             int currentTop = currentBottom + slices + 1;
             int nextTop = currentTop + 1;
 
-            this->faces.emplace_back(currentBottom,
-                                     currentBottom,
-                                     currentBottom,
-                                     currentTop,
-                                     currentTop,
-                                     currentTop,
-                                     nextTop,
-                                     nextTop,
-                                     nextTop);
-            this->faces.emplace_back(currentBottom,
-                                     currentBottom,
-                                     currentBottom,
-                                     nextTop,
-                                     nextTop,
-                                     nextTop,
-                                     nextBottom,
-                                     nextBottom,
-                                     nextBottom);
+            this->faces.push_back(utils::TriangleFace(currentBottom,
+                                                      currentBottom,
+                                                      currentBottom,
+                                                      currentTop,
+                                                      currentTop,
+                                                      currentTop,
+                                                      nextTop,
+                                                      nextTop,
+                                                      nextTop));
+            this->faces.push_back(utils::TriangleFace(currentBottom,
+                                                      currentBottom,
+                                                      currentBottom,
+                                                      nextTop,
+                                                      nextTop,
+                                                      nextTop,
+                                                      nextBottom,
+                                                      nextBottom,
+                                                      nextBottom));
         }
     }
 
@@ -127,15 +128,15 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks, bool mult
     for (int jSlice = 0; jSlice < slices; jSlice++) {
         const int current = topCenterIndex + jSlice + 1;
         const int next = current + 1;
-        this->faces.emplace_back(current,
-                                 current,
-                                 current,
-                                 topCenterIndex,
-                                 topCenterIndex,
-                                 topCenterIndex,
-                                 next,
-                                 next,
-                                 next);
+        this->faces.push_back(utils::TriangleFace(current,
+                                                  current,
+                                                  current,
+                                                  topCenterIndex,
+                                                  topCenterIndex,
+                                                  topCenterIndex,
+                                                  next,
+                                                  next,
+                                                  next));
     }
 }
 
