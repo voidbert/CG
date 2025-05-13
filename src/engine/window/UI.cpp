@@ -20,7 +20,7 @@
 
 namespace engine::window {
 
-UI::UI(Window &window, scene::camera::Camera &_camera, int _entityCount, const int &_pickedId) :
+UI::UI(const Window &window, scene::camera::Camera &_camera, int _entityCount, const int &_pickedId) :
     camera(_camera),
     fpsCounter(),
     entityCount(_entityCount),

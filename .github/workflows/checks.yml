@@ -15,7 +15,7 @@ jobs:
 
             # Don't fail on empty include (not tracked by git)
             - run: if ! [ -d include ]; then mkdir include; fi
-            - run: sudo apt update && sudo apt install -y pkg-config libglfw3-dev libglm-dev libgl-dev libtinyxml2-dev
+            - run: sudo apt update && sudo apt install -y libglfw3-dev libglm-dev libgl-dev libtinyxml2-dev
             - run: make -j$(nproc)
     format:
         runs-on: ubuntu-latest
