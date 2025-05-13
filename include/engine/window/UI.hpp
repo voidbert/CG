@@ -25,11 +25,12 @@ private:
     scene::camera::Camera &camera;
     FPSCounter fpsCounter;
     int entityCount;
+    const int &pickedId;
     bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines,
         showNormals;
 
 public:
-    UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
+    UI(Window &window, scene::camera::Camera &_camera, int _entityCount, const int &pickedId);
     ~UI();
 
     bool isCapturingKeyboard() const;
