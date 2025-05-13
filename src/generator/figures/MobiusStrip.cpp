@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <glm/gtc/constants.hpp>
+#include <glm/vec4.hpp>
 
 #include "generator/figures/MobiusStrip.hpp"
 

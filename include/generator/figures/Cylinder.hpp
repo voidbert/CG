@@ -20,7 +20,7 @@ namespace generator::figures {
 
 class Cylinder : public utils::WavefrontOBJ {
 public:
-    Cylinder(float radius, float height, int slices, int stacks);
+    Cylinder(float radius, float height, int slices, int stacks, bool multiTextured = false);
 };
 
 }
