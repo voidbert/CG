@@ -31,16 +31,28 @@ private:
     UI ui;
     bool showUI;
 
+    GLuint pickingFBO;
+    GLuint pickingTexture;
+    GLuint pickingDepth;
+
+    void initPickingFramebuffer();
+    int readIdAtMousePos() const;
+
+    int pickedId;
+
 public:
     explicit SceneWindow(const std::string &sceneFile);
     SceneWindow(const SceneWindow &window) = delete;
     SceneWindow(SceneWindow &&window) = delete;
+
+    int getPickedId() const;
 
 protected:
     void onUpdate(float time, float timeElapsed) override;
     void onRender() override;
     void onResize(int _width, int _height) override;
     void onKeyEvent(int key, int action) override;
+    void onMouseButtonEvent(int button, int action, int mods) override;
 };
 
 }
