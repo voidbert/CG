@@ -194,6 +194,7 @@ int Group::drawPickingParts(render::RenderPipelineManager &pipelineManager,
         }
     }
 
+    // cppcheck-suppress useStlAlgorithm
     for (const std::unique_ptr<Group> &group : this->groups) {
         currentId += group->drawPickingParts(pipelineManager, camera, subTransform, currentId);
     }
