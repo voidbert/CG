@@ -30,7 +30,6 @@ namespace utils {
 class WavefrontOBJ {
 private:
     static std::regex lineRegex;
-    void generateNormals();
 
 protected:
     std::string comment;
@@ -50,6 +49,9 @@ public:
                std::vector<glm::vec4>, // Normals (padded)
                std::vector<uint32_t>> // Indices
         getIndexedVertices() const;
+
+private:
+    void generateNormals();
 };
 
 }
