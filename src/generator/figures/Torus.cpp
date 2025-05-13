@@ -39,6 +39,11 @@ Torus::Torus(float majorRadius, float minorRadius, int slices, int sides) {
             const glm::vec3 vertex = circleCenter + normal * minorRadius;
 
             this->positions.push_back(glm::vec4(vertex, 1.0f));
+            this->normals.push_back(normal); 
+
+            const float u = static_cast<float>(iSlice) / slices;
+            const float v = static_cast<float>(jSide) / sides;
+            this->textureCoordinates.push_back(glm::vec2(u, v));
         }
     }
 
@@ -49,8 +54,17 @@ Torus::Torus(float majorRadius, float minorRadius, int slices, int sides) {
             const int currentTop = currentBottom + (sides + 1);
             const int nextTop = currentTop + 1;
 
-            this->faces.push_back(utils::TriangleFace(currentBottom, nextTop, currentTop));
-            this->faces.push_back(utils::TriangleFace(currentBottom, nextBottom, nextTop));
+            this->faces.push_back(utils::TriangleFace(
+                currentBottom, currentBottom, currentBottom,
+                nextTop, nextTop, nextTop,
+                currentTop, currentTop, currentTop
+            ));
+
+            this->faces.push_back(utils::TriangleFace(
+                currentBottom, currentBottom, currentBottom,
+                nextBottom, nextBottom, nextBottom,
+                nextTop, nextTop, nextTop
+            ));
         }
     }
 }
