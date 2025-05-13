@@ -50,4 +50,8 @@ void RenderPipelineManager::useProgram(ShaderProgram *program) {
     }
 }
 
+const PickingShaderProgram &RenderPipelineManager::getPickingShaderProgram() {
+    return this->pickingShaderProgram;
+}
+
 }

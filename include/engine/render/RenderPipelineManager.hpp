@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "engine/render/PickingShaderProgram.hpp"
 #include "engine/render/ShadedShaderProgram.hpp"
 #include "engine/render/ShaderProgram.hpp"
 #include "engine/render/SolidColorShaderProgram.hpp"
@@ -26,6 +27,7 @@ private:
     SolidColorShaderProgram solidColorShaderProgram;
     ShaderProgram *currentProgram;
     bool currentfillPolygons;
+    PickingShaderProgram pickingShaderProgram;
 
 public:
     RenderPipelineManager(int pointLights, int directionalLights, int spotlights);
@@ -36,6 +38,7 @@ public:
 
     const SolidColorShaderProgram &getSolidColorShaderProgram();
     const ShadedShaderProgram &getShadedShaderProgram();
+    const PickingShaderProgram &getPickingShaderProgram();
 
 private:
     void useProgram(ShaderProgram *program);
