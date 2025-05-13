@@ -13,8 +13,11 @@
 /// limitations under the License.
 
 #include <cmath>
-#include <glm/glm.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 #include "generator/figures/Sphere.hpp"
 
@@ -35,23 +38,21 @@ Sphere::Sphere(float radius, int slices, int stacks) {
         const float theta = iStack * stackStep;
         const float y = radius * cosf(theta);
         const float xz = radius * sinf(theta);
-        const float v = 1.0f - (float) iStack / stacks;
+        const float v = 1.0f - static_cast<float>(iStack) / stacks;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
             const float phi = jSlice * sliceStep;
             const float x = xz * sinf(phi);
             const float z = xz * cosf(phi);
-
-            glm::vec3 normal = glm::normalize(glm::vec3(x, y, z));
-            float u = (float) jSlice / slices;
+            const float u = static_cast<float>(jSlice) / slices;
 
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
-            this->normals.push_back(normal);
+            this->normals.push_back(glm::normalize(glm::vec3(x, y, z)));
             this->textureCoordinates.push_back(glm::vec2(u, v));
         }
     }
 
-    int southPoleIndex = this->positions.size();
+    const int southPoleIndex = this->positions.size();
     this->positions.push_back(glm::vec4(0.0f, -radius, 0.0f, 1.0f));
     this->normals.push_back(glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)));
     this->textureCoordinates.push_back(glm::vec2(0.5f, 0.0f));
