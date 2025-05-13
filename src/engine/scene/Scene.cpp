@@ -203,8 +203,8 @@ int Scene::drawPickingParts(render::RenderPipelineManager &pipelineManager,
     int baseId = 1;
     int count = 0;
 
-    // cppcheck-suppress useStlAlgorithm
     for (const std::unique_ptr<Group> &group : this->groups) {
+        // cppcheck-suppress useStlAlgorithm
         count += group->drawPickingParts(pipelineManager, activeCamera, identity, baseId + count);
     }
 
