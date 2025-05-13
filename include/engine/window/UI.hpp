@@ -30,7 +30,10 @@ private:
         showNormals;
 
 public:
-    UI(const Window &window, scene::camera::Camera &_camera, int _entityCount, const int &_pickedId);
+    UI(const Window &window,
+       scene::camera::Camera &_camera,
+       int _entityCount,
+       const int &_pickedId);
     ~UI();
 
     bool isCapturingKeyboard() const;
