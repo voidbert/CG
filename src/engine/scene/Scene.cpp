@@ -197,4 +197,17 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
     return entityCount;
 }
 
+int Scene::drawPickingParts(render::RenderPipelineManager &pipelineManager,
+                            const camera::Camera &activeCamera) const {
+    const glm::mat4 identity = glm::mat4(1.0f);
+    int baseId = 1;
+    int count = 0;
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        count += group->drawPickingParts(pipelineManager, activeCamera, identity, baseId + count);
+    }
+
+    return count;
+}
+
 }

@@ -162,6 +162,45 @@ int Group::drawShadedParts(render::RenderPipelineManager &pipelineManager,
     return renderedEntities;
 }
 
+int Group::drawPickingParts(render::RenderPipelineManager &pipelineManager,
+                            const camera::Camera &camera,
+                            const glm::mat4 &worldTransform,
+                            int baseId) const {
+
+    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
+    const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
+    const glm::mat4 fullTransform = cameraMatrix * subTransform;
+    int currentId = baseId;
+
+    if (!camera.isInFrustum(this->boundingSphere)) {
+        return 0;
+    }
+
+    for (const std::unique_ptr<Entity> &entity : this->entities) {
+        const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
+
+        if (camera.isInFrustum(entityBoundingSphere)) {
+            glm::vec3 idColor = glm::vec3((currentId & 0x000000FF) / 255.0f,
+                                          ((currentId & 0x0000FF00) >> 8) / 255.0f,
+                                          ((currentId & 0x00FF0000) >> 16) / 255.0f);
+
+            auto &shader = pipelineManager.getPickingShaderProgram();
+            shader.use();
+            shader.setFullMatrix(fullTransform);
+            shader.setColor(idColor);
+
+            entity->getModel().drawRaw();
+            currentId++;
+        }
+    }
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        currentId += group->drawPickingParts(pipelineManager, camera, subTransform, currentId);
+    }
+
+    return currentId - baseId;
+}
+
 const render::BoundingSphere &Group::getBoundingSphere() const {
     return this->boundingSphere;
 }

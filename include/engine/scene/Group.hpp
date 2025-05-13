@@ -61,6 +61,10 @@ public:
                         const camera::Camera &camera,
                         const glm::mat4 &worldtransform,
                         bool fillPolygons) const;
+    int drawPickingParts(render::RenderPipelineManager &pipelineManager,
+                         const camera::Camera &camera,
+                         const glm::mat4 &worldTransform,
+                         int baseId) const;
 
 private:
     const render::BoundingSphere &getBoundingSphere() const;

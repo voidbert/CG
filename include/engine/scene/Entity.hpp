@@ -54,6 +54,7 @@ public:
               const glm::mat4 &worldMatrix,
               const glm::mat4 &normalMatrix,
               bool fillPolygons) const;
+    const render::Model &getModel() const;
 };
 
 }

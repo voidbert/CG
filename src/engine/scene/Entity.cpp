@@ -94,4 +94,8 @@ void Entity::draw(render::RenderPipelineManager &pipelineManager,
     }
 }
 
+const render::Model &Entity::getModel() const {
+    return *this->model;
+}
+
 }
