@@ -15,6 +15,9 @@
 #include <cmath>
 #include <glm/geometric.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 #include "generator/figures/Cylinder.hpp"
 
