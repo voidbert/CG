@@ -30,6 +30,7 @@ SolarSystem::SolarSystem(float sunScale, float rockyScale, float gasScale, float
 
     this->createPreamble(sunScale, rockyScale, gasScale);
     this->createCamera();
+    this->createLight();
     this->createObjects(sunScale, rockyScale, gasScale);
 }
 
@@ -245,6 +246,15 @@ void SolarSystem::createCamera() {
     projection->SetAttribute("fov", 60);
     projection->SetAttribute("near", 1);
     projection->SetAttribute("far", 6000);
+}
+
+void SolarSystem::createLight() {
+    tinyxml2::XMLElement *lights = this->world->InsertNewChildElement("lights");
+    tinyxml2::XMLElement *light = lights->InsertNewChildElement("light");
+    light->SetAttribute("type", "point");
+    light->SetAttribute("posX", "0");
+    light->SetAttribute("posY", "0");
+    light->SetAttribute("posZ", "0");
 }
 
 void SolarSystem::createObjects(float sunScale, float rockyScale, float gasScale) {

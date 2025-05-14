@@ -54,6 +54,7 @@ private:
 
     void createPreamble(float sunScale, float rockyScale, float gasScale);
     void createCamera();
+    void createLight();
     void createObjects(float sunScale, float rockyScale, float gasScale);
 };
 
