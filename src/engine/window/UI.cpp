@@ -23,11 +23,13 @@ namespace engine::window {
 UI::UI(const Window &window,
        scene::camera::Camera &_camera,
        int _entityCount,
-       const int &_pickedId) :
+       const int &_pickedId,
+       const std::string &_pickedName) :
     camera(_camera),
     fpsCounter(),
     entityCount(_entityCount),
     pickedId(_pickedId),
+    pickedName(_pickedName),
     fillPolygons(true),
     backFaceCulling(true),
     showAxes(true),
@@ -69,6 +71,7 @@ void UI::draw(int renderedEntities) {
     ImGui::Text(entityText.c_str());
 
     ImGui::Text("Selected ID: %d", this->pickedId);
+    ImGui::Text("Entity Name: %s", this->pickedName.c_str());
 
     ImGui::Spacing();
     ImGui::Separator();

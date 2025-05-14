@@ -28,7 +28,7 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
                     scene.getDirectionalLightCount(),
                     scene.getSpotlightCount()),
     cameraController(scene.getCamera()),
-    ui(*this, scene.getCamera(), scene.getEntityCount(), this->pickedId),
+    ui(*this, scene.getCamera(), scene.getEntityCount(), this->pickedId, this->pickedName),
     showUI(true),
     pickedId(0) {
 
@@ -90,8 +90,12 @@ void SceneWindow::onMouseButtonEvent(int button, int action) {
         std::array<uint8_t, 3> pixelColor = framebuffer.sample(x, y);
         const int id = pixelColor[0] + (pixelColor[1] << 8) + (pixelColor[2] << 16);
 
-        std::cout << id << (idToNameMap.count(id) ? " (Name: " + idToNameMap.at(id) + ")" : "")
-                  << std::endl;
+        // std::cout << id << (idToNameMap.count(id) ? " (Name: " + idToNameMap.at(id) + ")" : "")
+        //           << std::endl;
+
+        this->pickedId = id;
+        auto it = idToNameMap.find(id);
+        this->pickedName = (it != idToNameMap.end()) ? it->second : "";
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, this->getWidth(), this->getHeight());

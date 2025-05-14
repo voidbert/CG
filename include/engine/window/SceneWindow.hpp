@@ -32,6 +32,7 @@ private:
     bool showUI;
 
     int pickedId;
+    std::string pickedName;
 
 public:
     explicit SceneWindow(const std::string &sceneFile);

@@ -30,7 +30,7 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
     }
 
     const char *nameAttr = modelElement->Attribute("name");
-    this->name = nameAttr ? std::string(nameAttr) : "UnnamedEntity";
+    this->name = nameAttr ? std::string(nameAttr) : "Unnamed";
 
     const std::string modelPath = std::filesystem::canonical(sceneDirectory / file);
     auto modelIt = loadedModels.find(modelPath);
