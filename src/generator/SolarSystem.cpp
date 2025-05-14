@@ -137,7 +137,7 @@ tinyxml2::XMLElement *SolarSystem::createBody(const std::string &path,
     return group;
 }
 
-tinyxml2::XMLElement *SolarSystem::createRings(const std::string &path,float radius) {
+tinyxml2::XMLElement *SolarSystem::createRings(const std::string &path, float radius) {
     tinyxml2::XMLElement *group = this->document.NewElement("group");
     tinyxml2::XMLElement *transform = group->InsertNewChildElement("transform");
 
@@ -327,7 +327,7 @@ void SolarSystem::createObjects(float sunScale, float rockyScale, float gasScale
 
     tinyxml2::XMLElement *saturn =
         this->createBody("../texturesSolarSystem/saturnmap.jpg", 30.0f, 2400.0f, 100.0f, 30.0f);
-    saturn->InsertEndChild(this->createRings("../texturesSolarSystem/saturnringcolor.jpg",3.0f));
+    saturn->InsertEndChild(this->createRings("../texturesSolarSystem/saturnringcolor.jpg", 3.0f));
     group->InsertEndChild(saturn);
 
     group->InsertEndChild(this->createBody("../texturesSolarSystem/uranusmap.jpg",

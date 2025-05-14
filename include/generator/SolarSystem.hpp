@@ -47,7 +47,7 @@ private:
                                      float rotationTime,
                                      float y = 0.0f,
                                      bool hasOrbiters = false);
-    tinyxml2::XMLElement *createRings(const std::string &path,float radius);
+    tinyxml2::XMLElement *createRings(const std::string &path, float radius);
     tinyxml2::XMLElement *
         createAsteroidBelt(float minDistance, float maxDistance, float orbitTime, int numAsteroids);
     tinyxml2::XMLElement *createComet();
