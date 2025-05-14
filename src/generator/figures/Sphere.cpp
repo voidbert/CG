@@ -13,7 +13,11 @@
 /// limitations under the License.
 
 #include <cmath>
+#include <glm/geometric.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 #include "generator/figures/Sphere.hpp"
 
@@ -27,26 +31,42 @@ Sphere::Sphere(float radius, int slices, int stacks) {
     const float sliceStep = glm::two_pi<float>() / slices;
 
     this->positions.push_back(glm::vec4(0.0f, radius, 0.0f, 1.0f));
+    this->normals.push_back(glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
+    this->textureCoordinates.push_back(glm::vec2(0.5f, 1.0f));
 
     for (int iStack = 1; iStack < stacks; iStack++) {
         const float theta = iStack * stackStep;
         const float y = radius * cosf(theta);
         const float xz = radius * sinf(theta);
+        const float v = 1.0f - static_cast<float>(iStack) / stacks;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
             const float phi = jSlice * sliceStep;
             const float x = xz * sinf(phi);
             const float z = xz * cosf(phi);
+            const float u = static_cast<float>(jSlice) / slices;
 
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
+            this->normals.push_back(glm::normalize(glm::vec3(x, y, z)));
+            this->textureCoordinates.push_back(glm::vec2(u, v));
         }
     }
 
-    int southPoleIndex = this->positions.size();
+    const int southPoleIndex = this->positions.size();
     this->positions.push_back(glm::vec4(0.0f, -radius, 0.0f, 1.0f));
+    this->normals.push_back(glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)));
+    this->textureCoordinates.push_back(glm::vec2(0.5f, 0.0f));
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {
-        this->faces.push_back(utils::TriangleFace(0, jSlice + 1, jSlice + 2));
+        this->faces.push_back(utils::TriangleFace(0,
+                                                  0,
+                                                  0,
+                                                  jSlice + 1,
+                                                  jSlice + 1,
+                                                  jSlice + 1,
+                                                  jSlice + 2,
+                                                  jSlice + 2,
+                                                  jSlice + 2));
     }
 
     for (int iStack = 0; iStack < stacks - 2; iStack++) {
@@ -56,8 +76,24 @@ Sphere::Sphere(float radius, int slices, int stacks) {
             const int currentBottom = currentTop + (slices + 1);
             const int nextBottom = currentBottom + 1;
 
-            faces.push_back(utils::TriangleFace(currentTop, currentBottom, nextBottom));
-            faces.push_back(utils::TriangleFace(currentTop, nextBottom, nextTop));
+            this->faces.push_back(utils::TriangleFace(currentTop,
+                                                      currentTop,
+                                                      currentTop,
+                                                      currentBottom,
+                                                      currentBottom,
+                                                      currentBottom,
+                                                      nextBottom,
+                                                      nextBottom,
+                                                      nextBottom));
+            this->faces.push_back(utils::TriangleFace(currentTop,
+                                                      currentTop,
+                                                      currentTop,
+                                                      nextBottom,
+                                                      nextBottom,
+                                                      nextBottom,
+                                                      nextTop,
+                                                      nextTop,
+                                                      nextTop));
         }
     }
 
@@ -66,11 +102,16 @@ Sphere::Sphere(float radius, int slices, int stacks) {
         const int current = bottomStackStart + jSlice;
         const int next = current + 1;
 
-        this->faces.push_back(utils::TriangleFace(southPoleIndex, next, current));
+        this->faces.push_back(utils::TriangleFace(southPoleIndex,
+                                                  southPoleIndex,
+                                                  southPoleIndex,
+                                                  next,
+                                                  next,
+                                                  next,
+                                                  current,
+                                                  current,
+                                                  current));
     }
-
-    // TODO - remove this when adding normals. This is only here for BoundingSphere to work
-    this->generateNormals();
 }
 
 }
