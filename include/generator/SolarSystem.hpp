@@ -51,8 +51,8 @@ private:
                                      bool hasOrbiters = false);
     tinyxml2::XMLElement *createRings(const std::string &name, float radius);
     tinyxml2::XMLElement *
-        createAsteroidBelt(float minDistance, float maxDistance, float orbitTime, int numAsteroids);
-    tinyxml2::XMLElement *createComet();
+        createAsteroidBelt(const std::string &name,float minDistance, float maxDistance, float orbitTime, int numAsteroids);
+    tinyxml2::XMLElement *createComet(const std::string &name);
 
     void createPreamble(float sunScale, float rockyScale, float gasScale);
     void createCamera();

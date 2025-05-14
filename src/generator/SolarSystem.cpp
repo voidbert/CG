@@ -193,7 +193,8 @@ tinyxml2::XMLElement *SolarSystem::createRings(const std::string &name, float ra
     return group;
 }
 
-tinyxml2::XMLElement *SolarSystem::createAsteroidBelt(float minDistance,
+tinyxml2::XMLElement *SolarSystem::createAsteroidBelt(const std::string &name,
+                                                      float minDistance,
                                                       float maxDistance,
                                                       float orbitTime,
                                                       int numAsteroids) {
@@ -221,7 +222,7 @@ tinyxml2::XMLElement *SolarSystem::createAsteroidBelt(float minDistance,
         const float radius = radiusDistribution(this->rng);
         const float y = yDistribution(this->rng);
 
-        tinyxml2::XMLElement *asteroid = this->createBody("", radius, distance, orbitTime, 0.0f, y);
+        tinyxml2::XMLElement *asteroid = this->createBody(name, radius, distance, orbitTime, 0.0f, y);
         const int group = floorf(this->lastTranslationAngle / groupArc);
         subGroups[group]->InsertEndChild(asteroid);
     }
@@ -229,7 +230,7 @@ tinyxml2::XMLElement *SolarSystem::createAsteroidBelt(float minDistance,
     return parentGroup;
 }
 
-tinyxml2::XMLElement *SolarSystem::createComet() {
+tinyxml2::XMLElement *SolarSystem::createComet(const std::string &name) {
     tinyxml2::XMLElement *group = this->document.NewElement("group");
     tinyxml2::XMLElement *transform = group->InsertNewChildElement("transform");
 
@@ -253,6 +254,8 @@ tinyxml2::XMLElement *SolarSystem::createComet() {
     tinyxml2::XMLElement *models = group->InsertNewChildElement("models");
     tinyxml2::XMLElement *model = models->InsertNewChildElement("model");
     model->SetAttribute("file", "comet.3d");
+    tinyxml2::XMLElement *texture = model->InsertNewChildElement("texture");
+    texture->SetAttribute("file", (name + ".jpg").c_str());
     return group;
 }
 
@@ -347,9 +350,9 @@ void SolarSystem::createObjects(float sunScale, float rockyScale, float gasScale
 
     // Asteroid belts
     this->bodyScale = rockyScale;
-    group->InsertEndChild(this->createAsteroidBelt(1000.0f, 1600.0f, 80.0f, 2000));
-    group->InsertEndChild(this->createAsteroidBelt(3500.0, 3800.0, 4000.0f, 2000));
-    group->InsertEndChild(this->createComet());
+    group->InsertEndChild(this->createAsteroidBelt("Comet",1000.0f, 1600.0f, 80.0f, 2000));
+    group->InsertEndChild(this->createAsteroidBelt("Comet",3500.0, 3800.0, 4000.0f, 2000));
+    group->InsertEndChild(this->createComet("Comet"));
 }
 
 }
