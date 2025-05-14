@@ -56,12 +56,15 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
 
             const float u = static_cast<float>(jSlice) / slices;
             this->textureCoordinates.push_back(glm::vec2(u, v));
-
-            const float nx = cosf(angle);
-            const float ny = radius / height;
-            const float nz = sinf(angle);
-            this->normals.push_back(glm::normalize(glm::vec3(nx, ny, nz)));
         }
+    }
+
+    for (int jSlice = 0; jSlice < slices; ++jSlice) {
+        const float angle = jSlice * sliceStep;
+        const float nx = cosf(angle + sliceStep / 2);
+        const float ny = radius / height;
+        const float nz = sinf(angle + sliceStep / 2);
+        this->normals.push_back(glm::normalize(glm::vec3(nx, ny, nz)));
     }
 
     // Triangulate base
@@ -78,24 +81,26 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
             const int currentTop = currentBottom + slices + 1;
             const int nextTop = currentTop + 1;
 
+            const int faceNormal = (jSlice) % slices + 1;
+
             this->faces.push_back(utils::TriangleFace(currentBottom,
                                                       currentBottom,
-                                                      currentBottom - slices - 1,
+                                                      faceNormal,
                                                       currentTop,
                                                       currentTop,
-                                                      currentTop - slices - 1,
+                                                      faceNormal,
                                                       nextTop,
                                                       nextTop,
-                                                      nextTop - slices - 1));
+                                                      faceNormal));
             this->faces.push_back(utils::TriangleFace(currentBottom,
                                                       currentBottom,
-                                                      currentBottom - slices - 1,
+                                                      faceNormal,
                                                       nextTop,
                                                       nextTop,
-                                                      nextTop - slices - 1,
+                                                      faceNormal,
                                                       nextBottom,
                                                       nextBottom,
-                                                      nextBottom - slices - 1));
+                                                      faceNormal));
         }
     }
 }
