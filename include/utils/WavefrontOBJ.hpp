@@ -50,9 +50,7 @@ public:
                std::vector<uint32_t>> // Indices
         getIndexedVertices() const;
 
-    // TODO - Mariana, please make generateNormals private when Sphere.cpp doesn't need it anymore
-
-protected:
+private:
     void generateNormals();
 };
 
