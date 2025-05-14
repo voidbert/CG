@@ -279,7 +279,7 @@ void SolarSystem::createCamera() {
     tinyxml2::XMLElement *camera = this->world->InsertNewChildElement("camera");
     camera->SetAttribute("type", "free");
 
-    camera->InsertEndChild(this->createVector("position", glm::vec3(100, 100, 100)));
+    camera->InsertEndChild(this->createVector("position", glm::vec3(528, 465, 515)));
     camera->InsertEndChild(this->createVector("lookAt", glm::vec3(0, 0, 0)));
     camera->InsertEndChild(this->createVector("up", glm::vec3(0, 1, 0)));
 
