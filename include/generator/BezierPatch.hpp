@@ -33,8 +33,22 @@ private:
     float stringToFloat(std::string str);
     glm::vec3 stringToVector(const std::string &str);
     std::vector<int> stringToArray(const std::string &str);
-
     glm::mat4 preComputePatchMatrix(const std::vector<glm::vec3> &patchPoints, int coordinate);
+    glm::vec3 evaluateBezierSurface(const glm::mat4 &mx,
+                                    const glm::mat4 &my,
+                                    const glm::mat4 &mz,
+                                    float u,
+                                    float v);
+    glm::vec3 evaluateBezierSurfaceDu(const glm::mat4 &mx,
+                                      const glm::mat4 &my,
+                                      const glm::mat4 &mz,
+                                      float u,
+                                      float v);
+    glm::vec3 evaluateBezierSurfaceDv(const glm::mat4 &mx,
+                                      const glm::mat4 &my,
+                                      const glm::mat4 &mz,
+                                      float u,
+                                      float v);
 };
 
 }

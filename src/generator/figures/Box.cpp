@@ -12,7 +12,9 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 #include "generator/figures/Box.hpp"
 
