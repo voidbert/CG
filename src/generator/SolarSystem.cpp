@@ -52,6 +52,14 @@ void SolarSystem::writeToFile(const std::string &dirname) {
 
     BezierPatch bezierPatch("res/patches/comet.patch", 10);
     bezierPatch.writeToFile(directoryPath / "comet.3d");
+
+    std::filesystem::directory_iterator end;
+    for (std::filesystem::directory_iterator it("res/textures/solarSystem"); it != end; ++it) {
+        std::filesystem::path destinationPath = directoryPath / (*it).path().filename();
+        std::filesystem::copy_file(*it,
+                                   destinationPath,
+                                   std::filesystem::copy_options::update_existing);
+    }
 }
 
 tinyxml2::XMLElement *SolarSystem::createVector(const std::string &name, const glm::vec3 &vec) {
@@ -62,7 +70,15 @@ tinyxml2::XMLElement *SolarSystem::createVector(const std::string &name, const g
     return translate;
 }
 
-tinyxml2::XMLElement *SolarSystem::createBody(const std::string &path,
+tinyxml2::XMLElement *SolarSystem::createColor(const std::string &name, const glm::vec3 &color) {
+    tinyxml2::XMLElement *translate = this->document.NewElement(name.c_str());
+    translate->SetAttribute("R", color.r * 255.0f);
+    translate->SetAttribute("G", color.g * 255.0f);
+    translate->SetAttribute("B", color.b * 255.0f);
+    return translate;
+}
+
+tinyxml2::XMLElement *SolarSystem::createBody(const std::string &name,
                                               float radius,
                                               float distance,
                                               float orbitTime,
@@ -83,9 +99,37 @@ tinyxml2::XMLElement *SolarSystem::createBody(const std::string &path,
     tinyxml2::XMLElement *models = innerGroup->InsertNewChildElement("models");
     tinyxml2::XMLElement *model = models->InsertNewChildElement("model");
     model->SetAttribute("file", "sphere.3d");
-    if (path != "") {
+
+    if (name != "") {
         tinyxml2::XMLElement *texture = model->InsertNewChildElement("texture");
-        texture->SetAttribute("file", path.c_str());
+        texture->SetAttribute("file", (name + ".jpg").c_str());
+    }
+
+    /*
+                    <diffuse R="200" G="200" B="000" />
+                    <ambient R="50" G="50" B="00" />
+                    <specular R="0" G="0" B="0" />
+                    <emissive R="255" G="0" B="0" />
+                    <shininess value="0" />
+    */
+
+    if (name == "Sun") {
+        tinyxml2::XMLElement *material = model->InsertNewChildElement("color");
+
+        tinyxml2::XMLElement *diffuse = this->createColor("diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+        material->InsertEndChild(diffuse);
+
+        tinyxml2::XMLElement *ambient = this->createColor("ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+        material->InsertEndChild(ambient);
+
+        tinyxml2::XMLElement *specular = this->createColor("specular", glm::vec3(0.0f, 0.0f, 0.0f));
+        material->InsertEndChild(specular);
+
+        tinyxml2::XMLElement *emissive = this->createColor("emissive", glm::vec3(1.0f, 1.0f, 1.0f));
+        material->InsertEndChild(emissive);
+
+        tinyxml2::XMLElement *shininess = material->InsertNewChildElement("shininess");
+        shininess->SetAttribute("value", 0);
     }
 
     // Distributions for transforms
@@ -138,7 +182,7 @@ tinyxml2::XMLElement *SolarSystem::createBody(const std::string &path,
     return group;
 }
 
-tinyxml2::XMLElement *SolarSystem::createRings(const std::string &path, float radius) {
+tinyxml2::XMLElement *SolarSystem::createRings(const std::string &name, float radius) {
     tinyxml2::XMLElement *group = this->document.NewElement("group");
     tinyxml2::XMLElement *transform = group->InsertNewChildElement("transform");
 
@@ -146,8 +190,9 @@ tinyxml2::XMLElement *SolarSystem::createRings(const std::string &path, float ra
     tinyxml2::XMLElement *models = group->InsertNewChildElement("models");
     tinyxml2::XMLElement *model = models->InsertNewChildElement("model");
     model->SetAttribute("file", "torus.3d");
+
     tinyxml2::XMLElement *texture = model->InsertNewChildElement("texture");
-    texture->SetAttribute("file", path.c_str());
+    texture->SetAttribute("file", (name + ".jpg").c_str());
 
     // Scale
     transform->InsertEndChild(
@@ -262,71 +307,37 @@ void SolarSystem::createObjects(float sunScale, float rockyScale, float gasScale
 
     // Sun
     this->bodyScale = sunScale;
-    group->InsertEndChild(
-        this->createBody("../texturesSolarSystem/sunmap.jpg", 80.0f, 0.0f, 0.0f, 10.0f));
+    group->InsertEndChild(this->createBody("Sun", 80.0f, 0.0f, 0.0f, 10.0f));
 
     // Rocky planets
     this->bodyScale = rockyScale;
 
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/mercurymap.jpg",
-                                           5.0f,
-                                           200.0f,
-                                           25.0f,
-                                           15.0f)); // Mercury
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/venusmap.jpg",
-                                           6.5f,
-                                           370.0f,
-                                           35.0f,
-                                           18.0f)); // Venus
+    group->InsertEndChild(this->createBody("Mercury", 5.0f, 200.0f, 25.0f, 15.0f));
+    group->InsertEndChild(this->createBody("Venus", 6.5f, 370.0f, 35.0f, 18.0f));
 
-    tinyxml2::XMLElement *earth = this->createBody("../texturesSolarSystem/earthmap.jpg",
-                                                   7.0f,
-                                                   550.0f,
-                                                   50.0f,
-                                                   20.0f,
-                                                   0.0f,
-                                                   true);
-    earth->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
-                                           1.0f,
-                                           rockyScale * 12.0f,
-                                           10.0f,
-                                           10.0f)); // Moon
+    tinyxml2::XMLElement *earth = this->createBody("Earth", 7.0f, 550.0f, 50.0f, 20.0f, 0.0f, true);
+    earth->InsertEndChild(this->createBody("Moon", 1.0f, rockyScale * 12.0f, 10.0f, 10.0f));
     group->InsertEndChild(earth);
 
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/mars_1k_color.jpg",
-                                           6.5f,
-                                           730.0f,
-                                           65.0f,
-                                           22.0f)); // Mars
+    group->InsertEndChild(this->createBody("Mars", 6.5f, 730.0f, 65.0f, 22.0f));
 
     // Gas giants
     this->bodyScale = gasScale;
 
-    tinyxml2::XMLElement *jupiter = this->createBody("../texturesSolarSystem/jupitermap.jpg",
-                                                     35.0f,
-                                                     1900.0f,
-                                                     90.0f,
-                                                     25.0f,
-                                                     0.0f,
-                                                     true);
+    tinyxml2::XMLElement *jupiter =
+        this->createBody("Jupiter", 35.0f, 1900.0f, 90.0f, 25.0f, 0.0f, true);
 
     this->bodyScale = rockyScale;
-    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
-                                             0.5f,
-                                             40.0f * gasScale,
-                                             3.0f,
+    jupiter->InsertEndChild(this->createBody("Moon", 0.5f, 40.0f * gasScale, 3.0f,
                                              5.0f)); // Io
-    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
-                                             0.5f,
-                                             45.0f * gasScale,
-                                             4.0f,
+    jupiter->InsertEndChild(this->createBody("Moon", 0.5f, 45.0f * gasScale, 4.0f,
                                              6.0f)); // Europa
-    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
+    jupiter->InsertEndChild(this->createBody("Moon",
                                              0.7f,
                                              50.0f * gasScale,
                                              5.0f,
                                              7.0f)); // Ganymede
-    jupiter->InsertEndChild(this->createBody("../texturesSolarSystem/moonmap1k.jpg",
+    jupiter->InsertEndChild(this->createBody("Moon",
                                              0.7f,
                                              55.0f * gasScale,
                                              6.0f,
@@ -335,21 +346,12 @@ void SolarSystem::createObjects(float sunScale, float rockyScale, float gasScale
 
     this->bodyScale = gasScale;
 
-    tinyxml2::XMLElement *saturn =
-        this->createBody("../texturesSolarSystem/saturnmap.jpg", 30.0f, 2400.0f, 100.0f, 30.0f);
-    saturn->InsertEndChild(this->createRings("../texturesSolarSystem/saturnringcolor.jpg", 3.0f));
+    tinyxml2::XMLElement *saturn = this->createBody("Saturn", 30.0f, 2400.0f, 100.0f, 30.0f);
+    saturn->InsertEndChild(this->createRings("Rings", 3.0f));
     group->InsertEndChild(saturn);
 
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/uranusmap.jpg",
-                                           24.0f,
-                                           2850.0f,
-                                           130.0f,
-                                           32.0f)); // Uranus
-    group->InsertEndChild(this->createBody("../texturesSolarSystem/neptunemap.jpg",
-                                           23.0f,
-                                           3330.0f,
-                                           150.0f,
-                                           35.0f)); // Neptune
+    group->InsertEndChild(this->createBody("Uranus", 24.0f, 2850.0f, 130.0f, 32.0f));
+    group->InsertEndChild(this->createBody("Neptune", 23.0f, 3330.0f, 150.0f, 35.0f));
 
     // Asteroid belts
     this->bodyScale = rockyScale;

@@ -40,14 +40,16 @@ public:
 
 private:
     tinyxml2::XMLElement *createVector(const std::string &name, const glm::vec3 &vec);
-    tinyxml2::XMLElement *createBody(const std::string &path,
+    tinyxml2::XMLElement *createColor(const std::string &name, const glm::vec3 &color);
+
+    tinyxml2::XMLElement *createBody(const std::string &name,
                                      float radius,
                                      float distance,
                                      float orbitTime,
                                      float rotationTime,
                                      float y = 0.0f,
                                      bool hasOrbiters = false);
-    tinyxml2::XMLElement *createRings(const std::string &path, float radius);
+    tinyxml2::XMLElement *createRings(const std::string &name, float radius);
     tinyxml2::XMLElement *
         createAsteroidBelt(float minDistance, float maxDistance, float orbitTime, int numAsteroids);
     tinyxml2::XMLElement *createComet();
