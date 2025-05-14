@@ -198,11 +198,11 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
 }
 
 void Scene::drawForPicking(render::RenderPipelineManager &pipelineManager) const {
-    int baseId = this->camera->drawForPicking(pipelineManager, 1);
+    int currentId = this->camera->drawForPicking(pipelineManager, 1);
     const glm::mat4 identity(1.0f);
     for (const std::unique_ptr<Group> &group : this->groups) {
         // cppcheck-suppress useStlAlgorithm
-        baseId += group->drawForPicking(pipelineManager, *this->camera, identity, baseId);
+        currentId = group->drawForPicking(pipelineManager, *this->camera, identity, currentId);
     }
 }
 
