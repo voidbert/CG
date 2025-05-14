@@ -211,6 +211,41 @@ todas as faces, itera-se por todas as posições no dicionário, e define-se a n
 como o quociente entre a normal armazenada e a área total. Logicamente, este vetor deve ser
 normalizado antes de adicionado ao modelo.
 
+\subsection{VBOs}
+
+Com a adição de coordenadas de textura e normais, foi necessário criar mais VBOs para as armazenar.
+Agora, cada modelo passa a ter um VAO associado a três VBOs, como mostra a figura abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{res/phase4/VAO.pdf}
+    \caption{Organização do VAO, dos VBOs, e do EBO de um modelo.}
+\end{figure}
+
+Pode observar-se que, ao contrário do que acontece nos ficheiros \texttt{.3d}, não pode haver
+vértices formados por posições, coordenadas de textura, e normais com diferentes índices. Para isso,
+seria necessário mais do que um \emph{buffer} de índices, e isso não é suportado pelo OpenGL. Logo,
+após carregar um modelo, é necessário converter o esquema de indexação de um ficheiro Wavefront OBJ
+para o de um \emph{index buffer}. Para o fazer, um algoritmo simples pode ser utilizado:
+
+\begin{itemize}
+    \item Cria-se um \emph{index buffer} e três outros \emph{buffers}, para armazenamento das
+        posições, das coordenadas de textura, e das normais, inicialmente vazios;
+
+    \item Armazena-se um dicionário que associa tuplos posição-c.textura-normal a índices (elementos
+        do \emph{index buffer});
+
+    \item Iteram-se por todos os vértices no modelo. Para cada vértice:
+        \begin{itemize}
+            \item Constrói-se o tuplo posição-c.textura-normal associado ao vértice, que se procura
+                no dicionário;
+            \item Caso seja encontrado, adiciona-se o índice encontrado ao \emph{index buffer}.
+            \item Caso contrário, coloca-se o tuplo no dicionário; adicionam-se a posição, a
+                coordenada de textura e a normal aos seus respetivos \emph{buffers}; e adiciona-se o
+                índice de um destes elementos ao \emph{index buffer}.
+        \end{itemize}
+\end{itemize}
+
 \subsection{Adição ao \emph{Schema} XML}
 
 {\color{red} TODO - Mariana}
