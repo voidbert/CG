@@ -49,6 +49,7 @@ public:
                                      bool showNormals) const override;
     virtual int drawShadedParts(render::RenderPipelineManager &pipelineManager,
                                 bool fillPolygons) const override;
+    virtual int drawForPicking(render::RenderPipelineManager &pipelineManager, int currentId) const;
 
 protected:
     virtual void updateWithMotion() override;

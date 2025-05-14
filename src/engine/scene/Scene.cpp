@@ -198,11 +198,7 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
 }
 
 void Scene::drawForPicking(render::RenderPipelineManager &pipelineManager) const {
-    this->xAxis.draw(pipelineManager, this->camera->getCameraMatrix());
-    this->yAxis.draw(pipelineManager, this->camera->getCameraMatrix());
-    this->zAxis.draw(pipelineManager, this->camera->getCameraMatrix());
-
-    int baseId = 1;
+    int baseId = this->camera->drawForPicking(pipelineManager, 1);
     const glm::mat4 identity(1.0f);
     for (const std::unique_ptr<Group> &group : this->groups) {
         baseId += group->drawForPicking(pipelineManager, *this->camera, identity, baseId);

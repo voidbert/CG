@@ -96,6 +96,12 @@ int Camera::drawShadedParts(render::RenderPipelineManager &pipelineManager,
     return 0;
 }
 
+int Camera::drawForPicking(render::RenderPipelineManager &pipelineManager, int currentId) const {
+    static_cast<void>(pipelineManager);
+    static_cast<void>(currentId);
+    return 0;
+}
+
 bool Camera::isInFrustum(const render::BoundingSphere &sphere) const {
     return std::none_of(this->viewFrustum.cbegin(),
                         this->viewFrustum.cend(),

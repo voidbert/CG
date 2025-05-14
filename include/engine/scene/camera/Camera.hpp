@@ -60,6 +60,7 @@ public:
                                      bool showNormals) const;
     virtual int drawShadedParts(render::RenderPipelineManager &pipelineManager,
                                 bool fillPolygons) const;
+    virtual int drawForPicking(render::RenderPipelineManager &pipelineManager, int currentId) const;
 
     bool isInFrustum(const render::BoundingSphere &sphere) const;
 
