@@ -67,7 +67,7 @@ void Model::drawShaded(RenderPipelineManager &pipelineManager,
     shader.setNormalMatrix(normalMatrix);
 
     if (texture) {
-        shader.setTexture(*texture);
+        shader.setTexture(*texture, material);
     } else {
         shader.setMaterial(material);
     }

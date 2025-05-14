@@ -68,8 +68,9 @@ void ShadedShaderProgram::setCameraPosition(const glm::vec3 &position) const {
     glUniform3f(this->cameraPositionUniformLocation, position.x, position.y, position.z);
 }
 
-void ShadedShaderProgram::setTexture(const Texture &texture) const {
-    this->setMaterial(scene::Material());
+void ShadedShaderProgram::setTexture(const Texture &texture,
+                                     const scene::Material &material) const {
+    this->setMaterial(material);
     glUniform1i(this->texturedUniformLocation, true);
     texture.use();
 }
@@ -295,6 +296,7 @@ void main() {
                         spotColors.regularColor +
                         uniAmbient +
                         uniEmissive;
+
     vec3 specularColor =
         pointColors.specularColor + directionalColors.specularColor + spotColors.specularColor;
 
