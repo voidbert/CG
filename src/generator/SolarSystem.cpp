@@ -222,7 +222,8 @@ tinyxml2::XMLElement *SolarSystem::createAsteroidBelt(const std::string &name,
         const float radius = radiusDistribution(this->rng);
         const float y = yDistribution(this->rng);
 
-        tinyxml2::XMLElement *asteroid = this->createBody(name, radius, distance, orbitTime, 0.0f, y);
+        tinyxml2::XMLElement *asteroid =
+            this->createBody(name, radius, distance, orbitTime, 0.0f, y);
         const int group = floorf(this->lastTranslationAngle / groupArc);
         subGroups[group]->InsertEndChild(asteroid);
     }
@@ -350,8 +351,8 @@ void SolarSystem::createObjects(float sunScale, float rockyScale, float gasScale
 
     // Asteroid belts
     this->bodyScale = rockyScale;
-    group->InsertEndChild(this->createAsteroidBelt("Comet",1000.0f, 1600.0f, 80.0f, 2000));
-    group->InsertEndChild(this->createAsteroidBelt("Comet",3500.0, 3800.0, 4000.0f, 2000));
+    group->InsertEndChild(this->createAsteroidBelt("Comet", 1000.0f, 1600.0f, 80.0f, 2000));
+    group->InsertEndChild(this->createAsteroidBelt("Comet", 3500.0, 3800.0, 4000.0f, 2000));
     group->InsertEndChild(this->createComet("Comet"));
 }
 
