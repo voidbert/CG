@@ -81,7 +81,36 @@
 
 \subsection{Formato \texttt{.3d}}
 
-{\color{red} TODO - Humberto}
+O formato \texttt{.3d} exportado pelo \texttt{generator} e utilizado pela \texttt{engine} é o
+Wavefront OBJ \cite{wavefront-obj}. Apenas uma pequena fração das funcionalidades deste formato
+são suportadas e, nesta fase, foram necessárias adições aos mecanismos de escrita e leitura de
+ficheiros Wavefront OBJ para suportar coordenadas de textura e normais. Este formato é textual, onde
+cada linha pode ser um comentário, uma posição, uma coordenada de textura, uma normal, ou uma face
+triangular, como mostra o exemplo abaixo, na ordem apresentada:
+
+\begin{lstlisting}
+
+# Comment
+v 0.5 0.5 1
+vt 0.3 0.3
+vn 0 1 0
+f 1/2/3 4/5/6 7/8/9
+\end{lstlisting}
+
+Quando uma linha começa com \texttt{v}, \texttt{vt} ou \texttt{vn}, devem seguir-se as coordenadas
+de uma posição, de uma textura, ou de um vetor normal, respetivamente. Quando uma linha começa com
+\texttt{f}, deve seguir-se uma face triangular, ou seja três pontos. O \texttt{generator} e a
+\texttt{engine} suportam dois tipos de ponto:
+
+\begin{itemize}
+    \item Apenas um número, um índice de uma posição, ou seja, um elemento do tipo \texttt{v}
+        (começando a contar em 1);
+    \item Da forma \texttt{v/t/n}, onde estão presentes três índices, um para uma posição, um para
+        uma coordenada de textura, e outro para um vetor normal.
+\end{itemize}
+
+Como o \emph{parser} de ficheiros Wavefront OBJ foi reimplementado na fase anterior com base em
+expressões regulares, foi trivial adicionar o suporte para coordenadas de textura e vetores normais.
 
 \subsection{Plano Horizontal}
 
@@ -208,6 +237,9 @@ com a UI escondida (U), Humberto escreve}
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
+    \bibitem{wavefront-obj}
+        "Wavefront OBJ File Format Summary."{} FileFormat.Info. Accessed: May 14, 2025. [Online.]
+        Available: \url{https://www.fileformat.info/format/wavefrontobj/egff.htm}
 \end{thebibliography}
 \endgroup
 
