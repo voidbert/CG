@@ -61,9 +61,11 @@ Window::Window(const std::string &title, int _width, int _height) : width(_width
 
     glfwSetMouseButtonCallback(this->handle,
                                [](GLFWwindow *_handle, int button, int action, int mods) {
+                                   static_cast<void>(mods);
+
                                    Window *window = reinterpret_cast<Window *>(
                                        glfwGetWindowUserPointer(_handle));
-                                   window->onMouseButtonEvent(button, action, mods);
+                                   window->onMouseButtonEvent(button, action);
                                });
 
     // Load OpenGL

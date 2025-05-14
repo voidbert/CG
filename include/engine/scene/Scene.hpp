@@ -59,8 +59,7 @@ public:
              bool showAnimationLines,
              bool showNormals) const;
 
-    int drawPickingParts(render::RenderPipelineManager &pipelineManager,
-                         const camera::Camera &camera) const;
+    void drawForPicking(render::RenderPipelineManager &pipelineManager) const;
 };
 
 }

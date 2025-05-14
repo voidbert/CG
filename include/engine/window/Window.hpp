@@ -42,7 +42,7 @@ protected:
     virtual void onRender() = 0;
     virtual void onResize(int _width, int _height) = 0;
     virtual void onKeyEvent(int key, int action) = 0;
-    virtual void onMouseButtonEvent(int button, int action, int mods) = 0;
+    virtual void onMouseButtonEvent(int button, int action) = 0;
 };
 
 }

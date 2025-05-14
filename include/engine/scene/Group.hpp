@@ -16,6 +16,7 @@
 
 #include <filesystem>
 #include <glm/mat4x4.hpp>
+#include <glm/vec4.hpp>
 #include <memory>
 #include <string>
 #include <tinyxml2.h>
@@ -61,10 +62,11 @@ public:
                         const camera::Camera &camera,
                         const glm::mat4 &worldtransform,
                         bool fillPolygons) const;
-    int drawPickingParts(render::RenderPipelineManager &pipelineManager,
-                         const camera::Camera &camera,
-                         const glm::mat4 &worldTransform,
-                         int baseId) const;
+
+    int drawForPicking(render::RenderPipelineManager &pipelineManager,
+                       const camera::Camera &camera,
+                       const glm::mat4 &worldTransform,
+                       int currentId) const;
 
 private:
     const render::BoundingSphere &getBoundingSphere() const;

@@ -76,12 +76,6 @@ void Model::drawShaded(RenderPipelineManager &pipelineManager,
     glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-void Model::drawRaw() const {
-    glBindVertexArray(this->vao);
-    glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
-}
-
 Model::Model(const std::tuple<std::vector<glm::vec4>,
                               std::vector<glm::vec2>,
                               std::vector<glm::vec4>,

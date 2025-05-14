@@ -31,13 +31,6 @@ private:
     UI ui;
     bool showUI;
 
-    GLuint pickingFBO;
-    GLuint pickingTexture;
-    GLuint pickingDepth;
-
-    void initPickingFramebuffer();
-    int readIdAtMousePos() const;
-
     int pickedId;
 
 public:
@@ -52,7 +45,7 @@ protected:
     void onRender() override;
     void onResize(int _width, int _height) override;
     void onKeyEvent(int key, int action) override;
-    void onMouseButtonEvent(int button, int action, int mods) override;
+    void onMouseButtonEvent(int button, int action) override;
 };
 
 }

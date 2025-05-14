@@ -12,27 +12,25 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
-#pragma once
-
-#include <glm/glm.hpp>
-
-#include "engine/render/ShaderProgram.hpp"
+#include <array>
+#include <cstdint>
+#include <glad/glad.h>
 
 namespace engine::render {
 
-class PickingShaderProgram : public ShaderProgram {
-public:
-    PickingShaderProgram();
-
-    void setFullMatrix(const glm::mat4 &fullMatrix) const;
-    void setColor(const glm::vec3 &color) const;
-
+class Framebuffer {
 private:
-    GLint fullMatrixUniformLocation;
-    GLint colorUniformLocation;
+    GLuint fbo, colorTexture, depthRenderBuffer;
+    int width, height;
 
-    static const std::string vertexShaderSource;
-    static const std::string fragmentShaderSource;
+public:
+    Framebuffer(int _width, int _height);
+    Framebuffer(const Framebuffer &framebuffer) = delete;
+    Framebuffer(Framebuffer &&framebuffer) = delete;
+    ~Framebuffer();
+
+    void use();
+    std::array<uint8_t, 3> sample(int x, int y);
 };
 
 }

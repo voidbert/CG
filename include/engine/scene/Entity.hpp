@@ -49,12 +49,16 @@ public:
     const render::BoundingSphere &getBoundingSphere() const;
     const render::NormalsPreview &getNormalsPreview() const;
 
+    void drawSolidColor(render::RenderPipelineManager &pipelineManager,
+                        const glm::mat4 &fullMatrix,
+                        const glm::vec4 &color,
+                        bool fillPolygons) const;
+
     void draw(render::RenderPipelineManager &pipelineManager,
               const glm::mat4 &fullMatrix,
               const glm::mat4 &worldMatrix,
               const glm::mat4 &normalMatrix,
               bool fillPolygons) const;
-    const render::Model &getModel() const;
 };
 
 }

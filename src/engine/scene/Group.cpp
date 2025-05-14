@@ -162,44 +162,41 @@ int Group::drawShadedParts(render::RenderPipelineManager &pipelineManager,
     return renderedEntities;
 }
 
-int Group::drawPickingParts(render::RenderPipelineManager &pipelineManager,
-                            const camera::Camera &camera,
-                            const glm::mat4 &worldTransform,
-                            int baseId) const {
+int Group::drawForPicking(render::RenderPipelineManager &pipelineManager,
+                          const camera::Camera &camera,
+                          const glm::mat4 &worldTransform,
+                          int currentId) const {
 
     const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
     const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
     const glm::mat4 fullTransform = cameraMatrix * subTransform;
-    int currentId = baseId;
 
+    // std::cout << baseId << std::endl;
     if (!camera.isInFrustum(this->boundingSphere)) {
-        return 0;
+        return currentId + this->getEntityCount();
     }
 
     for (const std::unique_ptr<Entity> &entity : this->entities) {
         const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
 
         if (camera.isInFrustum(entityBoundingSphere)) {
-            glm::vec3 idColor = glm::vec3((currentId & 0x000000FF) / 255.0f,
-                                          ((currentId & 0x0000FF00) >> 8) / 255.0f,
-                                          ((currentId & 0x00FF0000) >> 16) / 255.0f);
+            const glm::vec4 idColor = glm::vec4 { (currentId & 0x000000FF) / 255.0f,
+                                                  ((currentId & 0x0000FF00) >> 8) / 255.0f,
+                                                  ((currentId & 0x00FF0000) >> 16) / 255.0f,
+                                                  1.0f };
 
-            auto &shader = pipelineManager.getPickingShaderProgram();
-            shader.use();
-            shader.setFullMatrix(fullTransform);
-            shader.setColor(idColor);
-
-            entity->getModel().drawRaw();
-            currentId++;
+            entity->drawSolidColor(pipelineManager, fullTransform, idColor, true);
         }
+
+        currentId++;
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
         // cppcheck-suppress useStlAlgorithm
-        currentId += group->drawPickingParts(pipelineManager, camera, subTransform, currentId);
+        currentId = group->drawForPicking(pipelineManager, camera, subTransform, currentId);
     }
 
-    return currentId - baseId;
+    return currentId;
 }
 
 const render::BoundingSphere &Group::getBoundingSphere() const {

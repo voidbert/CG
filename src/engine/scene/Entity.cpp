@@ -76,6 +76,14 @@ const render::NormalsPreview &Entity::getNormalsPreview() const {
     return this->model->getNormalsPreview();
 }
 
+void Entity::drawSolidColor(render::RenderPipelineManager &pipelineManager,
+                            const glm::mat4 &fullMatrix,
+                            const glm::vec4 &color,
+                            bool fillPolygons) const {
+
+    this->model->drawSolidColor(pipelineManager, fullMatrix, color, fillPolygons);
+}
+
 void Entity::draw(render::RenderPipelineManager &pipelineManager,
                   const glm::mat4 &fullMatrix,
                   const glm::mat4 &worldMatrix,
@@ -90,12 +98,8 @@ void Entity::draw(render::RenderPipelineManager &pipelineManager,
                                 this->texture,
                                 this->material);
     } else {
-        this->model->drawSolidColor(pipelineManager, fullMatrix, glm::vec4(1.0f), fillPolygons);
+        this->drawSolidColor(pipelineManager, fullMatrix, glm::vec4(1.0f), false);
     }
-}
-
-const render::Model &Entity::getModel() const {
-    return *this->model;
 }
 
 }
