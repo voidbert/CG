@@ -105,14 +105,6 @@ tinyxml2::XMLElement *SolarSystem::createBody(const std::string &name,
         texture->SetAttribute("file", (name + ".jpg").c_str());
     }
 
-    /*
-                    <diffuse R="200" G="200" B="000" />
-                    <ambient R="50" G="50" B="00" />
-                    <specular R="0" G="0" B="0" />
-                    <emissive R="255" G="0" B="0" />
-                    <shininess value="0" />
-    */
-
     if (name == "Sun") {
         tinyxml2::XMLElement *material = model->InsertNewChildElement("color");
 
