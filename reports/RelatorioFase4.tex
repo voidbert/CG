@@ -81,7 +81,36 @@
 
 \subsection{Formato \texttt{.3d}}
 
-{\color{red} TODO - Humberto}
+O formato \texttt{.3d} exportado pelo \texttt{generator} e utilizado pela \texttt{engine} é o
+Wavefront OBJ \cite{wavefront-obj}. Apenas uma pequena fração das funcionalidades deste formato
+são suportadas e, nesta fase, foram necessárias adições aos mecanismos de escrita e leitura de
+ficheiros Wavefront OBJ para suportar coordenadas de textura e normais. Este formato é textual, onde
+cada linha pode ser um comentário, uma posição, uma coordenada de textura, uma normal, ou uma face
+triangular, como mostra o exemplo abaixo, na ordem apresentada:
+
+\begin{lstlisting}
+
+# Comment
+v 0.5 0.5 1
+vt 0.3 0.3
+vn 0 1 0
+f 1/2/3 4/5/6 7/8/9
+\end{lstlisting}
+
+Quando uma linha começa com \texttt{v}, \texttt{vt} ou \texttt{vn}, devem seguir-se as coordenadas
+de uma posição, de uma textura, ou de um vetor normal, respetivamente. Quando uma linha começa com
+\texttt{f}, deve seguir-se uma face triangular, ou seja três pontos. O \texttt{generator} e a
+\texttt{engine} suportam dois tipos de ponto:
+
+\begin{itemize}
+    \item Apenas um número, um índice de uma posição, ou seja, um elemento do tipo \texttt{v}
+        (começando a contar em 1);
+    \item Da forma \texttt{v/t/n}, onde estão presentes três índices, um para uma posição, um para
+        uma coordenada de textura, e outro para um vetor normal.
+\end{itemize}
+
+Como o \emph{parser} de ficheiros Wavefront OBJ foi reimplementado na fase anterior com base em
+expressões regulares, foi trivial adicionar o suporte para coordenadas de textura e vetores normais.
 
 \subsection{Plano Horizontal}
 
@@ -151,7 +180,11 @@ utilizados valores ligeiramente acima de zero para garantir a estabilidade do c�
 
 \subsection{Outras Figuras}
 
-{\color{red} TODO - Humberto}
+Para as restantes figuras, devido à sua complexidade e ao pouco tempo disponível para a conclusão
+desta fase do trabalho prático, não foram adicionadas nem coordenadas de textura nem normais. No
+entanto, a \texttt{engine} ainda é capaz de importar estes modelos e de os desenhar com iluminação,
+graças a um algoritmo de geração automática de normais implementado e descrito posteriormente neste
+relatório.
 
 \subsection{Sistema Solar}
 
@@ -161,7 +194,99 @@ utilizados valores ligeiramente acima de zero para garantir a estabilidade do c�
 
 \subsection{Geração Automática de Normais}
 
-{\color{red} TODO - Humberto}
+A \texttt{engine} é capaz de carregar modelos que não tenham informação sobre coordenadas de
+texturas ou normais. Caso não haja informação sobre as coordenadas de textura de um modelo, é
+possível desenhá-lo a uma cor sólida, mas é necessário que se tenha informação sobre as suas normais
+para o iluminar corretamente. Como esta nem sempre está presente, foi implementado um algoritmo para
+gerar normais de modelos automaticamente.
+
+Este algoritmo considera o modelo inteiro como um único \emph{smoothing group}, e calcula a normal
+de cada vértice como a média das normais dos triângulos a que este pertence, pesada pela área dos
+triângulos. Logo, é necessário, em primeiro lugar, uma forma de calcular a normal de um triângulo.
+Para um triângulo $[ABC]$, esta pode ser calculada do seguinte modo:
+
+$$
+\hat{n}_{[ABC]} = \frac{
+    \overrightarrow{AB} \times \overrightarrow{AC}
+}{
+    \lVert \overrightarrow{AB} \times \overrightarrow{AC} \rVert
+}
+$$
+
+Depois, a área de cada triângulo, $A$, pode ser calculada pela fórmula de Heron:
+
+$$
+S = \frac{
+    \lVert \overrightarrow{AB} \rVert +
+    \lVert \overrightarrow{AC} \rVert +
+    \lVert \overrightarrow{BC} \rVert
+}{
+    2
+}
+$$
+
+$$
+A = \sqrt{
+    S
+    \left ( S - \lVert \overrightarrow{AB} \rVert \right )
+    \left ( S - \lVert \overrightarrow{AC} \rVert \right )
+    \left ( S - \lVert \overrightarrow{BC} \rVert \right )
+}
+$$
+
+Logo, sendo $F$ o conjunto de faces triangulares nas quais um ponto está presente, o vetor normal
+desse ponto é dado por:
+
+$$
+\hat{n} = \frac{
+    \sum_{f \in F} {A_f \, \hat{n}_f}
+}{
+    \lVert \sum_{f \in F} {A_f \, \hat{n}_f} \rVert
+}
+$$
+
+Em termos de implementação deste algoritmo, um dicionário é utilizado para armazenar associações
+entre posições de pontos e pares normal-área. Iteram-se por todas as faces do modelo e, para
+cada face, calcula-se a sua normal e a sua área. Depois, para cada ponto nessa face, adicionam-se
+aos valores armazenados de normal e de área $A \, \hat{n}$ e $A$ respetivamente. Após iterar por
+todas as faces, itera-se por todas as posições no dicionário, e define-se a normal de cada ponto
+como o quociente entre a normal armazenada e a área total. Logicamente, este vetor deve ser
+normalizado antes de adicionado ao modelo.
+
+\subsection{VBOs}
+
+Com a adição de coordenadas de textura e normais, foi necessário criar mais VBOs para as armazenar.
+Agora, cada modelo passa a ter um VAO associado a três VBOs, como mostra a figura abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{res/phase4/VAO.pdf}
+    \caption{Organização do VAO, dos VBOs, e do EBO de um modelo.}
+\end{figure}
+
+Pode observar-se que, ao contrário do que acontece nos ficheiros \texttt{.3d}, não pode haver
+vértices formados por posições, coordenadas de textura, e normais com diferentes índices. Para isso,
+seria necessário mais do que um \emph{buffer} de índices, e isso não é suportado pelo OpenGL. Logo,
+após carregar um modelo, é necessário converter o esquema de indexação de um ficheiro Wavefront OBJ
+para o de um \emph{index buffer}. Para o fazer, um algoritmo simples pode ser utilizado:
+
+\begin{itemize}
+    \item Cria-se um \emph{index buffer} e três outros \emph{buffers}, para armazenamento das
+        posições, das coordenadas de textura, e das normais, inicialmente vazios;
+
+    \item Armazena-se um dicionário que associa tuplos posição-c.textura-normal a índices (elementos
+        do \emph{index buffer});
+
+    \item Iteram-se por todos os vértices no modelo. Para cada vértice:
+        \begin{itemize}
+            \item Constrói-se o tuplo posição-c.textura-normal associado ao vértice, que se procura
+                no dicionário;
+            \item Caso seja encontrado, adiciona-se o índice encontrado ao \emph{index buffer}.
+            \item Caso contrário, coloca-se o tuplo no dicionário; adicionam-se a posição, a
+                coordenada de textura e a normal aos seus respetivos \emph{buffers}; e adiciona-se o
+                índice de um destes elementos ao \emph{index buffer}.
+        \end{itemize}
+\end{itemize}
 
 \subsection{Adição ao \emph{Schema} XML}
 
@@ -239,9 +364,151 @@ A criação dinâmica das instâncias de luz é realizada pela \texttt{LightFact
 atributo \texttt{type}. Cada instância herda da interface \texttt{Light}, e é posteriormente
 adicionada à lista de luzes da cena.
 
-\subsection{Texturas e Normais}
+\subsection{Texturas e Iluminação}
 
-{\color{red} TODO - Humberto}
+O principal objetivo desta fase do trabalho prático é a adição de texturas e iluminação ao projeto.
+Com a informação de coordenadas de textura e normais nos modelos, e informação sobre luzes,
+materiais, e caminhos para imagens nos ficheiros de cena, é agora possível que a \texttt{engine}
+desenhe os objetos de uma cena iluminados e com texturas.
+
+Para carregar as texturas para a memória, a biblioteca \texttt{stb\_image} \cite{stb-image} é
+utilizada. Como o referencial de coordenadas de textura em OpenGL tem a sua origem no canto inferior
+esquerdo, mas o referencial regularmente utilizado em imagens tem a sua origem no canto superior
+esquerdo, a função \texttt{stbi\_set\_flip\_vertically\_on\_load} é utilizada para inverter
+verticalmente todas as imagens lidas. Depois de carregar uma imagem, é possível criar uma textura,
+vinculá-la, definir os seus parâmetros de \emph{wrapping} e \emph{filtering}, enviar os dados da
+textura para a GPU, gerar \emph{mipmaps}, e libertar a memória ocupada pela imagem inicialmente
+carregada. Tal como é feito para o carregamento de modelos, caso uma cena referencie a mesma imagem
+mais do que uma vez, apenas uma textura será criada, assim poupando memória da GPU.
+
+Para desenhar os objetos da cena com texturas e iluminação, foi necessário criar novos
+\emph{shaders} para o efeito. Como alguns objetos na cena não são iluminados (eixos, linhas de
+animação, esferas encapsuladoras, \emph{etc.}), é necessário trocar de programa sempre que se deseja
+desenhar um destes objetos. Para minimizar o número de trocas de programa, uma operação com um custo
+elevado para o desempenho, todos os objetos não iluminados são desenhados em primeiro lugar, e só
+depois se renderizam os restantes.
+
+Ao contrário da \emph{fixed-function pipeline} do OpenGL, que implementa \emph{shading} de Gouraud,
+os \emph{shaders} desenvolvidos utilizam \emph{shading} de Phong, onde as equações da luz são
+computadas para cada fragmento, com base em normais interpoladas pelo \emph{shader} de vértices.
+Assim, as manchas especulares são representadas muito mais claramente do que seriam caso a
+\emph{fixed-function pipeline} tivesse sido utilizada. Ademais, devido ao uso de \emph{shaders}, é
+possível ter mais do que oito luzes numa cena, o número exigido pelo enunciado. Agora, o limite
+máximo de luzes é ditado pelo número máximo de variáveis uniformes num programa, que depende do
+\emph{hardware} utilizado.
+
+Antes de apresentar os \emph{shaders} desenvolvidos, é necessário apresentar alguma notação para as
+matrizes utilizadas:
+
+\begin{itemize}
+    \item $P$ - Matriz de projeção, que converte coordenadas do espaço da câmara para
+        \emph{clip-space};
+    \item $V$ - Matriz de vista, que converte coordenadas do espaço do mundo para o espaço da
+        câmara;
+    \item $M$ - Matriz do modelo, que converte coordenadas do espaço local (do modelo) para o espaço
+        do mundo;
+\end{itemize}
+
+Comece-se por perceber o funcionamento do \emph{shader} de vértices. Este, como o outro
+\emph{shader} previamente desenvolvido, também multiplica as coordenadas dos pontos do modelo a
+desenhar pela matriz $PVM$ (passada ao \emph{shader} numa variável uniforme), colocando-as em
+\emph{clip-space} antes de serem passadas ao \emph{shader} de fragmentos. No entanto, agora também é
+necessário tratamento das coordenadas de texturas e das normais. As coordenadas de textura são
+passadas ao \emph{shader} de fragmentos sem qualquer transformação (apenas interpolação). As
+normais, para continuarem perpendiculares às superfícies a que se referem, mesmo após a aplicação de
+escalas não uniformes, são multiplicadas pela matriz $(M^T)^{-1}$ \cite{learn-opengl-1}, também
+passada ao \emph{shader} numa variável uniforme. Isto converte-as para o espaço do mundo, onde os
+cálculos das equações da luz serão feitos
+\footnote{Apesar de, para o cálculo das equações da
+luz ser feito no espaço do mundo, ser necessária mais uma variável uniforme (a posição da câmara),
+achámos este método um pouco mais intuitivo e fácil de depurar do que fazer os mesmo cálculos no
+espaço da câmara.}.
+Em último lugar, é calculada e passada ao \emph{shader} de fragmentos (após uma interpolação) a
+posição do vértice no espaço do mundo, ou seja, a posição do vértice do modelo multiplicada pela
+matriz $M$, passada ao \emph{shader} de vértices numa variável uniforme.
+
+O \emph{shader} de fragmentos, antes de poder calcular a cor de qualquer ponto, deve, em primeiro
+lugar, renormalizar o vetor normal que recebe interpolado do \emph{shader} de fragmentos, visto que
+o seu comprimento pode diminuir durante a interpolação. Desta operação resulta o vetor que se
+denominará $\hat{n}$. Ademais, também é necessário calcular a direção do fragmento para a câmara,
+$\hat{e}$, dada pela diferença entre a posição da câmara e a posição do fragmento, seguida de uma
+normalização.
+
+Para cada luz, é necessário calcular o vetor normalizado que aponta para a luz, $\hat{l}$. Para as
+luzes direcionais, este valor é constante e passado ao \emph{shader} por uma variável uniforme. Para
+as \emph{point lights} e \emph{spotlights}, este vetor é a diferença entre a posição da luz e a
+posição do fragmento, seguido de uma normalização.
+
+De um modo geral, o contributo da $i$-ésima luz para a componente difusa da cor de um fragmento,
+$D_i$ é dado pela seguinte expressão \cite{learn-opengl-1}, onde $K_d$ representa a componente
+difusa do material aplicado ao objeto:
+
+$$
+D_i = K_d \times \max \left ( 0, \cos \left ( \angle (\hat{n}, \hat{l}) \right ) \right )
+$$
+
+Como os vetores $\hat{n}$ e $\hat{l}$ se encontram normalizados, e tendo em conta que
+$
+\vec{u} \, \cdot \, \vec{v} =
+\lVert \vec{u} \rVert \, \lVert \vec{v} \rVert \cos (\angle (\vec{u}, \vec{v}))
+$
+é possível simplificar a expressão acima do seguinte modo:
+
+$$
+D_i = K_d \times \max \left ( 0, \hat{n} \cdot \hat{l} \right )
+$$
+
+O contributo da $i$-ésima luz para a componente especular da cor do fragmento, $S_i$, é calculado
+de acordo com a seguinte expressão, onde $K_s$ e $s$ representam a componente especular e o fator
+\emph{shininess} do material aplicado ao objecto, respetivamente:
+
+$$
+S_i = K_s \times \left ( \max \left (0, \hat{e} \cdot \hat{r} \right ) \right ) ^ s
+$$
+
+Na expressão acima, $\hat{r}$ representa o raio da luz refletido, calculado pela função
+\texttt{reflect} do GLSL.
+
+Em relação à diferença entre os vários tipos de luz, já se explicou que é necessário calcular a
+direção da luz para as \emph{point lights} e \emph{spotlights}. Em relação a estas luzes, não se
+implementou qualquer forma de atenuação, visto que o formato XML da cena não permite a sua definição
+e, por omissão, em OpenGL as luzes não sofrem qualquer atenuação \cite{glLight}. Também pelo mesmo
+motivo, nas expressões apresentadas acima, a intensidade da luz não é considerada, visto que esta é
+a mesma para em todas as luzes, 1. No entanto, é necessário algum cuidado com as \emph{spotlights}.
+Para o contributo de uma destas luzes não ser nulo, é necessário que o fragmento esteja dentro do
+cone de luz, ou seja, que o ângulo entre o raio de luz e o simétrico do vetor de direção da
+\emph{spotlight} seja inferior ao \emph{cutoff} $\theta$ \cite{learn-opengl-2}:
+
+\begin{align*}
+    & \angle (\hat{l}, -\hat{d}) \le \theta \\
+    \Leftrightarrow & \cos \left ( \angle (\hat{l}, -\hat{d}) \right ) \le \cos \theta \\
+    \Leftrightarrow & \, \hat{l} \cdot (-\hat{d}) \le \cos \theta
+\end{align*}
+
+Na prática, o cosseno do ângulo de \emph{cutoff} de uma \emph{spotlight} é passado ao \emph{shader}
+numa variável uniforme, e o \emph{shader} faz a comparação acima para verificar se um fragmento é
+ou não iluminado por essa \emph{spotlight}.
+
+Estando calculadas as contribuições de todas as luzes, a cor de um fragmento pode ser determinada do
+seguinte modo, onde $K_a$ e $K_e$ representam a componentes ambiente e emissiva do material aplicado
+ao objeto, respetivamente \cite{learn-opengl-1} \cite{learn-opengl-3}:
+
+$$
+K = K_a + K_e + \sum_{i} D_i + \sum_{i} S_i
+$$
+
+Quando um objeto é desenhado com uma textura, a cor amostrada da textura é utilizada, nas
+expressões acima, como a componente difusa do material, e a componente ambiente é uma fração da cor
+da textura (por omissão, um quinto).
+
+Abaixo, segue-se um diagrama a explicar como estes \emph{shaders} desenvolvidos se encaixam na
+\emph{pipeline} de renderização:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{res/phase4/Shaders.pdf}
+    \caption{Esquema dos \emph{shaders} desenvolvidos na \emph{pipeline} de renderização.}
+\end{figure}
 
 \subsection{\emph{Object Picking}}
 
@@ -261,6 +528,24 @@ com a UI escondida (U), Humberto escreve}
 \renewcommand{\section}[2]{}
 
 \begin{thebibliography}{9}
+    \bibitem{wavefront-obj}
+        ``Wavefront OBJ File Format Summary.''{} FileFormat.Info. Accessed: May 14, 2025. [Online.]
+        Available: \url{https://www.fileformat.info/format/wavefrontobj/egff.htm}
+    \bibitem{stb-image}
+        ``stb.'' GitHub. Accessed: May 13, 2025. [Online.] Available:
+        \url{https://github.com/nothings/stb}
+    \bibitem{learn-opengl-1}
+        ``Basic Lighting.'' Learn OpenGL. Accessed: May 13, 2025. [Online.] Available:
+        \url{https://learnopengl.com/Lighting/Basic-Lighting}
+    \bibitem{glLight}
+        ``glLight''. Khronos Registry. Accessed: May 13, 2025. [Online.] Available:
+        \url{https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glLight.xml}
+    \bibitem{learn-opengl-2}
+        ``Light casters.'' Learn OpenGL. Accessed: May 13, 2025. [Online.] Available:
+        \url{https://learnopengl.com/Lighting/Light-casters}
+    \bibitem{learn-opengl-3}
+        ``Multiple Lights.'' Learn OpenGL. Accessed: May 13, 2025. [Online.] Available:
+        \url{https://learnopengl.com/Lighting/Multiple-lights}
 \end{thebibliography}
 \endgroup
 

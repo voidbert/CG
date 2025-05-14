@@ -15,7 +15,6 @@
 #include <cmath>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream> // TODO - remove
 #include <regex>
 #include <sstream>
 #include <stdexcept>
@@ -157,7 +156,6 @@ std::string ShadedShaderProgram::initializeFragmentShader(int _pointLights,
     ss << "#define NUM_POINT_LIGHTS " << _pointLights << std::endl;
     ss << "#define NUM_SPOTLIGHTS " << _spotlights << std::endl;
     ss << ShadedShaderProgram::fragmentShaderSource;
-    std::cout << ss.str();
     return ss.str();
 }
 
