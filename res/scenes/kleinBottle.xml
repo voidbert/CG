@@ -1,11 +1,16 @@
 <world>
     <window width="512" height="512" />
     <camera type="orbital">
-        <position x="-3" y="-2" z="4" />
+        <position x="-1.4" y="0.9" z="14.5" />
         <lookAt x="0" y="0" z="0" />
         <up x="0" y="1" z="0" />
         <projection fov="40" near="1" far="500" />
     </camera>
+
+    <lights>
+		<light type="directional" dirX="1" dirY="0.7" dirZ="0.5"/>
+	</lights>
+
     <group>
         <models>
             <model file="../models/kleinBottle.3d" />
