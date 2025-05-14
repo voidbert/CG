@@ -165,7 +165,8 @@ int Group::drawShadedParts(render::RenderPipelineManager &pipelineManager,
 int Group::drawForPicking(render::RenderPipelineManager &pipelineManager,
                           const camera::Camera &camera,
                           const glm::mat4 &worldTransform,
-                          int currentId) const {
+                          int currentId,
+                          std::unordered_map<int, std::string> *idToNameMap) const {
 
     const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
     const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
@@ -188,12 +189,14 @@ int Group::drawForPicking(render::RenderPipelineManager &pipelineManager,
             entity->drawSolidColor(pipelineManager, fullTransform, idColor, true);
         }
 
+        (*idToNameMap)[currentId] = entity->getName();
         currentId++;
     }
 
     for (const std::unique_ptr<Group> &group : this->groups) {
         // cppcheck-suppress useStlAlgorithm
-        currentId = group->drawForPicking(pipelineManager, camera, subTransform, currentId);
+        currentId =
+            group->drawForPicking(pipelineManager, camera, subTransform, currentId, idToNameMap);
     }
 
     return currentId;

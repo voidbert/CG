@@ -15,7 +15,7 @@
             </transform>
     
             <models>
-                <model file="../models/boxSingleTexture.3d" />
+                <model file="../models/boxSingleTexture.3d" name="Box1"/>
             </models>
         </group>
 
@@ -27,7 +27,7 @@
             </transform>
     
             <models>
-                <model file="../models/boxSingleTexture.3d" />
+                <model file="../models/boxSingleTexture.3d" name="Box2"/>
             </models>
         </group>
 
@@ -39,7 +39,7 @@
             </transform>
     
             <models>
-                <model file="../models/boxSingleTexture.3d" />
+                <model file="../models/boxSingleTexture.3d" name="Box3"/>
             </models>
         </group>
     </group>

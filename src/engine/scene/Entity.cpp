@@ -29,6 +29,9 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
         throw std::runtime_error("<rotate> missing file attribute in scene XML file");
     }
 
+    const char *nameAttr = modelElement->Attribute("name");
+    this->name = nameAttr ? std::string(nameAttr) : "UnnamedEntity";
+
     const std::string modelPath = std::filesystem::canonical(sceneDirectory / file);
     auto modelIt = loadedModels.find(modelPath);
     if (modelIt == loadedModels.end()) {
@@ -74,6 +77,10 @@ const render::BoundingSphere &Entity::getBoundingSphere() const {
 
 const render::NormalsPreview &Entity::getNormalsPreview() const {
     return this->model->getNormalsPreview();
+}
+
+const std::string &Entity::getName() const {
+    return this->name;
 }
 
 void Entity::drawSolidColor(render::RenderPipelineManager &pipelineManager,

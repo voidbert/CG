@@ -66,7 +66,8 @@ public:
     int drawForPicking(render::RenderPipelineManager &pipelineManager,
                        const camera::Camera &camera,
                        const glm::mat4 &worldTransform,
-                       int currentId) const;
+                       int currentId,
+                       std::unordered_map<int, std::string> *idToNameMap = nullptr) const;
 
 private:
     const render::BoundingSphere &getBoundingSphere() const;

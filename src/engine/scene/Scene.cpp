@@ -197,12 +197,14 @@ int Scene::draw(render::RenderPipelineManager &pipelineManager,
     return entityCount;
 }
 
-void Scene::drawForPicking(render::RenderPipelineManager &pipelineManager) const {
+void Scene::drawForPicking(render::RenderPipelineManager &pipelineManager,
+                           std::unordered_map<int, std::string> *idToNameMap) const {
     int currentId = this->camera->drawForPicking(pipelineManager, 1);
     const glm::mat4 identity(1.0f);
     for (const std::unique_ptr<Group> &group : this->groups) {
         // cppcheck-suppress useStlAlgorithm
-        currentId = group->drawForPicking(pipelineManager, *this->camera, identity, currentId);
+        currentId =
+            group->drawForPicking(pipelineManager, *this->camera, identity, currentId, idToNameMap);
     }
 }
 

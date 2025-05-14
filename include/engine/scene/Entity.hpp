@@ -36,6 +36,7 @@ private:
     render::BoundingSphere boundingSphere;
     std::shared_ptr<render::Texture> texture;
     Material material;
+    std::string name;
 
 public:
     Entity(const tinyxml2::XMLElement *modelElement,
@@ -48,6 +49,7 @@ public:
     void updateBoundingSphere(const glm::mat4 &worldTransform);
     const render::BoundingSphere &getBoundingSphere() const;
     const render::NormalsPreview &getNormalsPreview() const;
+    const std::string &getName() const;
 
     void drawSolidColor(render::RenderPipelineManager &pipelineManager,
                         const glm::mat4 &fullMatrix,

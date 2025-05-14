@@ -81,7 +81,8 @@ void SceneWindow::onMouseButtonEvent(int button, int action) {
         framebuffer.use();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        this->scene.drawForPicking(this->pipelineManager);
+        std::unordered_map<int, std::string> idToNameMap;
+        this->scene.drawForPicking(this->pipelineManager, &idToNameMap);
 
         // Sample pixel color and determine ID
         double x, y;
@@ -89,7 +90,8 @@ void SceneWindow::onMouseButtonEvent(int button, int action) {
         std::array<uint8_t, 3> pixelColor = framebuffer.sample(x, y);
         const int id = pixelColor[0] + (pixelColor[1] << 8) + (pixelColor[2] << 16);
 
-        std::cout << id << std::endl;
+        std::cout << id << (idToNameMap.count(id) ? " (Name: " + idToNameMap.at(id) + ")" : "")
+                  << std::endl;
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, this->getWidth(), this->getHeight());

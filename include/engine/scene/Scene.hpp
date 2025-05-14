@@ -59,7 +59,8 @@ public:
              bool showAnimationLines,
              bool showNormals) const;
 
-    void drawForPicking(render::RenderPipelineManager &pipelineManager) const;
+    void drawForPicking(render::RenderPipelineManager &pipelineManager,
+                        std::unordered_map<int, std::string> *idToNameMap) const;
 };
 
 }
