@@ -62,11 +62,12 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
         }
     }
 
+    // Generate side normals
     for (int jSlice = 0; jSlice < slices; ++jSlice) {
         const float angle = jSlice * sliceStep;
-        const float nx = cosf(angle + sliceStep / 2);
+        const float nx = cosf(angle);
         const float ny = radius / height;
-        const float nz = sinf(angle + sliceStep / 2);
+        const float nz = sinf(angle);
         this->normals.push_back(glm::normalize(glm::vec3(nx, ny, nz)));
     }
 
@@ -84,26 +85,27 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
             const int currentTop = currentBottom + slices + 1;
             const int nextTop = currentTop + 1;
 
-            const int faceNormal = (jSlice) % slices + 1;
+            const int currentFaceNormal = (jSlice) % slices + 1;
+            const int nextFaceNormal = (jSlice + 1) % slices + 1;
 
             this->faces.push_back(utils::TriangleFace(currentBottom,
                                                       currentBottom,
-                                                      faceNormal,
+                                                      currentFaceNormal,
                                                       currentTop,
                                                       currentTop,
-                                                      faceNormal,
+                                                      currentFaceNormal,
                                                       nextTop,
                                                       nextTop,
-                                                      faceNormal));
+                                                      nextFaceNormal));
             this->faces.push_back(utils::TriangleFace(currentBottom,
                                                       currentBottom,
-                                                      faceNormal,
+                                                      currentFaceNormal,
                                                       nextTop,
                                                       nextTop,
-                                                      faceNormal,
+                                                      nextFaceNormal,
                                                       nextBottom,
                                                       nextBottom,
-                                                      faceNormal));
+                                                      nextFaceNormal));
         }
     }
 }
