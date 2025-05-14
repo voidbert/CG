@@ -109,7 +109,11 @@
 
 \subsection{Outras Figuras}
 
-{\color{red} TODO - Humberto}
+Para as restantes figuras, devido à sua complexidade e ao pouco tempo disponível para a conclusão
+desta fase do trabalho prático, não foram adicionadas nem coordenadas de textura nem normais. No
+entanto, a \texttt{engine} ainda é capaz de importar estes modelos e de os desenhar com iluminação,
+graças a um algoritmo de geração automática de normais implementado e descrito posteriormente neste
+relatório.
 
 \subsection{Sistema Solar}
 
@@ -119,7 +123,64 @@
 
 \subsection{Geração Automática de Normais}
 
-{\color{red} TODO - Humberto}
+A \texttt{engine} é capaz de carregar modelos que não tenham informação sobre coordenadas de
+texturas ou normais. Caso não haja informação sobre as coordenadas de textura de um modelo, é
+possível desenhá-lo a uma cor sólida, mas é necessário que se tenha informação sobre as suas normais
+para o iluminar corretamente. Como esta nem sempre está presente, foi implementado um algoritmo para
+gerar normais de modelos automaticamente.
+
+Este algoritmo considera o modelo inteiro como um único \emph{smoothing group}, e calcula a normal
+de cada vértice como a média das normais dos triângulos a que este pertence, pesada pela área dos
+triângulos. Logo, é necessário, em primeiro lugar, uma forma de calcular a normal de um triângulo.
+Para um triângulo $[ABC]$, esta pode ser calculada do seguinte modo:
+
+$$
+\hat{n}_{[ABC]} = \frac{
+    \overrightarrow{AB} \times \overrightarrow{AC}
+}{
+    \lVert \overrightarrow{AB} \times \overrightarrow{AC} \rVert
+}
+$$
+
+Depois, a área de cada triângulo, $A$, pode ser calculada pela fórmula de Heron:
+
+$$
+S = \frac{
+    \lVert \overrightarrow{AB} \rVert +
+    \lVert \overrightarrow{AC} \rVert +
+    \lVert \overrightarrow{BC} \rVert
+}{
+    2
+}
+$$
+
+$$
+A = \sqrt{
+    S
+    \left ( S - \lVert \overrightarrow{AB} \rVert \right )
+    \left ( S - \lVert \overrightarrow{AC} \rVert \right )
+    \left ( S - \lVert \overrightarrow{BC} \rVert \right )
+}
+$$
+
+Logo, sendo $F$ o conjunto de faces triangulares nas quais um ponto está presente, o vetor normal
+desse ponto é dado por:
+
+$$
+\hat{n} = \frac{
+    \sum_{f \in F} {A_f \, \hat{n}_f}
+}{
+    \lVert \sum_{f \in F} {A_f \, \hat{n}_f} \rVert
+}
+$$
+
+Em termos de implementação deste algoritmo, um dicionário é utilizado para armazenar associações
+entre posições de pontos e pares normal-área. Iteram-se por todas as faces do modelo e, para
+cada face, calcula-se a sua normal e a sua área. Depois, para cada ponto nessa face, adicionam-se
+aos valores armazenados de normal e de área $A \, \hat{n}$ e $A$ respetivamente. Após iterar por
+todas as faces, itera-se por todas as posições no dicionário, e define-se a normal de cada ponto
+como o quociente entre a normal armazenada e a área total. Logicamente, este vetor deve ser
+normalizado antes de adicionado ao modelo.
 
 \subsection{Adição ao \emph{Schema} XML}
 
