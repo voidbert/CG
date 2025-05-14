@@ -145,6 +145,10 @@ normalizada. Este processo garante uma correta iluminação durante a renderiza�
 As coordenadas de textura são diretamente baseadas nos parâmetros u e v, que variam entre 0 e 1.
 Assim, cada ponto da superfície fica mapeado para uma posição correspondente numa imagem de textura.
 
+No entanto, durante o cálculo das derivadas parciais, valores como $u = 0$ ou $v = 0$ podem
+originar problemas numéricos nas fronteiras da superfície. De modo que, para esses casos, são
+utilizados valores ligeiramente acima de zero para garantir a estabilidade do cálculo das normais.
+
 \subsection{Outras Figuras}
 
 {\color{red} TODO - Humberto}
