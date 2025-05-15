@@ -1,0 +1,37 @@
+<world>
+    <window width="512" height="512" />
+    <camera type="orbital">
+        <position x="2" y="1" z="2" />
+        <lookAt x="0" y="0.5" z="0" />
+        <up x="0" y="1" z="0" />
+        <projection fov="60" near="1" far="10000" />
+    </camera>
+    <lights>
+        <light type="directional" dirX="1" dirY="1" dirZ="1" />
+    </lights>
+    <group>
+        <group>
+            <transform>
+                    <translate x="0" y="1" z="0" />
+                    <rotate angle="180" x="1" y="0" z="0" />
+                    <scale x="0.4" y="1" z="0.4" />
+            </transform>
+            <models>
+                <model file="../models/cone.3d">
+                    <texture file="../textures/ice_cream_cone.jpg" />
+                </model>
+            </models>
+        </group>
+        <group>
+            <transform>
+                    <translate x="0" y="1" z="0" />
+                    <scale x="0.45" y="0.45" z="0.45" />
+            </transform>
+            <models>
+                <model file="../models/sphere.3d">
+                    <texture file="../textures/ice_cream.jpg" />
+                </model>
+            </models>
+        </group>
+    </group>
+</world>
