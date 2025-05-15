@@ -50,7 +50,7 @@ public:
     void setNormalMatrix(const glm::mat4 &normalMatrix) const;
     void setCameraPosition(const glm::vec3 &position) const;
 
-    void setTexture(const Texture &texture) const;
+    void setTexture(const Texture &texture, const scene::Material &material) const;
     void setMaterial(const scene::Material &material) const;
     void setLights(const std::vector<std::unique_ptr<scene::light::Light>> &lights) const;
 
