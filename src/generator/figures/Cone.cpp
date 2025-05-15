@@ -30,44 +30,83 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
     const float stackStep = height / stacks;
     const float sliceStep = glm::two_pi<float>() / slices;
 
+    // Generate base
     this->positions.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    this->textureCoordinates.push_back(glm::vec2(0.5f, 0.5f));
+    this->normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
+    for (int jSlice = 0; jSlice <= slices; jSlice++) {
+        const float angle = jSlice * sliceStep;
+        const float x = radius * cosf(angle);
+        const float z = radius * sinf(angle);
+        this->positions.push_back(glm::vec4(x, 0.0f, z, 1.0f));
 
-    for (int iStack = 0; iStack < stacks; iStack++) {
+        const float s = 0.5 + 0.5 * cosf(angle);
+        const float t = 0.5 + 0.5 * sinf(angle);
+        this->textureCoordinates.push_back(glm::vec2(s, t));
+    }
+
+    // Generate stacks
+    for (int iStack = 0; iStack <= stacks; iStack++) {
         const float y = iStack * stackStep;
         const float stackRadius = ((height - y) * radius) / height;
+        const float v = static_cast<float>(iStack) / stacks;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
             const float angle = jSlice * sliceStep;
             const float x = stackRadius * cosf(angle);
             const float z = stackRadius * sinf(angle);
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
+
+            const float u = static_cast<float>(jSlice) / slices;
+            this->textureCoordinates.push_back(glm::vec2(u, v));
         }
     }
 
-    const int topVertexIndex = this->positions.size();
-    this->positions.push_back(glm::vec4(0.0f, height, 0.0f, 1.0f));
-
-    for (int jSlice = 0; jSlice < slices; jSlice++) {
-        this->faces.push_back(utils::TriangleFace(0, jSlice + 1, jSlice + 2));
+    // Generate side normals
+    for (int jSlice = 0; jSlice < slices; ++jSlice) {
+        const float angle = jSlice * sliceStep;
+        const float nx = cosf(angle);
+        const float ny = radius / height;
+        const float nz = sinf(angle);
+        this->normals.push_back(glm::normalize(glm::vec3(nx, ny, nz)));
     }
 
-    for (int iStack = 0; iStack < stacks - 1; iStack++) {
+    // Triangulate base
+    for (int jSlice = 0; jSlice < slices; jSlice++) {
+        this->faces.push_back(
+            utils::TriangleFace(0, 0, 0, jSlice + 1, jSlice + 1, 0, jSlice + 2, jSlice + 2, 0));
+    }
+
+    // Triangulate stacks
+    for (int iStack = 0; iStack < stacks; iStack++) {
         for (int jSlice = 0; jSlice < slices; jSlice++) {
-            const int currentBottom = iStack * (slices + 1) + jSlice + 1;
+            const int currentBottom = iStack * (slices + 1) + jSlice + slices + 2;
             const int nextBottom = currentBottom + 1;
             const int currentTop = currentBottom + slices + 1;
             const int nextTop = currentTop + 1;
 
-            this->faces.push_back(utils::TriangleFace(currentBottom, currentTop, nextTop));
-            this->faces.push_back(utils::TriangleFace(currentBottom, nextTop, nextBottom));
-        }
-    }
+            const int currentFaceNormal = (jSlice) % slices + 1;
+            const int nextFaceNormal = (jSlice + 1) % slices + 1;
 
-    const int topStackStart = topVertexIndex - slices - 1;
-    for (int jSlice = 0; jSlice < slices; jSlice++) {
-        const int current = topStackStart + jSlice;
-        const int next = current + 1;
-        this->faces.push_back(utils::TriangleFace(current, topVertexIndex, next));
+            this->faces.push_back(utils::TriangleFace(currentBottom,
+                                                      currentBottom,
+                                                      currentFaceNormal,
+                                                      currentTop,
+                                                      currentTop,
+                                                      currentFaceNormal,
+                                                      nextTop,
+                                                      nextTop,
+                                                      nextFaceNormal));
+            this->faces.push_back(utils::TriangleFace(currentBottom,
+                                                      currentBottom,
+                                                      currentFaceNormal,
+                                                      nextTop,
+                                                      nextTop,
+                                                      nextFaceNormal,
+                                                      nextBottom,
+                                                      nextBottom,
+                                                      nextFaceNormal));
+        }
     }
 }
 
