@@ -267,20 +267,20 @@ void WavefrontOBJ::generateNormals() {
         const glm::vec4 p1 = this->positions[face.positions[1]];
         const glm::vec4 p2 = this->positions[face.positions[2]];
 
-        const glm::vec3 v0 = glm::vec3(p0) - glm::vec3(p1);
-        const glm::vec3 v1 = glm::vec3(p0) - glm::vec3(p2);
-        const glm::vec3 v2 = glm::vec3(p1) - glm::vec3(p2);
+        const glm::vec3 v0 = glm::vec3(p1) - glm::vec3(p0);
+        const glm::vec3 v1 = glm::vec3(p2) - glm::vec3(p0);
+        const glm::vec3 v2 = glm::vec3(p2) - glm::vec3(p1);
 
         // Calculate area of triangle via Heron's formula
         const float sideLength0 = glm::length(v0);
         const float sideLength1 = glm::length(v1);
         const float sideLength2 = glm::length(v2);
         const float semiPerimeter = 0.5f * (sideLength0 + sideLength1 + sideLength2);
-        const float area = semiPerimeter * (semiPerimeter - sideLength0) *
-            (semiPerimeter - sideLength1) * (semiPerimeter - sideLength2);
+        const float area = sqrtf(semiPerimeter * (semiPerimeter - sideLength0) *
+                                 (semiPerimeter - sideLength1) * (semiPerimeter - sideLength2));
 
         // Calculate weighted average
-        const glm::vec3 normal = glm::cross(v0, v1) * area;
+        const glm::vec3 normal = glm::normalize(glm::cross(v0, v1)) * area;
 
         averageNormals[p0] += normal;
         averageWeights[p0] += area;

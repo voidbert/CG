@@ -15,7 +15,6 @@
 #include <cmath>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream> // TODO - remove
 #include <regex>
 #include <sstream>
 #include <stdexcept>
@@ -69,8 +68,9 @@ void ShadedShaderProgram::setCameraPosition(const glm::vec3 &position) const {
     glUniform3f(this->cameraPositionUniformLocation, position.x, position.y, position.z);
 }
 
-void ShadedShaderProgram::setTexture(const Texture &texture) const {
-    this->setMaterial(scene::Material());
+void ShadedShaderProgram::setTexture(const Texture &texture,
+                                     const scene::Material &material) const {
+    this->setMaterial(material);
     glUniform1i(this->texturedUniformLocation, true);
     texture.use();
 }
@@ -157,7 +157,6 @@ std::string ShadedShaderProgram::initializeFragmentShader(int _pointLights,
     ss << "#define NUM_POINT_LIGHTS " << _pointLights << std::endl;
     ss << "#define NUM_SPOTLIGHTS " << _spotlights << std::endl;
     ss << ShadedShaderProgram::fragmentShaderSource;
-    std::cout << ss.str();
     return ss.str();
 }
 
@@ -297,6 +296,7 @@ void main() {
                         spotColors.regularColor +
                         uniAmbient +
                         uniEmissive;
+
     vec3 specularColor =
         pointColors.specularColor + directionalColors.specularColor + spotColors.specularColor;
 
