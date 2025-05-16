@@ -74,7 +74,18 @@
 
 \begin{abstract}
     \noindent
-    {\color{red} TODO - Humberto}
+    Nesta fase do trabalho prático, continuou-se o desenvolvimento dos programas \texttt{engine} e
+    \texttt{generator}. Em particular, na \texttt{engine}, foram implementadas a leitura de texturas
+    e a iluminação da cena. É lógico que estas funcionalidades exigiram alterações à estrutura de
+    armazenamento de modelos em VBOs, ao formato XML da cena, e a criação de novos \emph{shaders},
+    para implementação dos modelos de iluminação e de \emph{shading} de Phong. Adicionalmente,
+    também foi implementado \emph{object picking} e geração automática de normais, para modelos que
+    não têm essa informação. Do lado do \texttt{generator}, foi necessário implementar a geração de
+    normais e coordenadas de textura para as figuras, bem como atualizar a geração do Sistema Solar,
+    para adicionar informação de texturas e iluminação. Em suma, apesar de se considerar que o
+    trabalho desenvolvido foi além do era pedido pelo enunciado, visto que foram utilizados
+    \emph{shaders}, haveria muitas possibilidades de melhorar o trabalho para hipotéticas fases
+    futuras (\emph{instanced rendering}, \emph{normal maps}, sombras, tesselação, \emph{etc.}).
 \end{abstract}
 
 \section{\emph{Generator}}
