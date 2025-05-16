@@ -29,6 +29,9 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
         throw std::runtime_error("<rotate> missing file attribute in scene XML file");
     }
 
+    const char *nameAttribute = modelElement->Attribute("name");
+    this->name = nameAttribute ? std::string(nameAttribute) : "";
+
     const std::string modelPath = std::filesystem::canonical(sceneDirectory / file);
     auto modelIt = loadedModels.find(modelPath);
     if (modelIt == loadedModels.end()) {
@@ -76,6 +79,18 @@ const render::NormalsPreview &Entity::getNormalsPreview() const {
     return this->model->getNormalsPreview();
 }
 
+const std::string &Entity::getName() const {
+    return this->name;
+}
+
+void Entity::drawSolidColor(render::RenderPipelineManager &pipelineManager,
+                            const glm::mat4 &fullMatrix,
+                            const glm::vec4 &color,
+                            bool fillPolygons) const {
+
+    this->model->drawSolidColor(pipelineManager, fullMatrix, color, fillPolygons);
+}
+
 void Entity::draw(render::RenderPipelineManager &pipelineManager,
                   const glm::mat4 &fullMatrix,
                   const glm::mat4 &worldMatrix,
@@ -90,7 +105,7 @@ void Entity::draw(render::RenderPipelineManager &pipelineManager,
                                 this->texture,
                                 this->material);
     } else {
-        this->model->drawSolidColor(pipelineManager, fullMatrix, glm::vec4(1.0f), fillPolygons);
+        this->drawSolidColor(pipelineManager, fullMatrix, glm::vec4(1.0f), false);
     }
 }
 

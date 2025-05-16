@@ -20,7 +20,7 @@
 
 namespace engine::window {
 
-UI::UI(Window &window, scene::camera::Camera &_camera, int _entityCount) :
+UI::UI(const Window &window, scene::camera::Camera &_camera, int _entityCount) :
     camera(_camera),
     fpsCounter(),
     entityCount(_entityCount),
@@ -50,7 +50,7 @@ bool UI::isCapturingKeyboard() const {
     return io.WantCaptureKeyboard || io.WantTextInput;
 }
 
-void UI::draw(int renderedEntities) {
+void UI::draw(int renderedEntities, const std::string &selectedEntity) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -63,6 +63,10 @@ void UI::draw(int renderedEntities) {
     const std::string entityText = std::to_string(renderedEntities) + " / " +
         std::to_string(this->entityCount) + " entities rendered";
     ImGui::Text(entityText.c_str());
+
+    if (selectedEntity != "") {
+        ImGui::Text("Selected entity: %s", selectedEntity.c_str());
+    }
 
     ImGui::Spacing();
     ImGui::Separator();

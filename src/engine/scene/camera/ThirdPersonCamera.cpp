@@ -61,7 +61,7 @@ void ThirdPersonCamera::drawSolidColorParts(render::RenderPipelineManager &pipel
 
     return this->player->drawSolidColorParts(pipelineManager,
                                              *this,
-                                             this->cameraMatrix * this->playerTransform,
+                                             this->playerTransform,
                                              showBoundingSpheres,
                                              showAnimationLines,
                                              showNormals);
@@ -72,8 +72,19 @@ int ThirdPersonCamera::drawShadedParts(render::RenderPipelineManager &pipelineMa
 
     return this->player->drawShadedParts(pipelineManager,
                                          *this,
-                                         this->cameraMatrix * this->playerTransform,
+                                         this->playerTransform,
                                          fillPolygons);
+}
+
+int ThirdPersonCamera::drawForPicking(render::RenderPipelineManager &pipelineManager,
+                                      std::unordered_map<int, std::string> &idToName,
+                                      int currentId) const {
+
+    return this->player->drawForPicking(pipelineManager,
+                                        *this,
+                                        this->playerTransform,
+                                        idToName,
+                                        currentId);
 }
 
 void ThirdPersonCamera::updateWithMotion() {

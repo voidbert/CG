@@ -12,6 +12,10 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 
+#include <array>
+#include <cstdint>
+
+#include "engine/render/Framebuffer.hpp"
 #include "engine/window/SceneWindow.hpp"
 
 namespace engine::window {
@@ -24,6 +28,7 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
                     scene.getSpotlightCount()),
     cameraController(scene.getCamera()),
     ui(*this, scene.getCamera(), scene.getEntityCount()),
+    selectedEntity(),
     showUI(true) {
 
     glEnable(GL_DEPTH_TEST);
@@ -49,7 +54,7 @@ void SceneWindow::onRender() {
                                                   this->ui.shouldShowNormals());
 
     if (this->showUI) {
-        this->ui.draw(renderedEntities);
+        this->ui.draw(renderedEntities, selectedEntity);
     }
 }
 
@@ -65,6 +70,27 @@ void SceneWindow::onKeyEvent(int key, int action) {
 
     if (key == GLFW_KEY_U && action == GLFW_PRESS) {
         this->showUI = !this->showUI;
+    }
+}
+
+void SceneWindow::onMouseButtonEvent(int button, int action) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        // Draw scene to framebuffer
+        render::Framebuffer framebuffer(this->getWidth(), this->getHeight());
+        framebuffer.use();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        std::unordered_map<int, std::string> idToName;
+        this->scene.drawForPicking(this->pipelineManager, idToName);
+        // Sample pixel color and determine ID
+        double x, y;
+        glfwGetCursorPos(this->getHandle(), &x, &y);
+        const std::array<uint8_t, 3> pixelColor = framebuffer.sample(x, y);
+        const int id = pixelColor[0] + (pixelColor[1] << 8) + (pixelColor[2] << 16);
+        this->selectedEntity = idToName[id];
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, this->getWidth(), this->getHeight());
     }
 }
 

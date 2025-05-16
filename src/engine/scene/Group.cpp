@@ -162,6 +162,45 @@ int Group::drawShadedParts(render::RenderPipelineManager &pipelineManager,
     return renderedEntities;
 }
 
+int Group::drawForPicking(render::RenderPipelineManager &pipelineManager,
+                          const camera::Camera &camera,
+                          const glm::mat4 &worldTransform,
+                          std::unordered_map<int, std::string> &idToName,
+                          int currentId) const {
+
+    const glm::mat4 &cameraMatrix = camera.getCameraMatrix();
+    const glm::mat4 subTransform = worldTransform * this->transform.getMatrix();
+    const glm::mat4 fullTransform = cameraMatrix * subTransform;
+
+    if (!camera.isInFrustum(this->boundingSphere)) {
+        return currentId + this->getEntityCount();
+    }
+
+    for (const std::unique_ptr<Entity> &entity : this->entities) {
+        const render::BoundingSphere entityBoundingSphere = entity->getBoundingSphere();
+
+        if (camera.isInFrustum(entityBoundingSphere)) {
+            const glm::vec4 idColor = glm::vec4 { (currentId & 0x000000FF) / 255.0f,
+                                                  ((currentId & 0x0000FF00) >> 8) / 255.0f,
+                                                  ((currentId & 0x00FF0000) >> 16) / 255.0f,
+                                                  1.0f };
+
+            entity->drawSolidColor(pipelineManager, fullTransform, idColor, true);
+        }
+
+        idToName[currentId] = entity->getName();
+        currentId++;
+    }
+
+    for (const std::unique_ptr<Group> &group : this->groups) {
+        // cppcheck-suppress useStlAlgorithm
+        currentId =
+            group->drawForPicking(pipelineManager, camera, subTransform, idToName, currentId);
+    }
+
+    return currentId;
+}
+
 const render::BoundingSphere &Group::getBoundingSphere() const {
     return this->boundingSphere;
 }

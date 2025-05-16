@@ -18,6 +18,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <unordered_map>
 
 #include "engine/render/BoundingSphere.hpp"
 #include "engine/render/RenderPipelineManager.hpp"
@@ -60,6 +61,9 @@ public:
                                      bool showNormals) const;
     virtual int drawShadedParts(render::RenderPipelineManager &pipelineManager,
                                 bool fillPolygons) const;
+    virtual int drawForPicking(render::RenderPipelineManager &pipelineManager,
+                               std::unordered_map<int, std::string> &idToName,
+                               int currentId) const;
 
     bool isInFrustum(const render::BoundingSphere &sphere) const;
 

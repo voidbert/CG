@@ -29,6 +29,7 @@ private:
     scene::camera::CameraController cameraController;
 
     UI ui;
+    std::string selectedEntity;
     bool showUI;
 
 public:
@@ -41,6 +42,7 @@ protected:
     void onRender() override;
     void onResize(int _width, int _height) override;
     void onKeyEvent(int key, int action) override;
+    void onMouseButtonEvent(int button, int action) override;
 };
 
 }

@@ -29,11 +29,11 @@ private:
         showNormals;
 
 public:
-    UI(Window &window, scene::camera::Camera &_camera, int _entityCount);
+    UI(const Window &window, scene::camera::Camera &_camera, int _entityCount);
     ~UI();
 
     bool isCapturingKeyboard() const;
-    void draw(int renderedEntities);
+    void draw(int renderedEntities, const std::string &selectedEntity);
 
     bool shouldFillPolygons() const;
     bool shouldCullBackFaces() const;

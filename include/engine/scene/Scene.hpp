@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "engine/render/Axis.hpp"
@@ -58,6 +59,9 @@ public:
              bool showBoundingSpheres,
              bool showAnimationLines,
              bool showNormals) const;
+
+    void drawForPicking(render::RenderPipelineManager &pipelineManager,
+                        std::unordered_map<int, std::string> &idToName) const;
 };
 
 }
