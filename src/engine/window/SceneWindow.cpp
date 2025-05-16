@@ -14,7 +14,6 @@
 
 #include <array>
 #include <cstdint>
-#include <iostream> // TODO - remove
 
 #include "engine/render/Framebuffer.hpp"
 #include "engine/window/SceneWindow.hpp"
@@ -28,9 +27,9 @@ SceneWindow::SceneWindow(const std::string &sceneFile) :
                     scene.getDirectionalLightCount(),
                     scene.getSpotlightCount()),
     cameraController(scene.getCamera()),
-    ui(*this, scene.getCamera(), scene.getEntityCount(), this->pickedId, this->pickedName),
-    showUI(true),
-    pickedId(0) {
+    ui(*this, scene.getCamera(), scene.getEntityCount()),
+    selectedEntity(),
+    showUI(true) {
 
     glEnable(GL_DEPTH_TEST);
     this->resize(scene.getWindowWidth(), scene.getWindowHeight());
@@ -55,7 +54,7 @@ void SceneWindow::onRender() {
                                                   this->ui.shouldShowNormals());
 
     if (this->showUI) {
-        this->ui.draw(renderedEntities);
+        this->ui.draw(renderedEntities, selectedEntity);
     }
 }
 
@@ -81,29 +80,18 @@ void SceneWindow::onMouseButtonEvent(int button, int action) {
         framebuffer.use();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        std::unordered_map<int, std::string> idToNameMap;
-        this->scene.drawForPicking(this->pipelineManager, &idToNameMap);
-
+        std::unordered_map<int, std::string> idToName;
+        this->scene.drawForPicking(this->pipelineManager, idToName);
         // Sample pixel color and determine ID
         double x, y;
         glfwGetCursorPos(this->getHandle(), &x, &y);
-        std::array<uint8_t, 3> pixelColor = framebuffer.sample(x, y);
+        const std::array<uint8_t, 3> pixelColor = framebuffer.sample(x, y);
         const int id = pixelColor[0] + (pixelColor[1] << 8) + (pixelColor[2] << 16);
-
-        // std::cout << id << (idToNameMap.count(id) ? " (Name: " + idToNameMap.at(id) + ")" : "")
-        //           << std::endl;
-
-        this->pickedId = id;
-        auto it = idToNameMap.find(id);
-        this->pickedName = (it != idToNameMap.end()) ? it->second : "";
+        this->selectedEntity = idToName[id];
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, this->getWidth(), this->getHeight());
     }
-}
-
-int SceneWindow::getPickedId() const {
-    return this->pickedId;
 }
 
 }

@@ -25,21 +25,15 @@ private:
     scene::camera::Camera &camera;
     FPSCounter fpsCounter;
     int entityCount;
-    const int &pickedId;
-    const std::string &pickedName;
     bool fillPolygons, backFaceCulling, showAxes, showBoundingSpheres, showAnimationLines,
         showNormals;
 
 public:
-    UI(const Window &window,
-       scene::camera::Camera &_camera,
-       int _entityCount,
-       const int &_pickedId,
-       const std::string &_pickedName);
+    UI(const Window &window, scene::camera::Camera &_camera, int _entityCount);
     ~UI();
 
     bool isCapturingKeyboard() const;
-    void draw(int renderedEntities);
+    void draw(int renderedEntities, const std::string &selectedEntity);
 
     bool shouldFillPolygons() const;
     bool shouldCullBackFaces() const;

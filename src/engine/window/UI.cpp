@@ -20,16 +20,10 @@
 
 namespace engine::window {
 
-UI::UI(const Window &window,
-       scene::camera::Camera &_camera,
-       int _entityCount,
-       const int &_pickedId,
-       const std::string &_pickedName) :
+UI::UI(const Window &window, scene::camera::Camera &_camera, int _entityCount) :
     camera(_camera),
     fpsCounter(),
     entityCount(_entityCount),
-    pickedId(_pickedId),
-    pickedName(_pickedName),
     fillPolygons(true),
     backFaceCulling(true),
     showAxes(true),
@@ -56,7 +50,7 @@ bool UI::isCapturingKeyboard() const {
     return io.WantCaptureKeyboard || io.WantTextInput;
 }
 
-void UI::draw(int renderedEntities) {
+void UI::draw(int renderedEntities, const std::string &selectedEntity) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -70,8 +64,9 @@ void UI::draw(int renderedEntities) {
         std::to_string(this->entityCount) + " entities rendered";
     ImGui::Text(entityText.c_str());
 
-    ImGui::Text("Selected ID: %d", this->pickedId);
-    ImGui::Text("Entity Name: %s", this->pickedName.c_str());
+    if (selectedEntity != "") {
+        ImGui::Text("Selected entity: %s", selectedEntity.c_str());
+    }
 
     ImGui::Spacing();
     ImGui::Separator();

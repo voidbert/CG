@@ -29,8 +29,8 @@ Entity::Entity(const tinyxml2::XMLElement *modelElement,
         throw std::runtime_error("<rotate> missing file attribute in scene XML file");
     }
 
-    const char *nameAttr = modelElement->Attribute("name");
-    this->name = nameAttr ? std::string(nameAttr) : "Unnamed";
+    const char *nameAttribute = modelElement->Attribute("name");
+    this->name = nameAttribute ? std::string(nameAttribute) : "";
 
     const std::string modelPath = std::filesystem::canonical(sceneDirectory / file);
     auto modelIt = loadedModels.find(modelPath);

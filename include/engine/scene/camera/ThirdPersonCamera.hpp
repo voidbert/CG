@@ -17,6 +17,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <memory>
+#include <unordered_map>
 
 #include "engine/scene/camera/OrbitalCamera.hpp"
 #include "engine/scene/Group.hpp"
@@ -50,6 +51,7 @@ public:
     virtual int drawShadedParts(render::RenderPipelineManager &pipelineManager,
                                 bool fillPolygons) const override;
     virtual int drawForPicking(render::RenderPipelineManager &pipelineManager,
+                               std::unordered_map<int, std::string> &idToName,
                                int currentId) const override;
 
 protected:

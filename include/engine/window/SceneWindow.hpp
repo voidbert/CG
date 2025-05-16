@@ -29,17 +29,13 @@ private:
     scene::camera::CameraController cameraController;
 
     UI ui;
+    std::string selectedEntity;
     bool showUI;
-
-    int pickedId;
-    std::string pickedName;
 
 public:
     explicit SceneWindow(const std::string &sceneFile);
     SceneWindow(const SceneWindow &window) = delete;
     SceneWindow(SceneWindow &&window) = delete;
-
-    int getPickedId() const;
 
 protected:
     void onUpdate(float time, float timeElapsed) override;

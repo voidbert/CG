@@ -96,8 +96,12 @@ int Camera::drawShadedParts(render::RenderPipelineManager &pipelineManager,
     return 0;
 }
 
-int Camera::drawForPicking(render::RenderPipelineManager &pipelineManager, int currentId) const {
+int Camera::drawForPicking(render::RenderPipelineManager &pipelineManager,
+                           std::unordered_map<int, std::string> &idToName,
+                           int currentId) const {
+
     static_cast<void>(pipelineManager);
+    static_cast<void>(idToName);
     static_cast<void>(currentId);
     return currentId;
 }

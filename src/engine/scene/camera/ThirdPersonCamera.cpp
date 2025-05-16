@@ -77,9 +77,14 @@ int ThirdPersonCamera::drawShadedParts(render::RenderPipelineManager &pipelineMa
 }
 
 int ThirdPersonCamera::drawForPicking(render::RenderPipelineManager &pipelineManager,
+                                      std::unordered_map<int, std::string> &idToName,
                                       int currentId) const {
 
-    return this->player->drawForPicking(pipelineManager, *this, this->playerTransform, currentId);
+    return this->player->drawForPicking(pipelineManager,
+                                        *this,
+                                        this->playerTransform,
+                                        idToName,
+                                        currentId);
 }
 
 void ThirdPersonCamera::updateWithMotion() {
