@@ -101,6 +101,8 @@ tinyxml2::XMLElement *SolarSystem::createBody(const std::string &name,
     model->SetAttribute("file", "sphere.3d");
 
     if (name != "") {
+        model->SetAttribute("name", name.c_str());
+
         tinyxml2::XMLElement *texture = model->InsertNewChildElement("texture");
         texture->SetAttribute("file", (name + ".jpg").c_str());
     }
