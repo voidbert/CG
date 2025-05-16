@@ -126,7 +126,32 @@ expressões regulares, foi trivial adicionar o suporte para coordenadas de textu
 
 \subsection{Cone}
 
-{\color{red} TODO - Ana}
+No cone, as normais são definidas conforme a sua geometria:
+
+\begin{itemize}
+    \item Na base do cone, as normais são verticais e viradas para baixo: $(0, -1, 0)$.
+    \item Na superfície lateral, as normais são vetores perpendiculares à superfície
+    inclinada (ou seja, à geratriz do cone) e são calculadas da seguinte forma:
+\[
+\vec{n} = \text{normalize}(\cos(\theta), \tfrac{r}{h}, \sin(\theta))
+\]
+onde \( \theta \) é o ângulo da fatia atual ao redor do eixo \( y \), \( r \) é o raio da
+base e \( h \) é a altura do cone.
+Esta fórmula resulta em vetores normais inclinados corretamente em relação à superfície
+lateral do cone.
+\end{itemize}
+
+As coordenadas de textura são atribuídas da seguinte forma:
+
+\begin{itemize}
+    \item As coordenadas da base são obtidas a partir da posição do vértice no plano XZ,
+    centralizadas em $(0{,}5,\ 0{,}5)$ e normalizadas para o intervalo $[0,\ 1]$,
+    permitindo o mapeamento de uma textura circular sobre a base do cone.
+    \item Na lateral, o valor de $u$ varia ao longo da circunferência de acordo com o ângulo
+    $\theta$ em torno do eixo $y$, sendo calculado como $u = \theta / 2\pi$. O valor de $v$
+    varia com a altura, indo de $v = 0$ na base até $v = 1$ no topo, de forma proporcional à
+    coordenada $y$ dos vértices, ou seja, $v = y/h$.
+\end{itemize}
 
 \subsection{Cilindro}
 
@@ -146,7 +171,16 @@ relatório.
 
 \subsection{Sistema Solar}
 
-{\color{red} TODO - Ana}
+Nesta fase, a cena do sistema solar evoluiu significativamente com a introdução de iluminação,
+texturas e materiais. Esses elementos contribuíram para uma representação mais fiel e
+envolvente do sistema solar, aumentando consideravelmente o realismo da cena e proporcionando
+uma experiência visual mais imersiva.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{res/phase4/SolarSystem.png}
+    \caption{Sistema Solar.}
+\end{figure}
 
 \section{\emph{Engine}}
 
