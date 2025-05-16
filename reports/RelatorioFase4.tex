@@ -436,7 +436,34 @@ com a UI escondida (U), Humberto escreve}
 
 \section{Conclusão}
 
-{\color{red} TODO - Humberto}
+Em suma, considera-se que a quarta fase do trabalho prático foi concluída com sucesso. Apesar desta
+fase ter sido a mais exigente, requirindo alterações a diversas partes da \texttt{engine} e do
+\texttt{generator}, o nosso grupo foi capaz de utilizar todo o conhecimento que tem vindo a adquirir
+ao longo do último semestre para implementar todas as funcionalidades pedidas, e ainda algumas
+adicionais! Também foi uma grande ajuda a reestruturação arquitetural do código feita na 3.ª fase,
+que tornou mais simples a adição de novas funcionalidades.
+
+As maiores dificuldades sentidas nesta fase deram-se no \texttt{generator}, no que toca à adição de
+coordenadas de texturas e normais, tendo sido difícil garantir que todas as figuras tinham um aspeto
+correto, e descobrir a origem dos erros que se iam encontrado: coordenadas de texturas erradas
+\emph{vs.} distorção natural inevitável, ou normais erradas \emph{vs.} implementação incorreta da
+iluminação.
+
+Em relação às funcionalidades previstas na 3.ª fase, \emph{object picking} foi implementado, mas não
+houve tempo para implementar \emph{instanced rendering}. No entanto, para as cenas desenvolvidas, a
+falta desta funcionalidade não se provou um problema, visto que o elemento do grupo com a placa
+gráfica menos capaz (Intel HD Graphics 630), conseguia correr à taxa de atualização do seu ecrã
+(60Hz) a cena mais complexa, o Sistema Solar, que pode exigir milhares de \emph{draw calls}.
+
+Conclui-se este trabalho com grande satisfação em relação ao resultado final, que se considera
+cumprir as funcionalidades pedidas pelo enunciado, bem como implementar muitas outras. No entanto,
+um possível ponto que poderia ser melhorado seria o subsistema de câmaras, que tem em
+falta aceleração e desaceleração suaves quando perante \emph{input} do utilizador. Apesar desta ser
+a última fase do trabalho prático, há muitas funcionalidades que poderiam ser implementadas caso
+houvesse tempo para tal em hipotéticas futuras fases, desde aspetos simples como uma \emph{skybox} e
+LODs, como outros mais complexas apenas possíveis por se ter arquiteturado o projeto para usar
+\emph{shaders}, como sombras, reflexões, \emph{normals maps}, tesselação, \emph{physically based
+rendering}, \emph{etc.}.
 
 \begingroup
 \section{Bibliografia}
