@@ -129,7 +129,13 @@ normais são perpendiculares à superfície.
 
 As coordenadas de textura (u, v) são atribuídas com base na posição angular de cada ponto. O valor
 de u varia entre 0 e 1 ao longo da longitude, e o valor de v varia entre 0 e 1 ao longo da latitude.
-Isto permite mapear uma imagem 2D na superfície da esfera de forma contínua, como um mapa-mundo.
+
+Nos polos, como existe apenas um vértice em cada um e é necessário ligá-lo a todas as \emph{slices}
+ao redor, o mesmo vértice recebe várias coordenadas de textura com valores diferentes de u.
+Isto permite ``cortar'' a textura em triângulos que convergem para os polos — como se estes fossem
+divididos em pequenas fatias triangulares.
+Desta forma, conseguimos aplicar uma imagem 2D na superfície da esfera de forma contínua, repartindo
+a textura entre os vários triângulos sem quebras visuais visíveis.
 
 \subsection{Cone}
 
