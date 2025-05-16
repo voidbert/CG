@@ -122,7 +122,20 @@ expressões regulares, foi trivial adicionar o suporte para coordenadas de textu
 
 \subsection{Esfera}
 
-{\color{red} TODO - Mariana}
+As normais da esfera são calculadas de forma muito simples: para cada vértice, a normal é o vetor
+que vai do centro da esfera até esse vértice, normalizado. Como a esfera está centrada na origem,
+isso equivale a normalizar o próprio vetor posição do vértice. Este método garante que todas as
+normais são perpendiculares à superfície.
+
+As coordenadas de textura (u, v) são atribuídas com base na posição angular de cada ponto. O valor
+de u varia entre 0 e 1 ao longo da longitude, e o valor de v varia entre 0 e 1 ao longo da latitude.
+
+Nos polos, como existe apenas um vértice em cada um e é necessário ligá-lo a todas as \emph{slices}
+ao redor, o mesmo vértice recebe várias coordenadas de textura com valores diferentes de u.
+Isto permite ``cortar'' a textura em triângulos que convergem para os polos — como se estes fossem
+divididos em pequenas fatias triangulares.
+Desta forma, conseguimos aplicar uma imagem 2D na superfície da esfera de forma contínua, repartindo
+a textura entre os vários triângulos sem quebras visuais visíveis.
 
 \subsection{Cone}
 
@@ -155,11 +168,46 @@ As coordenadas de textura são atribuídas da seguinte forma:
 
 \subsection{Cilindro}
 
-{\color{red} TODO - Mariana}
+No cilindro, as normais são definidas conforme a sua geometria:
+
+\begin{itemize}
+    \item Na base e no topo do cilidro, as normais são verticais: $(0, -1, 0)$ e $(0, 1, 0)$,
+    respetivamente.
+    \item Na superfície lateral, as normais são vetores radiais no plano $XZ$, ou seja, $(x, 0, z)$
+    normalizado e apontam para fora.
+\end{itemize}
+
+As coordenadas de textura são atribuídas de duas formas, dependendo do modo:
+
+\begin{itemize}
+    \item No modo simples, as coordenadas da base e do topo são calculadas a partir da posição do
+    vértice no plano $XZ$, centradas em $(0.5, 0.5)$. Na lateral, o valor de $u$ varia ao longo da
+    circunferência e $v$ varia com a altura.
+    \item No modo \texttt{multiTextured}, aplicam-se as mesmas regras, mas os valores são ajustados
+    para percorrer corretamente sobre uma imagem maior que pode conter várias secções, como base,
+    lateral e topo, numa única textura.
+\end{itemize}
 
 \subsection{\emph{Torus}}
 
 {\color{red} TODO - Sara}
+
+\subsection{Geração de modelos com base em \emph{patches} de Bézier}
+
+Ao gerar uma superfície de Bézier, é necessário calcular as normais e as coordenadas de textura para
+cada ponto da malha.
+
+De modo que, as normais são obtidas através do produto vetorial entre as derivadas
+parciais da superfície em relação a u e v. Estas derivadas representam os vetores tangentes à
+superfície em cada ponto. O produto vetorial desses vetores resulta na normal, que é posteriormente
+normalizada. Este processo garante uma correta iluminação durante a renderização do modelo.
+
+As coordenadas de textura são diretamente baseadas nos parâmetros u e v, que variam entre 0 e 1.
+Assim, cada ponto da superfície fica mapeado para uma posição correspondente numa imagem de textura.
+
+No entanto, durante o cálculo das derivadas parciais, valores como $u = 0$ ou $v = 0$ podem
+originar problemas numéricos nas fronteiras da superfície. De modo que, para esses casos, são
+utilizados valores ligeiramente acima de zero para garantir a estabilidade do cálculo das normais.
 
 \subsection{Outras Figuras}
 
@@ -282,7 +330,79 @@ para o de um \emph{index buffer}. Para o fazer, um algoritmo simples pode ser ut
 
 \subsection{Adição ao \emph{Schema} XML}
 
-{\color{red} TODO - Mariana}
+O \emph{schema} XML foi alargado para suportar materiais com múltiplas componentes de cor, texturas
+e fontes de luz diversas. Estas adições permitem um controlo mais detalhado sobre o aspeto visual
+dos modelos, a aplicação de texturas e a iluminação da cena.
+
+\subsubsection{Materiais}
+
+Pode ser associado a cada modelo um conjunto de propriedades de material que influenciam a forma
+como este interage com a luz. Estas propriedades são definidas no elemento \texttt{<color>}, onde é
+possível incluir as componentes \texttt{diffuse}, \texttt{ambient}, \texttt{specular} e
+\texttt{emissive}, bem como o valor de \texttt{shininess}. Caso o elemento \texttt{<color>} não
+esteja presente, são utilizados valores por omissão.
+
+\begin{lstlisting}[language=xml]
+<model file="sphere.3d">
+    <texture file="earth.jpg" />
+    <color>
+        <diffuse  R="200" G="200" B="200" />
+        <ambient  R="50"  G="50"  B="50"  />
+        <specular R="0"   G="0"   B="0"   />
+        <emissive R="0"   G="0"   B="0"   />
+        <shininess value="0" />
+    </color>
+</model>
+\end{lstlisting}
+
+Estas propriedades são processadas na classe \texttt{Material}, que interpreta os valores a partir
+do XML através de funções auxiliares definidas no módulo \texttt{XMLUtils}. O motor de renderização
+utiliza depois estes parâmetros para configurar o shader correspondente.
+
+\subsubsection{Texturas}
+
+Caso o elemento \texttt{<texture>} esteja presente, é carregado o ficheiro de textura especificado
+e aplicado ao modelo 3D. A ausência deste elemento implica que o modelo será renderizado apenas com
+base nas cores definidas no material.
+
+\begin{lstlisting}[language=xml]
+<model file="cylinder.3d">
+    <texture file="metal.jpg" />
+</model>
+\end{lstlisting}
+
+No carregamento da cena, o caminho da textura é resolvido com base no diretório do ficheiro XML, e
+a imagem é carregada para memória. O motor assegura que a mesma textura não é carregada múltiplas
+vezes, reutilizando instâncias já existentes. Esta otimização é feita através de um \texttt{map}
+que armazena texturas já processadas.
+
+\subsubsection{Iluminação}
+
+Foi também introduzido suporte para os diferentes tipos de luzes: pontuais, direcionais e
+\emph{spotlights}. Todas as fontes de luz devem ser declaradas dentro do elemento \texttt{<lights>}
+no ficheiro XML da cena. Cada elemento \texttt{<light>} possui um atributo \texttt{type} e
+argumentos adicionais consoante o tipo de luz especificado:
+
+\begin{itemize}
+    \item \texttt{point}: requer os atributos \texttt{posX}, \texttt{posY}, \texttt{posZ} (posição);
+    \item \texttt{directional}: solicita \texttt{dirX}, \texttt{dirY}, \texttt{dirZ} (direção);
+    \item \texttt{spotlight}: necessita da posição, da direção e o ângulo de corte
+    (\texttt{cutoff}).
+\end{itemize}
+
+\begin{lstlisting}[language=xml]
+<lights>
+    <light type="point"      posX="0" posY="10" posZ="0" />
+    <light type="directional" dirX="1" dirY="1" dirZ="1"/>
+    <light type="spotlight"  posX="0" posY="10" posZ="0"
+                             dirX="1" dirY="1" dirZ="1"
+                             cutoff="45" />
+</lights>
+\end{lstlisting}
+
+A criação dinâmica das instâncias de luz é realizada pela \texttt{LightFactory}, com base no
+atributo \texttt{type}. Cada instância herda da interface \texttt{Light}, e é posteriormente
+adicionada à lista de luzes da cena.
 
 \subsection{Texturas e Iluminação}
 
