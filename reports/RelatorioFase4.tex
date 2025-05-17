@@ -162,7 +162,7 @@ aplicada às faces do cubo como descreve a imagem abaixo:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.3\textwidth]{res/phase4/BoxOrientation.png}
+    \includegraphics[width=0.35\textwidth]{res/phase4/BoxOrientation.png}
     \caption{Identificação das faces de um cubo numa textura para o seu modo \emph{multi-textured}.}
 \end{figure}
 
@@ -192,7 +192,7 @@ como coordenada $s$ o valor de $s$ do ponto médio dos vértices da base, como m
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.3\textwidth]{res/phase4/SphereUV.png}
+    \includegraphics[width=0.35\textwidth]{res/phase4/SphereUV.png}
     \caption{Triângulos da esfera no espaço de textura.}
 \end{figure}
 
@@ -262,15 +262,10 @@ Tal como acontece na esfera, parte da textura será descartada junto aos polos.
 
 \subsection{Cilindro}
 
-No cilindro, as normais são definidas conforme a parte do modelo a ser gerada:
-
-\begin{itemize}
-    \item Nas bases inferior e superior do cilindro, as normais são $(0, -1, 0)$ e $(0, 1, 0)$,
-        respetivamente.
-
-    \item Na superfície lateral do cilindro, as normais são vetores radiais no plano $XZ$, ou seja,
-        $(x, 0, z)$ após uma normalização.
-\end{itemize}
+No cilindro, as normais são definidas conforme a parte do modelo a ser gerada. Nas bases inferior e
+superior do cilindro, as normais são $(0, -1, 0)$ e $(0, 1, 0)$, respetivamente. Na superfície
+lateral do cilindro, as normais são vetores radiais no plano $XZ$, ou seja, $(x, 0, z)$ após uma
+normalização.
 
 Para o cilindro, foram implementados dois modos de gerar coordenadas de textura. No modo simples, as
 coordenadas das bases são calculadas tal como no cone, formando uma circunferência de centro
@@ -382,12 +377,6 @@ texturas e materiais. Em primeiro lugar, a cada modelo, foi adicionada uma textu
 simular o Sol, uma \emph{point light} foi colocada na origem da cena. Para o modelo do Sol não ser
 representado pela sua cor ambiente, foi-lhe adicionado um material com uma componente emissiva
 branca.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{res/phase4/SolarSystem.png}
-    \caption{Cena do Sistema Solar apresentada pela \texttt{engine}.}
-\end{figure}
 
 \section{\emph{Engine}}
 
@@ -748,26 +737,62 @@ possível aceder a este dicionário para consultar o seu nome e apresentá-lo na
 
 \section{Resultados Obtidos}
 
-{\color{red} TODO - cada faz as suas prints, sem borda de janela, no tamanho especificado pela cena,
-com a UI escondida (U), Humberto escreve}
+Nesta secção, procuram-se apresentar algumas capturas de ecrã da \texttt{engine} das novas cenas
+criadas e das cenas fornecidas pela docência da UC.
+
+\subsection{Novas Cenas e Cenas Modificadas}
+
+Nesta fase, foram adicionas iluminação e texturas a algumas cenas previamente criadas, e novas cenas
+também foram desenvolvidas:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{res/phase4/Cone.png}
-    \caption{Cone.}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Plane.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/BoxSingleTexture.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/BoxMultiTexture.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Sphere.png}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{res/phase4/IceCream.png}
-    \caption{Gelado.}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Cone.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/CylinderSingleTexture.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/CylinderMultiTexture.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Torus.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/KleinBottle.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Teapot.png}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{res/phase4/IceCreamXYZ.png}
-    \caption{Gelado.}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/IceCream.png} \\
+    \includegraphics[width=0.8\textwidth]{res/phase4/results/SolarSystem.png}
+    \caption{Renderização das cenas da autoria do grupo de trabalho.}
 \end{figure}
+
+\subsection{Cenas Fornecidas pela Docência da UC}
+
+A docência da UC forneceu, juntamente com o enunciado do trabalho, algumas cenas a serem testadas no
+trabalho. A \texttt{engine} renderizou-as não exatamente como as capturas de ecrã fornecidas, visto
+que estas foram renderizadas com \emph{shading} de Gouraud, mas a \texttt{engine} desenvolvida
+implementa \emph{shading} de Phong:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Test1.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Test2.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Test3.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Test4.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Test5.png}
+    \includegraphics[width=0.4\textwidth]{res/phase4/results/Test6.png}
+    \caption{Renderização das cenas de teste fornecidas pela docência da UC.}
+\end{figure}
+
+A maior diferença entre os modelos de \emph{shading} pode ser observada na cena com a
+\emph{spotlight}, onde o corte entre a regiões iluminada e não iluminada é abrupto, em vez de suave.
+Note-se também que as manchas especulares no cone não têm a aparência correta, visto que o número de
+\emph{slices} é muito baixo, resultando numa má aproximação de um cone. Caso se desejasse gerar uma
+pirâmide, as normais deveriam ser perpendiculares às faces e não às arestas.
 
 \section{Conclusão}
 
