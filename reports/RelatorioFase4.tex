@@ -596,7 +596,7 @@ $$
 
 O contributo da $i$-ésima luz para a componente especular da cor do fragmento, $S_i$, é calculado
 de acordo com a seguinte expressão, onde $K_s$ e $s$ representam a componente especular e o fator
-\emph{shininess} do material aplicado ao objecto, respetivamente:
+\emph{shininess} do material aplicado ao objeto, respetivamente:
 
 $$
 S_i = K_s \times \left ( \max \left (0, \hat{e} \cdot \hat{r} \right ) \right ) ^ s
@@ -648,7 +648,32 @@ Abaixo, segue-se um diagrama a explicar como estes \emph{shaders} desenvolvidos 
 
 \subsection{\emph{Object Picking}}
 
-{\color{red} TODO - Sara}
+Para implementar \emph{object picking}, sempre que o utilizador clica na janela da \texttt{engine},
+é criado um \emph{framebuffer} com dois \emph{attachments}, um para cor e outro para profundidade.
+Depois, a cena é desenhada para este \emph{framebuffer}. A cada entidade na cena, é atribuído um
+identificador sequencial, que é utilizado para determinar a cor com que será desenhado no
+\emph{framebuffer}: os 24 bits menos significativos do identificador são mapeados para as
+componentes R, G, e B da cor da entidade, oito \emph{bits} de cada vez. Note-se que apenas são
+desenhadas as entidades da cena, e todas a uma cor sólida.
+
+Após a cena ser desenhada para o \emph{framebuffer}, lê-se, com a função \texttt{glReadPixels}, o
+\emph{pixel} do \emph{framebuffer} na posição do rato. Depois, transforma-se esta cor novamente num
+identificador, sendo assim possível identificar uma entidade com base num clique do utilizador.
+
+No entanto, um identificador não é algo muito útil para se apresentar ao utilizador. Logo, o formato
+XML da cena foi modificado para permitir a atribuição de nomes a entidades, como mostra o exemplo
+abaixo:
+
+\begin{lstlisting}
+
+<model name="Earth" file="sphere.3d">
+    ...
+</model>
+\end{lstlisting}
+
+Quando a cena é desenhada para \emph{object picking}, cria-se um dicionário que associa
+identificadores de entidades aos seus nomes. Logo, após se ter o identificador de um objeto, é
+possível aceder a este dicionário para consultar o seu nome e apresentá-lo na UI da \texttt{engine}.
 
 \section{Resultados Obtidos}
 
