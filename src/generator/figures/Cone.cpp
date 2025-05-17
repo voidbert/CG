@@ -49,7 +49,7 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
     for (int iStack = 0; iStack <= stacks; iStack++) {
         const float y = iStack * stackStep;
         const float stackRadius = ((height - y) * radius) / height;
-        const float v = static_cast<float>(iStack) / stacks;
+        const float t = static_cast<float>(iStack) / stacks;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
             const float angle = jSlice * sliceStep;
@@ -57,8 +57,8 @@ Cone::Cone(float radius, float height, int slices, int stacks) {
             const float z = stackRadius * sinf(angle);
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
 
-            const float u = static_cast<float>(jSlice) / slices;
-            this->textureCoordinates.push_back(glm::vec2(u, v));
+            const float s = static_cast<float>(jSlice) / slices;
+            this->textureCoordinates.push_back(glm::vec2(s, t));
         }
     }
 

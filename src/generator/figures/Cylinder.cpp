@@ -44,9 +44,9 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks, bool mult
         this->positions.push_back(glm::vec4(x, 0, z, 1.0f));
         this->normals.push_back(glm::vec3(0.0f, -1.0f, 0.0f));
 
-        float u = multiTextured ? (x / (2 * radius)) * 0.35f + 0.8125f : x / (2 * radius) + 0.5f;
-        float v = multiTextured ? (z / (2 * radius)) * 0.35f + 0.1875f : z / (2 * radius) + 0.5f;
-        this->textureCoordinates.push_back(glm::vec2(u, v));
+        float s = multiTextured ? (x / (2 * radius)) * 0.35f + 0.8125f : x / (2 * radius) + 0.5f;
+        float t = multiTextured ? (z / (2 * radius)) * 0.35f + 0.1875f : z / (2 * radius) + 0.5f;
+        this->textureCoordinates.push_back(glm::vec2(s, t));
     }
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {
@@ -65,7 +65,7 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks, bool mult
     for (int iStack = 0; iStack <= stacks; iStack++) {
         float y = iStack * stackStep;
 
-        float v = multiTextured ? 0.375f + (static_cast<float>(iStack) / stacks) * (1.0f - 0.375f) :
+        float t = multiTextured ? 0.375f + (static_cast<float>(iStack) / stacks) * (1.0f - 0.375f) :
                                   static_cast<float>(iStack) / stacks;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
@@ -73,11 +73,11 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks, bool mult
             float x = radius * cos(phi);
             float z = radius * sin(phi);
 
-            float u = 1.0f - static_cast<float>(jSlice) / slices;
+            float s = 1.0f - static_cast<float>(jSlice) / slices;
 
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
             this->normals.push_back(glm::normalize(glm::vec3(x, 0.0f, z)));
-            this->textureCoordinates.push_back(glm::vec2(u, v));
+            this->textureCoordinates.push_back(glm::vec2(s, t));
         }
     }
 
@@ -123,9 +123,9 @@ Cylinder::Cylinder(float radius, float height, int slices, int stacks, bool mult
         this->positions.push_back(glm::vec4(x, height, z, 1.0f));
         this->normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
 
-        float u = multiTextured ? (x / (2 * radius)) * 0.35f + 0.4375f : x / (2 * radius) + 0.5f;
-        float v = multiTextured ? (z / (2 * radius)) * 0.35f + 0.1875f : z / (2 * radius) + 0.5f;
-        this->textureCoordinates.push_back(glm::vec2(u, v));
+        float s = multiTextured ? (x / (2 * radius)) * 0.35f + 0.4375f : x / (2 * radius) + 0.5f;
+        float t = multiTextured ? (z / (2 * radius)) * 0.35f + 0.1875f : z / (2 * radius) + 0.5f;
+        this->textureCoordinates.push_back(glm::vec2(s, t));
     }
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {

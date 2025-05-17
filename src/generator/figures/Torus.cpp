@@ -44,9 +44,9 @@ Torus::Torus(float majorRadius, float minorRadius, int slices, int sides) {
             this->positions.push_back(glm::vec4(vertex, 1.0f));
             this->normals.push_back(normal);
 
-            const float u = static_cast<float>(iSlice) / slices;
-            const float v = static_cast<float>(jSide) / sides;
-            this->textureCoordinates.push_back(glm::vec2(u, v));
+            const float s = static_cast<float>(iSlice) / slices;
+            const float t = static_cast<float>(jSide) / sides;
+            this->textureCoordinates.push_back(glm::vec2(s, t));
         }
     }
 
