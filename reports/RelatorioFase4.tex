@@ -77,15 +77,15 @@
     Nesta fase do trabalho prático, continuou-se o desenvolvimento dos programas \texttt{engine} e
     \texttt{generator}. Em particular, na \texttt{engine}, foram implementadas a leitura de texturas
     e a iluminação da cena. É lógico que estas funcionalidades exigiram alterações à estrutura de
-    armazenamento de modelos em VBOs, ao formato XML da cena, e a criação de novos \emph{shaders},
-    para implementação dos modelos de iluminação e de \emph{shading} de Phong. Adicionalmente,
-    também foi implementado \emph{object picking} e geração automática de normais, para modelos que
-    não têm essa informação. Do lado do \texttt{generator}, foi necessário implementar a geração de
-    normais e coordenadas de textura para as figuras, bem como atualizar a geração do Sistema Solar,
-    para adicionar informação de texturas e iluminação. Em suma, apesar de se considerar que o
-    trabalho desenvolvido foi além do era pedido pelo enunciado, visto que foram utilizados
-    \emph{shaders}, haveria muitas possibilidades de melhorar o trabalho para hipotéticas fases
-    futuras (\emph{instanced rendering}, \emph{normal maps}, sombras, tesselação, \emph{etc.}).
+    armazenamento de modelos em VBOs, ao formato XML da cena, e também a criação de novos
+    \emph{shaders}, para implementação dos modelos de iluminação e de \emph{shading} de Phong.
+    Adicionalmente, também foi implementado \emph{object picking} e geração automática de normais,
+    para modelos que não têm essa informação. Do lado do \texttt{generator}, foi necessário
+    implementar a geração de normais e coordenadas de textura para as figuras, bem como atualizar a
+    geração do Sistema Solar, para adicionar informação de texturas e iluminação. Em suma, apesar de
+    se considerar que o trabalho desenvolvido foi além do que era pedido pelo enunciado, ainda
+    haveria muitas possibilidades de funcionalidades a implementar em hipotéticas fases futuras
+    (\emph{instanced rendering}, \emph{normal maps}, sombras, tesselação, \emph{etc.}).
 \end{abstract}
 
 \section{\emph{Generator}}
@@ -120,8 +120,9 @@ de uma posição, de uma textura, ou de um vetor normal, respetivamente. Quando 
         uma coordenada de textura, e outro para um vetor normal.
 \end{itemize}
 
-Como o \emph{parser} de ficheiros Wavefront OBJ foi reimplementado na fase anterior com base em
-expressões regulares, foi trivial adicionar o suporte para coordenadas de textura e vetores normais.
+Como o \emph{parser} de ficheiros Wavefront OBJ foi reimplementado na fase anterior para se basear
+em expressões regulares, foi trivial adicionar o suporte para coordenadas de textura e vetores
+normais.
 
 \subsection{Plano Horizontal}
 
@@ -135,90 +136,165 @@ expressões regulares, foi trivial adicionar o suporte para coordenadas de textu
 
 As normais da esfera são calculadas de forma muito simples: para cada vértice, a normal é o vetor
 que vai do centro da esfera até esse vértice, normalizado. Como a esfera está centrada na origem,
-isso equivale a normalizar o próprio vetor posição do vértice. Este método garante que todas as
-normais são perpendiculares à superfície.
+isso equivale a normalizar o próprio vetor posição do vértice.
 
-As coordenadas de textura (u, v) são atribuídas com base na posição angular de cada ponto. O valor
-de u varia entre 0 e 1 ao longo da longitude, e o valor de v varia entre 0 e 1 ao longo da latitude.
+Em todos os pontos da esfera que não os polos, para determinar as coordenadas de textura $(s, t)$, o
+valor de $s$ varia entre 0 e 1 ao longo da longitude, e o valor de $t$ varia entre 0 e 1 ao longo da
+latitude:
 
-Nos polos, como existe apenas um vértice em cada um e é necessário ligá-lo a todas as \emph{slices}
-ao redor, o mesmo vértice recebe várias coordenadas de textura com valores diferentes de u.
-Isto permite ``cortar'' a textura em triângulos que convergem para os polos — como se estes fossem
-divididos em pequenas fatias triangulares.
-Desta forma, conseguimos aplicar uma imagem 2D na superfície da esfera de forma contínua, repartindo
-a textura entre os vários triângulos sem quebras visuais visíveis.
+$$
+s_j = \frac{j}{N_\text{slices}}
+\hspace{1cm}
+t_i = \frac{i}{N_\text{stacks}}
+$$
+
+Nos polos da esfera, como são criados triângulos, e não quadrados, o método apresentado acima não é
+aplicável. Logo, o vértice do polo é replicado várias vezes, e criam-se triângulos cujo polo tem
+como coordenada $s$ o valor de $s$ do ponto médio dos vértices da base, como mostra a figura abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{res/phase4/SphereUV.png}
+    \caption{Triângulos da esfera no espaço de textura.}
+\end{figure}
+
+Matematicamente, $t$ assume o valor $1$ no polo norte e $0$ no polo sul, enquanto que $s$ é dado
+pela seguinte expressão:
+
+$$
+s_j = \frac{j + \frac{1}{2}}{N_\text{slices}}
+$$
+
+Com este método, parte da textura é descartada, mas torna-se possível aplicar uma imagem 2D na
+superfície da esfera de forma contínua, repartindo a textura entre os vários triângulos sem quebras
+visuais visíveis.
 
 \subsection{Cone}
 
-No cone, as normais são definidas conforme a sua geometria:
+No cone, as normais são definidas de forma diferente para diferentes vértices. Em primeiro lugar, na
+base do cone as normais são verticais e apontam para baixo: $(0, -1, 0)$, enquanto que na sua
+superfície lateral, as normais são vetores perpendiculares a cada aresta, sendo dadas pela seguinte
+expressão:
 
-\begin{itemize}
-    \item Na base do cone, as normais são verticais e viradas para baixo: $(0, -1, 0)$.
-    \item Na superfície lateral, as normais são vetores perpendiculares à superfície
-    inclinada (ou seja, à geratriz do cone) e são calculadas da seguinte forma:
-\[
-\vec{n} = \text{normalize}(\cos(\theta), \tfrac{r}{h}, \sin(\theta))
-\]
-onde \( \theta \) é o ângulo da fatia atual ao redor do eixo \( y \), \( r \) é o raio da
-base e \( h \) é a altura do cone.
-Esta fórmula resulta em vetores normais inclinados corretamente em relação à superfície
-lateral do cone.
-\end{itemize}
+$$
+\vec{n} =
+\begin{bmatrix}
+    \cos \theta \\
+    \frac{r}{h} \\
+    \sin \theta
+\end{bmatrix},
+$$
 
-As coordenadas de textura são atribuídas da seguinte forma:
+onde $\theta$ é o ângulo azimutal da aresta, $r$ o raio da base e $h$ a altura do cone. É lógico que
+o vetor acima deve ser normalizado antes de ser adicionado ao modelo. Analisando o vetor acima,
+facilmente se conclui que os termos $\cos \theta$ e $\sin \theta$ do vetor fazem com que a sua
+projeção horizontal aponte para fora da aresta a que se referem. Quanto à componente $y$ deste
+vetor, considerando o plano vertical que contém o eixo do cone e a aresta, $\frac{r}{h}$ é o declive
+de uma reta perpendicular à aresta, de declive $-\frac{h}{r}$.
 
-\begin{itemize}
-    \item As coordenadas da base são obtidas a partir da posição do vértice no plano XZ,
-    centralizadas em $(0{,}5,\ 0{,}5)$ e normalizadas para o intervalo $[0,\ 1]$,
-    permitindo o mapeamento de uma textura circular sobre a base do cone.
-    \item Na lateral, o valor de $u$ varia ao longo da circunferência de acordo com o ângulo
-    $\theta$ em torno do eixo $y$, sendo calculado como $u = \theta / 2\pi$. O valor de $v$
-    varia com a altura, indo de $v = 0$ na base até $v = 1$ no topo, de forma proporcional à
-    coordenada $y$ dos vértices, ou seja, $v = y/h$.
-\end{itemize}
+O processo explicado acima também é utilizado no vértice do cone, que é replicado várias vezes, uma
+vez para cada aresta.
+
+As coordenadas de textura são também atribuídas da forma diferente consoante a parte do cone a ser
+gerada. As coordenadas da base do cone são obtidas a partir da posição do vértice no plano XZ,
+ajustadas para ficarem centradas em $(\frac{1}{2}, \frac{1}{2})$ e normalizadas no o intervalo
+$[0, 1]$:
+
+$$
+s = \frac{1 + \cos \theta}{2}
+\hspace{1cm}
+t = \frac{1 + \sin \theta}{2}
+$$,
+
+onde $\theta$ é o ângulo azimutal. Na superfície lateral, o valor de $s$ varia ao longo da
+circunferência, e $t$ varia com a altura:
+
+$$
+s_j = \frac{j}{N_\text{slices}}
+\hspace{1cm}
+t_i = \frac{i}{N_\text{stacks}}
+$$
 
 \subsection{Cilindro}
 
-No cilindro, as normais são definidas conforme a sua geometria:
+No cilindro, as normais são definidas conforme a parte do modelo a ser gerada:
 
 \begin{itemize}
-    \item Na base e no topo do cilidro, as normais são verticais: $(0, -1, 0)$ e $(0, 1, 0)$,
-    respetivamente.
-    \item Na superfície lateral, as normais são vetores radiais no plano $XZ$, ou seja, $(x, 0, z)$
-    normalizado e apontam para fora.
+    \item Nas bases inferior e superior do cilindro, as normais são $(0, -1, 0)$ e $(0, 1, 0)$,
+        respetivamente.
+
+    \item Na superfície lateral do cilindro, as normais são vetores radiais no plano $XZ$, ou seja,
+        $(x, 0, z)$ após um normalização.
 \end{itemize}
 
-As coordenadas de textura são atribuídas de duas formas, dependendo do modo:
+Para o cilindro, foram implementados dois modos de gerar coordenadas de textura. No modo simples, as
+coordenadas das bases são calculadas tal como no cone, formando uma circunferência de centro
+$(0.5, 0.5)$. Na superfície lateral, o valor de $s$ varia ao longo da circunferência, e $t$ varia
+com a altura, também como no cone. Já no modo \emph{multi-textured}, aplicam-se as mesmas regras,
+mas os intervalos dos valores $s$ e $t$ são ajustados para percorrer apenas partes de uma imagem
+maior que contém várias secções, duas bases e a superfície lateral:
 
-\begin{itemize}
-    \item No modo simples, as coordenadas da base e do topo são calculadas a partir da posição do
-    vértice no plano $XZ$, centradas em $(0.5, 0.5)$. Na lateral, o valor de $u$ varia ao longo da
-    circunferência e $v$ varia com a altura.
-    \item No modo \texttt{multiTextured}, aplicam-se as mesmas regras, mas os valores são ajustados
-    para percorrer corretamente sobre uma imagem maior que pode conter várias secções, como base,
-    lateral e topo, numa única textura.
-\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{res/phase4/Barrel.jpg}
+    \caption{Textura para um cilindro \emph{multi-textured}.}
+\end{figure}
 
 \subsection{\emph{Torus}}
 
 {\color{red} TODO - Sara}
 
-\subsection{Geração de modelos com base em \emph{patches} de Bézier}
+\subsection{Geração de Modelos com Base em \emph{Patches} de Bézier}
 
-Ao gerar uma superfície de Bézier, é necessário calcular as normais e as coordenadas de textura para
-cada ponto da malha.
+Ao gerar uma superfície de Bézier, é necessário calcular as normais e as coordenadas de textura de
+cada ponto da malha. Para calcular a normal de um ponto, é necessário conhecer em primeiro lugar as
+derivadas parciais da curva em relação a $u$ e a $v$ nesse ponto:
 
-De modo que, as normais são obtidas através do produto vetorial entre as derivadas
-parciais da superfície em relação a u e v. Estas derivadas representam os vetores tangentes à
-superfície em cada ponto. O produto vetorial desses vetores resulta na normal, que é posteriormente
-normalizada. Este processo garante uma correta iluminação durante a renderização do modelo.
+$$
+\def\arraystretch{1}
+\frac{\partial p(u, v)}{\partial u} =
+\begin{bmatrix}
+    3 u^2 & 2 u & 1 & 0
+\end{bmatrix}
+M \, P_c \, M^T
+\begin{bmatrix}
+    v^3 \\ v^2 \\ v \\ 1
+\end{bmatrix},
+\hspace{1cm}
+u, v \in \left [ 0, 1 \right ]
+$$
 
-As coordenadas de textura são diretamente baseadas nos parâmetros u e v, que variam entre 0 e 1.
-Assim, cada ponto da superfície fica mapeado para uma posição correspondente numa imagem de textura.
+$$
+\def\arraystretch{1}
+\frac{\partial p(u, v)}{\partial v} =
+\begin{bmatrix}
+    u^3 & u^2 & u & 1
+\end{bmatrix}
+M \, P_c \, M^T
+\begin{bmatrix}
+    3 v^2 \\ 2 v \\ 1 \\ 0
+\end{bmatrix},
+\hspace{1cm}
+u, v \in \left [ 0, 1 \right ]
+$$
 
-No entanto, durante o cálculo das derivadas parciais, valores como $u = 0$ ou $v = 0$ podem
-originar problemas numéricos nas fronteiras da superfície. De modo que, para esses casos, são
-utilizados valores ligeiramente acima de zero para garantir a estabilidade do cálculo das normais.
+Para uma descrição mais detalhada das expressões acima, é recomendada a consulta do relatório da
+fase 3. As expressões acima são aplicadas uma vez para cada coordenada, $x$, $y$, e $z$, dando
+origem a dois vetores, que se denominarão $du$ e $dv$. Estes vetores são tangentes à superfície no
+ponto, pelo que o vetor normal pode ser dado por:
+
+$$
+\vec{n} = dv \times du
+$$
+
+Logicamente, este vetor deve ser normalizado antes de ser adicionado ao modelo. Durante o cálculo
+das derivadas parciais, valores como $du = \vec{0}$ ou $dv = \vec{0}$ podem surgir na fronteira da
+superfície e dar originar vetores normais inválidos. Para evitar estes casos, na fronteira da
+superfície são utilizados valores de $u$ e $v$ ligeiramente acima de zero para garantir a
+estabilidade do cálculo das normais.
+
+As coordenadas de textura $s$ e $t$ são diretamente baseadas nos parâmetros $u$ e $v$ de cada
+\emph{patch}, respetivamente, que variam entre 0 e 1.
 
 \subsection{Outras Figuras}
 
@@ -230,15 +306,16 @@ relatório.
 
 \subsection{Sistema Solar}
 
-Nesta fase, a cena do sistema solar evoluiu significativamente com a introdução de iluminação,
-texturas e materiais. Esses elementos contribuíram para uma representação mais fiel e
-envolvente do sistema solar, aumentando consideravelmente o realismo da cena e proporcionando
-uma experiência visual mais imersiva.
+Nesta fase, a cena do Sistema Solar evoluiu significativamente com a introdução de iluminação,
+texturas e materiais. Em primeiro lugar, a cada modelo, foi adicionada uma textura. Depois, para
+simular o Sol, uma \emph{point light} foi colocada na origem da cena. Para o modelo do Sol não ser
+representado pela sua cor ambiente, foi-lhe adicionado um material com uma componente emissiva
+branca.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{res/phase4/SolarSystem.png}
-    \caption{Sistema Solar.}
+    \caption{Cena do Sistema Solar apresentada pela \texttt{engine}.}
 \end{figure}
 
 \section{\emph{Engine}}
@@ -289,7 +366,24 @@ Logo, sendo $F$ o conjunto de faces triangulares nas quais um ponto está presen
 desse ponto é dado por:
 
 $$
-\hat{n} = \frac{
+\hat{n} =
+\frac{
+    \frac{
+        \sum_{f \in F} {A_f \, \hat{n}_f}
+    }{
+        \sum_{f \in F} {A_f}
+    }
+}{
+    \left \lVert
+    \frac{
+        \sum_{f \in F} {A_f \, \hat{n}_f}
+    }{
+        \sum_{f \in F} {A_f}
+    }
+    \right \rVert
+}
+=
+\frac{
     \sum_{f \in F} {A_f \, \hat{n}_f}
 }{
     \lVert \sum_{f \in F} {A_f \, \hat{n}_f} \rVert
@@ -297,12 +391,11 @@ $$
 $$
 
 Em termos de implementação deste algoritmo, um dicionário é utilizado para armazenar associações
-entre posições de pontos e pares normal-área. Iteram-se por todas as faces do modelo e, para
-cada face, calcula-se a sua normal e a sua área. Depois, para cada ponto nessa face, adicionam-se
-aos valores armazenados de normal e de área $A \, \hat{n}$ e $A$ respetivamente. Após iterar por
-todas as faces, itera-se por todas as posições no dicionário, e define-se a normal de cada ponto
-como o quociente entre a normal armazenada e a área total. Logicamente, este vetor deve ser
-normalizado antes de adicionado ao modelo.
+entre posições de pontos e normais pesadas. Iteram-se por todas as faces do modelo e, para cada
+face, calcula-se a sua normal e a sua área. Para cada ponto nessa face, adiciona-se ao valor
+armazenado de normal pesada $A \, \hat{n}$. Após iterar por todas as faces, itera-se por todas as
+posições no dicionário, e define-se a normal de cada ponto o como resultado da normalização do vetor
+normal pesado a si associado.
 
 \subsection{VBOs}
 
@@ -339,23 +432,24 @@ para o de um \emph{index buffer}. Para o fazer, um algoritmo simples pode ser ut
         \end{itemize}
 \end{itemize}
 
-\subsection{Adição ao \emph{Schema} XML}
+\subsection{Adições ao \emph{Schema} XML}
 
-O \emph{schema} XML foi alargado para suportar materiais com múltiplas componentes de cor, texturas
-e fontes de luz diversas. Estas adições permitem um controlo mais detalhado sobre o aspeto visual
-dos modelos, a aplicação de texturas e a iluminação da cena.
+Para suportar as funcionalidades obrigatórias desta fase do trabalho prático, o \emph{schema} XML
+foi alargado para suportar materiais com múltiplas componentes de cor, texturas, e fontes de luz
+diversas.
 
 \subsubsection{Materiais}
 
-Pode ser associado a cada modelo um conjunto de propriedades de material que influenciam a forma
+A cada modelo, pode ser associado um conjunto de propriedades de material, que influenciam a forma
 como este interage com a luz. Estas propriedades são definidas no elemento \texttt{<color>}, onde é
-possível incluir as componentes \texttt{diffuse}, \texttt{ambient}, \texttt{specular} e
-\texttt{emissive}, bem como o valor de \texttt{shininess}. Caso o elemento \texttt{<color>} não
-esteja presente, são utilizados valores por omissão.
+possível definir as componentes \texttt{diffuse} (componente difusa), \texttt{ambient} (componente
+ambiente), \texttt{specular} (componente especular) e \texttt{emissive} (componente emissiva), bem
+como o valor de \texttt{shininess}. Caso o elemento \texttt{<color>} não esteja presente, um
+conjunto pré-definido de valores são utilizados por omissão.
 
 \begin{lstlisting}[language=xml]
+
 <model file="sphere.3d">
-    <texture file="earth.jpg" />
     <color>
         <diffuse  R="200" G="200" B="200" />
         <ambient  R="50"  G="50"  B="50"  />
@@ -366,54 +460,45 @@ esteja presente, são utilizados valores por omissão.
 </model>
 \end{lstlisting}
 
-Estas propriedades são processadas na classe \texttt{Material}, que interpreta os valores a partir
-do XML através de funções auxiliares definidas no módulo \texttt{XMLUtils}. O motor de renderização
-utiliza depois estes parâmetros para configurar o shader correspondente.
-
 \subsubsection{Texturas}
 
-Caso o elemento \texttt{<texture>} esteja presente, é carregado o ficheiro de textura especificado
-e aplicado ao modelo 3D. A ausência deste elemento implica que o modelo será renderizado apenas com
-base nas cores definidas no material.
+O elemento \texttt{<texture>} é utilizado para definir o caminho para uma imagem a ser aplicada como
+textura de um modelo. A ausência deste elemento implica que o modelo será renderizado apenas com
+base nas cores definidas no seu material.
 
 \begin{lstlisting}[language=xml]
+
 <model file="cylinder.3d">
     <texture file="metal.jpg" />
 </model>
 \end{lstlisting}
 
-No carregamento da cena, o caminho da textura é resolvido com base no diretório do ficheiro XML, e
-a imagem é carregada para memória. O motor assegura que a mesma textura não é carregada múltiplas
-vezes, reutilizando instâncias já existentes. Esta otimização é feita através de um \texttt{map}
-que armazena texturas já processadas.
+No carregamento da cena, o caminho da textura é resolvido com base na diretoria do ficheiro XML.
 
 \subsubsection{Iluminação}
 
-Foi também introduzido suporte para os diferentes tipos de luzes: pontuais, direcionais e
-\emph{spotlights}. Todas as fontes de luz devem ser declaradas dentro do elemento \texttt{<lights>}
-no ficheiro XML da cena. Cada elemento \texttt{<light>} possui um atributo \texttt{type} e
-argumentos adicionais consoante o tipo de luz especificado:
+Nesta fase, foi adicionado suporte para três diferentes tipos de fonte de luz: \emph{point lights},
+luzes direcionais e \emph{spotlights}. Todas as fontes de luz devem ser declaradas dentro do
+elemento \texttt{<lights>}, filho do elemento \texttt{world}. Cada elemento \texttt{<light>} possui
+um atributo \texttt{type}, e argumentos adicionais consoante o tipo de luz especificado:
 
 \begin{itemize}
-    \item \texttt{point}: requer os atributos \texttt{posX}, \texttt{posY}, \texttt{posZ} (posição);
-    \item \texttt{directional}: solicita \texttt{dirX}, \texttt{dirY}, \texttt{dirZ} (direção);
-    \item \texttt{spotlight}: necessita da posição, da direção e o ângulo de corte
-    (\texttt{cutoff}).
+    \item \texttt{point}: \texttt{posX}, \texttt{posY}, \texttt{posZ} (posição);
+    \item \texttt{directional}: \texttt{dirX}, \texttt{dirY}, \texttt{dirZ} (direção);
+    \item \texttt{spotlight}: posição e direção (como as \emph{point} e \emph{directional lights}),
+        bem como e o ângulo de corte (\texttt{cutoff}).
 \end{itemize}
 
 \begin{lstlisting}[language=xml]
+
 <lights>
-    <light type="point"      posX="0" posY="10" posZ="0" />
+    <light type="point"       posX="0" posY="10" posZ="0" />
     <light type="directional" dirX="1" dirY="1" dirZ="1"/>
-    <light type="spotlight"  posX="0" posY="10" posZ="0"
-                             dirX="1" dirY="1" dirZ="1"
-                             cutoff="45" />
+    <light type="spotlight"   posX="0" posY="10" posZ="0"
+                              dirX="1" dirY="1" dirZ="1"
+                              cutoff="45" />
 </lights>
 \end{lstlisting}
-
-A criação dinâmica das instâncias de luz é realizada pela \texttt{LightFactory}, com base no
-atributo \texttt{type}. Cada instância herda da interface \texttt{Light}, e é posteriormente
-adicionada à lista de luzes da cena.
 
 \subsection{Texturas e Iluminação}
 
@@ -550,7 +635,7 @@ $$
 
 Quando um objeto é desenhado com uma textura, a cor amostrada da textura é utilizada, nas
 expressões acima, como a componente difusa do material, e a componente ambiente é uma fração da cor
-da textura (por omissão, um quinto).
+da textura (dependente do material).
 
 Abaixo, segue-se um diagrama a explicar como estes \emph{shaders} desenvolvidos se encaixam na
 \emph{pipeline} de renderização:
@@ -594,10 +679,10 @@ Em suma, considera-se que a quarta fase do trabalho prático foi concluída com 
 fase ter sido a mais exigente, requirindo alterações a diversas partes da \texttt{engine} e do
 \texttt{generator}, o nosso grupo foi capaz de utilizar todo o conhecimento que tem vindo a adquirir
 ao longo do último semestre para implementar todas as funcionalidades pedidas, e ainda algumas
-adicionais! Também foi uma grande ajuda a reestruturação arquitetural do código feita na 3.ª fase,
+adicionais! Foi também uma grande ajuda a reestruturação arquitetural do código feita na 3.ª fase,
 que tornou mais simples a adição de novas funcionalidades.
 
-As maiores dificuldades sentidas nesta fase deram-se no \texttt{generator}, no que toca à adição de
+As maiores dificuldades nesta fase sentiram-se no \texttt{generator}, no que toca à adição de
 coordenadas de texturas e normais, tendo sido difícil garantir que todas as figuras tinham um aspeto
 correto, e descobrir a origem dos erros que se iam encontrado: coordenadas de texturas erradas
 \emph{vs.} distorção natural inevitável, ou normais erradas \emph{vs.} implementação incorreta da
@@ -610,14 +695,14 @@ gráfica menos capaz (Intel HD Graphics 630), conseguia correr à taxa de atuali
 (60Hz) a cena mais complexa, o Sistema Solar, que pode exigir milhares de \emph{draw calls}.
 
 Conclui-se este trabalho com grande satisfação em relação ao resultado final, que se considera
-cumprir as funcionalidades pedidas pelo enunciado, bem como implementar muitas outras. No entanto,
-um possível ponto que poderia ser melhorado seria o subsistema de câmaras, que tem em
+cumprir os requisitos colocados pelo enunciado, bem como implementar muitas outras funcionalidades.
+No entanto, um possível ponto que poderia ser melhorado seria o subsistema de câmaras, que tem em
 falta aceleração e desaceleração suaves quando perante \emph{input} do utilizador. Apesar desta ser
 a última fase do trabalho prático, há muitas funcionalidades que poderiam ser implementadas caso
 houvesse tempo para tal em hipotéticas futuras fases, desde aspetos simples como uma \emph{skybox} e
-LODs, como outros mais complexas apenas possíveis por se ter arquiteturado o projeto para usar
+LODs, como outros mais complexos, apenas possíveis por se ter arquiteturado o projeto para usar
 \emph{shaders}, como sombras, reflexões, \emph{normals maps}, tesselação, \emph{physically based
-rendering}, \emph{etc.}.
+rendering}, \emph{etc.}
 
 \begingroup
 \section{Bibliografia}
