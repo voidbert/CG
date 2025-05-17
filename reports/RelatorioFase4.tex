@@ -126,11 +126,45 @@ normais.
 
 \subsection{Plano Horizontal}
 
-{\color{red} TODO - Humberto}
+A geração de normais do plano horizontal é trivial, todos os pontos partilham o mesmo vetor normal,
+$(0, 1, 0)$. Quanto às coordenadas de textura, $s$ aumenta entre $0$ e $1$ à medida que $z$ aumenta,
+e $t$ aumenta entre $0$ e $1$ à medida que $x$ aumenta. Na expressão abaixo, $N$ representa o número
+de divisões do plano, $i$ a variável de iteração que aumenta ao longo do eixo $x$, e $j$ a variável
+de iteração que aumenta ao longo do eixo $z$:
+
+$$
+s_j = \frac{j}{N}
+\hspace{1cm}
+t_i = \frac{i}{N}
+\hspace{1cm}
+i, j \in \lbrace 1, 2, \ldots, N \rbrace
+$$
 
 \subsection{Cubo}
 
-{\color{red} TODO - Humberto}
+Para a geração das normais do cubo, já durante a geração das posições do vértice do cubo foi
+necessário gerar as seis normais, uma para cada face (ver relatório da primeira fase). A normal de
+uma face é utilizada em todos os vértices dessa face.
+
+Em relação à geração de coordenadas de textura, foram implementados dois modos de geração. No modo
+simples, a totalidade da textura é utilizada nas seis faces do cubo: tal como no plano, em cada
+face, $s$ e $t$ variam entre $0$ e $1$. Já no modo \emph{multi-textured}, a cada face é aplicada uma
+parte diferente da textura:
+
+$$
+s \in \left [ s_0, s_0 + \frac{1}{4} \right ]
+\hspace{1cm}
+t \in \left [ t_0, t_0 + \frac{1}{3} \right ],
+$$
+
+tal que $s_0$ e $t_0$ assumem diferentes valores para diferentes faces, de modo que a textura é
+aplicada às faces do cubo como descreve a imagem abaixo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{res/phase4/BoxOrientation.png}
+    \caption{Identificação das faces de um cubo numa textura para o seu modo \emph{multi-textured}.}
+\end{figure}
 
 \subsection{Esfera}
 
@@ -146,6 +180,10 @@ $$
 s_j = \frac{j}{N_\text{slices}}
 \hspace{1cm}
 t_i = \frac{i}{N_\text{stacks}}
+\hspace{1cm}
+i \in \lbrace 1, 2, \ldots, N_\text{stacks} \rbrace
+\hspace{1cm}
+j \in \lbrace 1, 2, \ldots, N_\text{slices} \rbrace
 $$
 
 Nos polos da esfera, como são criados triângulos, e não quadrados, o método apresentado acima não é
@@ -188,7 +226,7 @@ $$
 onde $\theta$ é o ângulo azimutal da aresta, $r$ o raio da base e $h$ a altura do cone. É lógico que
 o vetor acima deve ser normalizado antes de ser adicionado ao modelo. Analisando o vetor acima,
 facilmente se conclui que os termos $\cos \theta$ e $\sin \theta$ do vetor fazem com que a sua
-projeção horizontal aponte para fora da aresta a que se referem. Quanto à componente $y$ deste
+projeção horizontal aponte para fora da aresta a que se refere. Quanto à componente $y$ deste
 vetor, considerando o plano vertical que contém o eixo do cone e a aresta, $\frac{r}{h}$ é o declive
 de uma reta perpendicular à aresta, de declive $-\frac{h}{r}$.
 
@@ -196,15 +234,16 @@ O processo explicado acima também é utilizado no vértice do cone, que é repl
 vez para cada aresta.
 
 As coordenadas de textura são também atribuídas da forma diferente consoante a parte do cone a ser
-gerada. As coordenadas da base do cone são obtidas a partir da posição do vértice no plano XZ,
-ajustadas para ficarem centradas em $(\frac{1}{2}, \frac{1}{2})$ e normalizadas no o intervalo
-$[0, 1]$:
+gerada. As coordenadas da base do cone foram uma circunferência de centro
+$(\frac{1}{2}, \frac{1}{2})$ tangente à fronteira da textura (raio $\frac{1}{2}$):
 
 $$
-s = \frac{1 + \cos \theta}{2}
+s_j = \frac{1 + \cos \theta_j}{2}
 \hspace{1cm}
-t = \frac{1 + \sin \theta}{2}
-$$,
+t_j = \frac{1 + \sin \theta_j}{2}
+\hspace{1cm}
+j \in \lbrace 1, 2, \ldots, N_\text{slices} \rbrace,
+$$
 
 onde $\theta$ é o ângulo azimutal. Na superfície lateral, o valor de $s$ varia ao longo da
 circunferência, e $t$ varia com a altura:
@@ -213,7 +252,13 @@ $$
 s_j = \frac{j}{N_\text{slices}}
 \hspace{1cm}
 t_i = \frac{i}{N_\text{stacks}}
+\hspace{1cm}
+i \in \lbrace 1, 2, \ldots, N_\text{stacks} \rbrace
+\hspace{1cm}
+j \in \lbrace 1, 2, \ldots, N_\text{slices} \rbrace
 $$
+
+Tal como acontece na esfera, parte da textura será descartada junto aos polos.
 
 \subsection{Cilindro}
 
@@ -224,7 +269,7 @@ No cilindro, as normais são definidas conforme a parte do modelo a ser gerada:
         respetivamente.
 
     \item Na superfície lateral do cilindro, as normais são vetores radiais no plano $XZ$, ou seja,
-        $(x, 0, z)$ após um normalização.
+        $(x, 0, z)$ após uma normalização.
 \end{itemize}
 
 Para o cilindro, foram implementados dois modos de gerar coordenadas de textura. No modo simples, as
@@ -242,7 +287,33 @@ maior que contém várias secções, duas bases e a superfície lateral:
 
 \subsection{\emph{Torus}}
 
-{\color{red} TODO - Sara}
+Previamente, para a geração dos pontos do \emph{torus}, já era necessário conhecer o vetor normal a
+cada ponto: este corresponde ao vetor do raio da secção radial nessa \emph{slice}, normalizado:
+
+$$
+\hat{n} = \begin{bmatrix}
+    \cos \theta \cos \phi \\
+    \sin \phi \\
+    \sin \theta \cos \phi
+\end{bmatrix},
+$$
+
+onde $\theta$ representa o ângulo em torno do eixo central, e $\phi$ o ângulo na circunferência que
+é a secção transversal do tubo.
+
+A geração de coordenadas de textura é muito simples: a coordenada $s$ aumenta à medida que se roda
+um ponto à volta do eixo central do \emph{torus}, e $t$ varia entre 0 e 1 em cada secção
+transversal do tubo:
+
+$$
+s_i = \frac{i}{N_\text{slices}}
+\hspace{1cm}
+t_j = \frac{j}{N_\text{sides}}
+\hspace{1cm}
+i \in \lbrace 1, 2, \ldots, N_\text{slices} \rbrace
+\hspace{1cm}
+j \in \lbrace 1, 2, \ldots, N_\text{stacks} \rbrace
+$$
 
 \subsection{Geração de Modelos com Base em \emph{Patches} de Bézier}
 
