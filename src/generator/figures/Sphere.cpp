@@ -35,9 +35,8 @@ Sphere::Sphere(float radius, int slices, int stacks) {
     this->positions.push_back(glm::vec4(0.0f, radius, 0.0f, 1.0f));
     this->normals.push_back(glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
     for (int jSlice = 0; jSlice < slices; jSlice++) {
-        const float u = jSlice * textureSliceStep + textureSliceStep / 2;
-
-        this->textureCoordinates.push_back(glm::vec2(u, 1.0f));
+        const float s = jSlice * textureSliceStep + textureSliceStep / 2;
+        this->textureCoordinates.push_back(glm::vec2(s, 1.0f));
     }
 
     // Generate center
@@ -45,17 +44,17 @@ Sphere::Sphere(float radius, int slices, int stacks) {
         const float theta = iStack * stackStep;
         const float y = radius * cosf(theta);
         const float xz = radius * sinf(theta);
-        const float v = 1.0f - static_cast<float>(iStack) / stacks;
+        const float t = 1.0f - static_cast<float>(iStack) / stacks;
 
         for (int jSlice = 0; jSlice <= slices; jSlice++) {
             const float phi = jSlice * sliceStep;
             const float x = xz * sinf(phi);
             const float z = xz * cosf(phi);
-            const float u = static_cast<float>(jSlice) / slices;
+            const float s = static_cast<float>(jSlice) / slices;
 
             this->positions.push_back(glm::vec4(x, y, z, 1.0f));
             this->normals.push_back(glm::normalize(glm::vec3(x, y, z)));
-            this->textureCoordinates.push_back(glm::vec2(u, v));
+            this->textureCoordinates.push_back(glm::vec2(s, t));
         }
     }
 
@@ -65,9 +64,8 @@ Sphere::Sphere(float radius, int slices, int stacks) {
     this->normals.push_back(glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)));
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {
-        const float u = jSlice * textureSliceStep + textureSliceStep / 2;
-
-        this->textureCoordinates.push_back(glm::vec2(u, 0.0f));
+        const float s = jSlice * textureSliceStep + textureSliceStep / 2;
+        this->textureCoordinates.push_back(glm::vec2(s, 0.0f));
     }
 
     for (int jSlice = 0; jSlice < slices; jSlice++) {

@@ -6,9 +6,20 @@
         <up x="0" y="0.06" z="0" />
         <projection fov="19" near="0.1" far="100" />
     </camera>
+    <lights>
+        <light type="directional" dirX="1" dirY="1" dirZ="1" />
+    </lights>
     <group>
         <models>
-            <model file="../models/homer.obj" />
+            <model file="../models/homer.obj">
+                <color>
+                    <diffuse R="212" G="175" B="55"/>
+                    <ambient R="77" G="63" B="20"/>
+                    <specular R="0" G="0" B="0"/>
+                    <emissive R="0" G="0" B="0"/>
+                    <shininess value="0"/>
+                </color>
+            </model>
         </models>
     </group>
 </world>

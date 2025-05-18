@@ -14,14 +14,6 @@
         />
     </lights>
     <group>
-        <transform>
-            <translate time="10">
-                <point x = "2" y = "0" z = "0" />
-                <point x = "0" y = "0" z = "2" />
-                <point x = "-2" y = "0" z = "0" />
-                <point x = "0" y = "0" z = "-2" />
-                </translate>
-        </transform>
         <models>
             <model file="../models/plane.3d">
                 <texture file="../textures/planeOrientation.jpg" />

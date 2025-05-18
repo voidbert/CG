@@ -259,7 +259,6 @@ std::tuple<std::vector<glm::vec4>,
 
 void WavefrontOBJ::generateNormals() {
     std::unordered_map<glm::vec4, glm::vec3> averageNormals;
-    std::unordered_map<glm::vec4, float> averageWeights;
 
     for (const TriangleFace &face : this->faces) {
         // Get points and sides of the triangle
@@ -281,20 +280,14 @@ void WavefrontOBJ::generateNormals() {
 
         // Calculate weighted average
         const glm::vec3 normal = glm::normalize(glm::cross(v0, v1)) * area;
-
         averageNormals[p0] += normal;
-        averageWeights[p0] += area;
         averageNormals[p1] += normal;
-        averageWeights[p1] += area;
         averageNormals[p2] += normal;
-        averageWeights[p2] += area;
     }
 
     for (const glm::vec4 &position : this->positions) {
         const glm::vec3 perpendicular = averageNormals[position];
-        const float weight = averageWeights[position];
-
-        this->normals.push_back(glm::normalize(perpendicular / weight));
+        this->normals.push_back(glm::normalize(perpendicular));
     }
 }
 

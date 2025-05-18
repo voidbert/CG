@@ -6,9 +6,20 @@
         <up x="0" y="1" z="0" />
         <projection fov="50" near="1" far="100" />
     </camera>
+    <lights>
+        <light type="directional" dirX="1" dirY="1" dirZ="1" />
+    </lights>
     <group>
         <models>
-            <model file="../models/dragon.obj" />
+            <model file="../models/dragon.obj">
+                <color>
+                    <diffuse R="212" G="175" B="55"/>
+                    <ambient R="77" G="63" B="20"/>
+                    <specular R="255" G="215" B="0"/>
+                    <emissive R="0" G="0" B="0"/>
+                    <shininess value="100"/>
+                </color>
+            </model>
         </models>
     </group>
 </world>
