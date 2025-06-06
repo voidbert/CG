@@ -3,6 +3,15 @@
 UMinho's Computer Graphics 2024/25 assignment. See [Assignment.pdf](Assignment.pdf) for more
 details.
 
+Grade: 20.0 / 20.0 :star:
+
+<img src="reports/res/phase4/results/SolarSystem.png" width="80%" />
+<p float="left">
+  <img src="reports/res/phase4/results/IceCream.png" width="40%" />
+  <img src="reports/res/phase4/results/Torus.png" width="40%" /> 
+</p>
+
+
 ## Authors
 
  - Ana Oliveira (A104437)
